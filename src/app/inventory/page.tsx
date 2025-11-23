@@ -268,12 +268,12 @@ export default function InventoryPage() {
         {/* Section 2: Box-by-Box Contents */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-6 print:break-after-page">
           <div className="flex justify-between items-center mb-4 print:mb-3">
-            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">2. Box-by-Box Contents</h2>
+            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">Box-by-Box Contents</h2>
             <button
               onClick={() => downloadCSV('box-contents.csv', generateBoxContentsCSV())}
-              className="print:hidden px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+              className="print:hidden px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
             >
-              📊 CSV
+              Download CSV
             </button>
           </div>
 
@@ -290,16 +290,47 @@ export default function InventoryPage() {
                 </tr>
               </thead>
               <tbody>
-                {boxContents.map((box, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 print:hover:bg-transparent">
-                    <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-2 print:py-1 print:text-xs">{box.box}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{box.date}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{box.item}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{box.unit}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-2 print:py-1 print:text-xs">{box.quantity}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{box.notes}</td>
-                  </tr>
-                ))}
+                {(() => {
+                  // Group items by box number
+                  const boxGroups = boxContents.reduce((acc, item) => {
+                    if (!acc[item.box]) acc[item.box] = [];
+                    acc[item.box].push(item);
+                    return acc;
+                  }, {} as Record<number, typeof boxContents>);
+
+                  const sortedBoxNumbers = Object.keys(boxGroups).map(Number).sort((a, b) => a - b);
+                  
+                  return sortedBoxNumbers.map((boxNum, boxIdx) => {
+                    const items = boxGroups[boxNum];
+                    const isEvenBox = boxIdx % 2 === 0;
+                    const bgColor = isEvenBox ? 'bg-gray-50' : 'bg-white';
+                    
+                    return items.map((item, itemIdx) => (
+                      <tr key={`${boxNum}-${itemIdx}`} className={`${bgColor} hover:opacity-80 print:hover:opacity-100`}>
+                        {itemIdx === 0 ? (
+                          <>
+                            <td 
+                              rowSpan={items.length}
+                              className="border border-gray-300 px-4 py-2 text-sm font-bold print:px-2 print:py-1 print:text-xs align-top"
+                            >
+                              {boxNum}
+                            </td>
+                            <td 
+                              rowSpan={items.length}
+                              className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs align-top"
+                            >
+                              {item.date}
+                            </td>
+                          </>
+                        ) : null}
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.item}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.unit}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-2 print:py-1 print:text-xs">{item.quantity}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.notes}</td>
+                      </tr>
+                    ));
+                  });
+                })()}
               </tbody>
             </table>
           </div>
