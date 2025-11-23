@@ -4,42 +4,61 @@ Follow these steps to configure the webhook in Airtable:
 
 ## Steps
 
-### 1. Open Airtable Automations
-1. Go to your Airtable base: https://airtable.com
-2. Click on "Automations" in the top menu
-3. Click "+ Create automation"
+### Option A: Simple Trigger (Recommended)
 
-### 2. Configure the Trigger
+1. **Open Airtable Automations**
+   - Go to your Airtable base
+   - Click "Automations" in the top menu
+   - Click "+ Create automation"
+
+2. **Choose Trigger**
+   - Select "When record is updated" (this catches most changes)
+   - Select your liturgist signups table
+   - Leave fields as "Any field"
+   - Click "Done"
+
+3. **Add Webhook Action**
+   - Click "+ Add action"
+   - Select "Send a request to a webhook"
+   - **Method**: `POST`
+   - **URL**: `https://liturgists-ukiahumc-org.vercel.app/api/webhook/airtable`
+   - Click "Done"
+
+4. **Activate**
+   - Name it "Liturgist Updates Webhook"
+   - Toggle "On"
+
+### Option B: Using Conditions (More Complex)
+
+If you want to use "When a record matches conditions" instead:
+### Option B: Using Conditions (More Complex)
+
+If you want to use "When a record matches conditions" instead:
+
 1. **Trigger type**: "When a record matches conditions"
-2. **Table**: Select your table that contains liturgist signups
+2. **Table**: Select your liturgist signups table
 3. **Conditions**: 
-   - Any of these conditions:
-     - Record created
-     - Record updated
-     - Record deleted
-4. **Test**: Click "Test trigger" to verify it works
+   - Pick a field that's always filled (like "Name" or "Service Date")
+   - Select "is not empty"
+   - This will trigger whenever ANY record has data in that field (which is always)
+   
+4. **Test**: Click "Test trigger"
 
-### 3. Configure the Action
+### 3. Configure the Action (Both Options)
+### 3. Configure the Action (Both Options)
 1. Click "+ Add action"
 2. Select "Send a request to a webhook"
 3. **Method**: `POST`
 4. **URL**: `https://liturgists-ukiahumc-org.vercel.app/api/webhook/airtable`
    - Replace with your actual domain if different
-5. **Headers** (optional):
-   ```json
-   {
-     "Content-Type": "application/json"
-   }
-   ```
-6. **Body** (optional - you can send data if needed):
+5. **Body** (optional - can leave empty):
    ```json
    {
      "table": "Signups",
-     "action": "updated",
      "timestamp": "{{CREATED_TIME}}"
    }
    ```
-7. **Test**: Click "Test action" to verify it works
+6. **Test**: Click "Test action" to verify it works
 
 ### 4. Name and Turn On
 1. Name your automation: "Real-time Updates Webhook"

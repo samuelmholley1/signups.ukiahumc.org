@@ -14,6 +14,7 @@ function getStockColorClass(quantity: number): string {
   const level = getStockLevel(quantity);
   if (level === 'critical') return 'bg-red-50 border-l-4 border-red-500';
   if (level === 'low') return 'bg-yellow-50 border-l-4 border-yellow-500';
+  if (quantity > 20) return 'bg-green-50 border-l-4 border-green-500';
   return '';
 }
 
@@ -163,7 +164,7 @@ export default function InventoryPage() {
     .sort((a, b) => a.quantity - b.quantity);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 print:bg-white">
       {/* Header - hidden when printing */}
       <div className="print:hidden bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -174,7 +175,7 @@ export default function InventoryPage() {
                 onClick={() => window.print()}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
-                📄 Print / Save as PDF
+                Print / Save as PDF
               </button>
               <button
                 onClick={() => {
@@ -184,7 +185,7 @@ export default function InventoryPage() {
                 }}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
               >
-                📊 Download All CSVs
+                Download All CSVs
               </button>
             </div>
           </div>
@@ -192,18 +193,18 @@ export default function InventoryPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 print:px-0 print:py-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 print:max-w-full print:px-4 print:py-2">
         {/* Print Header */}
-        <div className="hidden print:block text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Center for Hope Pantry Inventory</h1>
-          <p className="text-xl text-gray-700 mb-1">Food Left Over After 11/22/25 Distribution</p>
-          <p className="text-lg text-gray-600">Ukiah United Methodist Church – Center for Hope</p>
+        <div className="hidden print:block text-center mb-3">
+          <h1 className="text-xl font-bold text-gray-900 mb-1">Center for Hope Pantry Inventory</h1>
+          <p className="text-sm text-gray-700 mb-0.5">Food Left Over After 11/22/25 Distribution</p>
+          <p className="text-sm text-gray-600">Ukiah United Methodist Church – Center for Hope</p>
         </div>
 
         {/* Section 1: All Items with Box Locations */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-6 print:break-after-page">
-          <div className="flex justify-between items-center mb-4 print:mb-3">
-            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">Inventory (Sorted by Quantity: Low to High)</h2>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:break-after-page">
+          <div className="flex justify-between items-center mb-4 print:mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 print:text-base">Inventory (Sorted by Quantity: Low to High)</h2>
             <button
               onClick={() => downloadCSV('running-totals.csv', generateRunningTotalsCSV())}
               className="print:hidden px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
@@ -212,24 +213,14 @@ export default function InventoryPage() {
             </button>
           </div>
 
-          <div className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded print:text-xs">
-            <p className="text-sm text-gray-700">
-              <strong>Stock Level Guide:</strong> 
-              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-800 rounded">Low: 1-5</span>
-              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-800 rounded">Moderate: 6-10</span>
-              <span className="ml-2 px-2 py-1 bg-white text-gray-800 rounded border border-gray-300">Adequate: 11+</span>
-              <span className="ml-4 text-gray-600 italic">Items are sorted from lowest to highest quantity</span>
-            </p>
-          </div>
-
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Item</th>
-                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-2 print:py-1 print:text-xs">Quantity</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Box Location(s)</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Category</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Item</th>
+                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Qty</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Box Location(s)</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Category</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,24 +230,24 @@ export default function InventoryPage() {
                   const itemWithUnit = `${item.item} (${item.unit})`;
                   return (
                     <tr key={idx} className={`${stockColorClass} hover:bg-gray-50 print:hover:bg-transparent`}>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{itemWithUnit}</td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-base font-bold print:px-2 print:py-1 print:text-sm">
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{itemWithUnit}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center text-base font-bold print:px-1 print:py-0.5 print:text-[10px]">
                         {item.quantity}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">
                         {boxes.length > 0 ? (
                           <span className="inline-flex gap-1 flex-wrap">
                             {boxes.map(boxNum => (
-                              <span key={boxNum} className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs">
+                              <span key={boxNum} className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs print:px-1 print:py-0 print:text-[8px]">
                                 Box {boxNum}
                               </span>
                             ))}
                           </span>
                         ) : (
-                          <span className="text-gray-400 italic text-xs">See misc.</span>
+                          <span className="text-gray-400 italic text-xs print:text-[8px]">See misc.</span>
                         )}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.category}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{item.category}</td>
                     </tr>
                   );
                 })}
@@ -266,9 +257,9 @@ export default function InventoryPage() {
         </div>
 
         {/* Section 2: Box-by-Box Contents */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-6 print:break-after-page">
-          <div className="flex justify-between items-center mb-4 print:mb-3">
-            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">Box-by-Box Contents</h2>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:break-after-page">
+          <div className="flex justify-between items-center mb-4 print:mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 print:text-base">Box-by-Box Contents</h2>
             <button
               onClick={() => downloadCSV('box-contents.csv', generateBoxContentsCSV())}
               className="print:hidden px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
@@ -281,12 +272,12 @@ export default function InventoryPage() {
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Box #</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Date</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Item</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Unit</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Quantity</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Notes</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Box #</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Date</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Item</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Unit</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Qty</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -311,22 +302,22 @@ export default function InventoryPage() {
                           <>
                             <td 
                               rowSpan={items.length}
-                              className="border border-gray-300 px-4 py-2 text-sm font-bold print:px-2 print:py-1 print:text-xs align-top"
+                              className="border border-gray-300 px-4 py-2 text-sm font-bold print:px-1 print:py-0.5 print:text-[10px] align-top"
                             >
                               {boxNum}
                             </td>
                             <td 
                               rowSpan={items.length}
-                              className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs align-top"
+                              className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] align-top"
                             >
                               {item.date}
                             </td>
                           </>
                         ) : null}
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.item}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.unit}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-2 print:py-1 print:text-xs">{item.quantity}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.notes}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{item.item}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px]">{item.unit}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-1 print:py-0.5 print:text-[10px]">{item.quantity}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px]">{item.notes}</td>
                       </tr>
                     ));
                   });
@@ -337,9 +328,9 @@ export default function InventoryPage() {
         </div>
 
         {/* Section 3: Miscellaneous & Perishables */}
-        <div className="bg-white rounded-lg shadow-md p-6 print:shadow-none">
-          <div className="flex justify-between items-center mb-4 print:mb-3">
-            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">3. Miscellaneous & Perishables</h2>
+        <div className="bg-white rounded-lg shadow-md p-6 print:shadow-none print:p-2">
+          <div className="flex justify-between items-center mb-4 print:mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 print:text-base">Miscellaneous & Perishables</h2>
             <button
               onClick={() => downloadCSV('miscellaneous.csv', generateMiscellaneousCSV())}
               className="print:hidden px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
@@ -348,21 +339,21 @@ export default function InventoryPage() {
             </button>
           </div>
 
-          <div className="mb-6 print:mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 print:text-base">Perishable Produce</h3>
-            <p className="text-sm text-gray-600 italic mb-3 print:text-xs">(May be used by Center for Hope during the week)</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
+          <div className="mb-4 print:mb-2">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Perishable Produce</h3>
+            <p className="text-sm text-gray-600 italic mb-2 print:text-[9px] print:mb-1">(May be used by Center for Hope during the week)</p>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
               {miscellaneous.perishables.map((item, idx) => (
-                <li key={idx} className="text-sm print:text-xs">{item}</li>
+                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 print:text-base">Other Miscellaneous Items</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Other Miscellaneous Items</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
               {miscellaneous.other.map((item, idx) => (
-                <li key={idx} className="text-sm print:text-xs">{item}</li>
+                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
               ))}
             </ul>
           </div>
