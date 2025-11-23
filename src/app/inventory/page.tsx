@@ -186,6 +186,13 @@ export default function InventoryPage() {
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+        
+        * {
+          font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-weight: 600;
+        }
+        
         @media print {
           * {
             -webkit-print-color-adjust: exact !important;
