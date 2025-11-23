@@ -35,16 +35,16 @@ const runningTotals = {
     { item: 'Raisins', unit: 'bags', quantity: 20, notes: '' },
   ],
   'Shelf-Stable / Canned Items': [
-    { item: 'Applesauce (cups)', unit: 'cups', quantity: 19, notes: '' },
-    { item: 'Applesauce (canned)', unit: 'cans', quantity: 5, notes: '' },
-    { item: 'Fruit mix (canned)', unit: 'cans', quantity: 4, notes: '' },
-    { item: 'Carrots (canned)', unit: 'cans', quantity: 1, notes: '' },
+    { item: 'Applesauce cups', unit: 'cups', quantity: 19, notes: '' },
+    { item: 'Applesauce', unit: 'cans', quantity: 5, notes: '' },
+    { item: 'Fruit mix', unit: 'cans', quantity: 4, notes: '' },
+    { item: 'Carrots', unit: 'cans', quantity: 1, notes: '' },
     { item: 'Cream of chicken soup', unit: 'cans', quantity: 2, notes: '' },
-    { item: 'Salmon (canned)', unit: 'cans', quantity: 2, notes: '' },
+    { item: 'Salmon', unit: 'cans', quantity: 2, notes: '' },
   ],
   'Baby Food & Pasta': [
     { item: 'Baby food mini jars', unit: 'jars', quantity: 7, notes: '' },
-    { item: 'Rotini (dry pasta)', unit: 'boxes', quantity: 1, notes: '' },
+    { item: 'Rotini dry pasta', unit: 'boxes', quantity: 1, notes: '' },
   ],
   'Other Pantry / Non-Food': [
     { item: 'Chex cereal', unit: 'boxes', quantity: 1, notes: '' },
@@ -67,11 +67,11 @@ const boxContents = [
   { box: 10, date: '11/22/25', item: 'Split peas', unit: 'bags', quantity: 10, notes: '' },
   { box: 10, date: '11/22/25', item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 6, notes: '' },
   { box: 11, date: '11/22/25', item: 'Applesauce cups', unit: 'cups', quantity: 19, notes: '' },
-  { box: 11, date: '11/22/25', item: 'Applesauce (canned)', unit: 'cans', quantity: 5, notes: '' },
-  { box: 11, date: '11/22/25', item: 'Fruit mix (canned)', unit: 'cans', quantity: 4, notes: '' },
-  { box: 11, date: '11/22/25', item: 'Carrots (canned)', unit: 'cans', quantity: 1, notes: '' },
+  { box: 11, date: '11/22/25', item: 'Applesauce', unit: 'cans', quantity: 5, notes: '' },
+  { box: 11, date: '11/22/25', item: 'Fruit mix', unit: 'cans', quantity: 4, notes: '' },
+  { box: 11, date: '11/22/25', item: 'Carrots', unit: 'cans', quantity: 1, notes: '' },
   { box: 11, date: '11/22/25', item: 'Baby food mini jars', unit: 'jars', quantity: 7, notes: '' },
-  { box: 11, date: '11/22/25', item: 'Rotini (dry pasta)', unit: 'boxes', quantity: 1, notes: '' },
+  { box: 11, date: '11/22/25', item: 'Rotini dry pasta', unit: 'boxes', quantity: 1, notes: '' },
   { box: 12, date: '11/22/25', item: 'Canned pinto beans', unit: 'cans', quantity: 14, notes: '' },
   { box: 12, date: '11/22/25', item: 'Chex cereal', unit: 'boxes', quantity: 1, notes: '' },
   { box: 12, date: '11/22/25', item: 'Overdose rescue kit', unit: 'kits', quantity: 1, notes: '' },
@@ -81,7 +81,7 @@ const boxContents = [
   { box: 13, date: '11/22/25', item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 3, notes: '' },
   { box: 14, date: '11/22/25', item: 'Canned pinto beans', unit: 'cans', quantity: 7, notes: '' },
   { box: 14, date: '11/22/25', item: 'Cream of chicken soup', unit: 'cans', quantity: 2, notes: '' },
-  { box: 14, date: '11/22/25', item: 'Salmon (canned)', unit: 'cans', quantity: 2, notes: '' },
+  { box: 14, date: '11/22/25', item: 'Salmon', unit: 'cans', quantity: 2, notes: '' },
   { box: 14, date: '11/22/25', item: 'Toothpaste', unit: 'tubes', quantity: 4, notes: '' },
   { box: 14, date: '11/22/25', item: 'Almonds', unit: 'bags', quantity: 1, notes: '' },
   { box: 14, date: '11/22/25', item: 'Walnuts', unit: 'bags', quantity: 1, notes: '' },
@@ -150,11 +150,23 @@ export default function InventoryPage() {
   
   // Get box locations for items
   const getBoxLocations = (itemName: string): number[] => {
-    const normalized = itemName.toLowerCase().replace(/\s+/g, ' ').trim();
+    // Remove parentheses and normalize for better matching
+    const normalized = itemName.toLowerCase()
+      .replace(/\(.*?\)/g, '') // Remove anything in parentheses
+      .replace(/\s+/g, ' ')
+      .trim();
+    
     const boxes = boxContents
       .filter(box => {
-        const boxItemNormalized = box.item.toLowerCase().replace(/\s+/g, ' ').trim();
-        return boxItemNormalized.includes(normalized) || normalized.includes(boxItemNormalized);
+        const boxItemNormalized = box.item.toLowerCase()
+          .replace(/\(.*?\)/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        
+        // Match if either contains the other, or if they're very similar
+        return boxItemNormalized === normalized || 
+               boxItemNormalized.includes(normalized) || 
+               normalized.includes(boxItemNormalized);
       })
       .map(box => box.box);
     return Array.from(new Set(boxes)).sort((a, b) => a - b);
