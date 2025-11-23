@@ -49,7 +49,7 @@ const runningTotals = {
     { item: 'Chex cereal', unit: 'boxes', quantity: 1, notes: '' },
     { item: 'Toothpaste', unit: 'tubes', quantity: 4, notes: '' },
     { item: 'Overdose rescue kit', unit: 'kits', quantity: 1, notes: '' },
-    { item: 'Military can openers', unit: 'each', quantity: 5, notes: '' },
+    { item: 'Military can openers', unit: '', quantity: 5, notes: '' },
   ],
 };
 
@@ -74,7 +74,7 @@ const boxContents = [
   { box: 12, date: '11/22/25', item: 'Pinto beans', unit: 'cans', quantity: 14, notes: '' },
   { box: 12, date: '11/22/25', item: 'Chex cereal', unit: 'boxes', quantity: 1, notes: '' },
   { box: 12, date: '11/22/25', item: 'Overdose rescue kit', unit: 'kits', quantity: 1, notes: '' },
-  { box: 12, date: '11/22/25', item: 'Military can openers', unit: 'each', quantity: 5, notes: '' },
+  { box: 12, date: '11/22/25', item: 'Military can openers', unit: '', quantity: 5, notes: '' },
   { box: 13, date: '11/22/25', item: 'Rice', unit: 'bags', quantity: 3, notes: '' },
   { box: 13, date: '11/22/25', item: 'Split peas', unit: 'bags', quantity: 10, notes: '' },
   { box: 13, date: '11/22/25', item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 3, notes: '' },
