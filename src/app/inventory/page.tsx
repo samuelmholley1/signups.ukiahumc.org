@@ -209,14 +209,24 @@ export default function InventoryPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 print:max-w-full print:px-4 print:py-2">
         {/* Print Header */}
-        <div className="hidden print:block text-center mb-3">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">Center for Hope Pantry Inventory</h1>
-          <p className="text-sm text-gray-700 mb-0.5">Food Left Over After 11/22/25 Distribution</p>
-          <p className="text-sm text-gray-600">Ukiah United Methodist Church – Center for Hope</p>
+        <div className="hidden print:block mb-3">
+          <div className="flex items-center justify-between">
+            <img 
+              src="/logo-for-church-larger.jpg" 
+              alt="UUMC Logo" 
+              className="h-16 w-auto object-contain"
+            />
+            <div className="text-center flex-1">
+              <h1 className="text-xl font-bold text-gray-900 mb-1">Center for Hope Pantry Inventory</h1>
+              <p className="text-sm text-gray-700 mb-0.5">Food Left Over After 11/22/25 Distribution</p>
+              <p className="text-sm text-gray-600">Ukiah United Methodist Church – Center for Hope</p>
+            </div>
+            <div className="w-16"></div> {/* Spacer for centering */}
+          </div>
         </div>
 
         {/* Section 1: All Items with Box Locations */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:break-after-page">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2">
           <div className="flex justify-between items-center mb-4 print:mb-2">
             <h2 className="text-2xl font-bold text-gray-900 print:text-base">Inventory (Sorted by Quantity: Low to High)</h2>
             <button
@@ -270,8 +280,40 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* Section 2: Box-by-Box Contents */}
+        {/* Section 2: Miscellaneous & Perishables */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:break-after-page">
+          <div className="flex justify-between items-center mb-4 print:mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 print:text-base">Miscellaneous & Perishables</h2>
+            <button
+              onClick={() => downloadCSV('miscellaneous.csv', generateMiscellaneousCSV())}
+              className="print:hidden px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+            >
+              Download CSV
+            </button>
+          </div>
+
+          <div className="mb-4 print:mb-2">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Perishable Produce</h3>
+            <p className="text-sm text-gray-600 italic mb-2 print:text-[9px] print:mb-1">(May be used by Center for Hope during the week)</p>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
+              {miscellaneous.perishables.map((item, idx) => (
+                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Other Miscellaneous Items</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
+              {miscellaneous.other.map((item, idx) => (
+                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Section 3: Box-by-Box Contents */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2">
           <div className="flex justify-between items-center mb-4 print:mb-2">
             <h2 className="text-2xl font-bold text-gray-900 print:text-base">Box-by-Box Contents</h2>
             <button
@@ -308,7 +350,7 @@ export default function InventoryPage() {
                   return sortedBoxNumbers.map((boxNum, boxIdx) => {
                     const items = boxGroups[boxNum];
                     const isEvenBox = boxIdx % 2 === 0;
-                    const bgColor = isEvenBox ? 'bg-gray-50 print:!bg-gray-200' : 'bg-white print:!bg-white';
+                    const bgColor = isEvenBox ? 'bg-gray-200 print:!bg-gray-200' : 'bg-white print:!bg-white';
                     
                     return items.map((item, itemIdx) => (
                       <tr key={`${boxNum}-${itemIdx}`} className={`${bgColor} hover:opacity-80 print:hover:opacity-100`}>
@@ -338,38 +380,6 @@ export default function InventoryPage() {
                 })()}
               </tbody>
             </table>
-          </div>
-        </div>
-
-        {/* Section 3: Miscellaneous & Perishables */}
-        <div className="bg-white rounded-lg shadow-md p-6 print:shadow-none print:p-2">
-          <div className="flex justify-between items-center mb-4 print:mb-2">
-            <h2 className="text-2xl font-bold text-gray-900 print:text-base">Miscellaneous & Perishables</h2>
-            <button
-              onClick={() => downloadCSV('miscellaneous.csv', generateMiscellaneousCSV())}
-              className="print:hidden px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
-            >
-              📊 CSV
-            </button>
-          </div>
-
-          <div className="mb-4 print:mb-2">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Perishable Produce</h3>
-            <p className="text-sm text-gray-600 italic mb-2 print:text-[9px] print:mb-1">(May be used by Center for Hope during the week)</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
-              {miscellaneous.perishables.map((item, idx) => (
-                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Other Miscellaneous Items</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
-              {miscellaneous.other.map((item, idx) => (
-                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>
