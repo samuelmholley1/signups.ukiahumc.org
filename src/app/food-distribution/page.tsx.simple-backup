@@ -90,77 +90,56 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-green-600 text-white">
-                  <tr>
-                    <th className="px-6 py-4 text-left font-semibold">Date</th>
-                    <th className="px-6 py-4 text-left font-semibold">Volunteer #1</th>
-                    <th className="px-6 py-4 text-left font-semibold">Volunteer #2</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {signups.map((signup, index) => (
-                    <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                      <td className="px-6 py-4 font-medium text-gray-900">
-                        {signup.displayDate}
-                      </td>
-                      <td className="px-6 py-4">
-                        {signup.volunteer1 ? (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{signup.volunteer1.name}</p>
-                              <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
-                            </div>
-                            <button
-                              onClick={() => {/* TODO: Cancel */}}
-                              className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedDate(signup.date)
-                              setFormData({ ...formData, role: 'volunteer1' })
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                          >
-                            Sign Up
-                          </button>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        {signup.volunteer2 ? (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
-                              <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
-                            </div>
-                            <button
-                              onClick={() => {/* TODO: Cancel */}}
-                              className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedDate(signup.date)
-                              setFormData({ ...formData, role: 'volunteer2' })
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                          >
-                            Sign Up
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-4">
+              {signups.map(signup => (
+                <div key={signup.date} className="bg-white rounded-lg shadow-lg p-6">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">
+                    {signup.displayDate}
+                  </h3>
+                  
+                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-semibold text-green-700 mb-2">Volunteer #1</h4>
+                      {signup.volunteer1 ? (
+                        <div className="text-sm">
+                          <p className="font-medium">{signup.volunteer1.name}</p>
+                          <p className="text-gray-600">{signup.volunteer1.email}</p>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSelectedDate(signup.date)
+                            setFormData({ ...formData, role: 'volunteer1' })
+                          }}
+                          className="text-green-600 hover:text-green-700 font-medium"
+                        >
+                          + Sign Up
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-semibold text-green-700 mb-2">Volunteer #2</h4>
+                      {signup.volunteer2 ? (
+                        <div className="text-sm">
+                          <p className="font-medium">{signup.volunteer2.name}</p>
+                          <p className="text-gray-600">{signup.volunteer2.email}</p>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSelectedDate(signup.date)
+                            setFormData({ ...formData, role: 'volunteer2' })
+                          }}
+                          className="text-green-600 hover:text-green-700 font-medium"
+                        >
+                          + Sign Up
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
