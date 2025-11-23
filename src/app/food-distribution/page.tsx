@@ -76,11 +76,27 @@ export default function FoodDistribution() {
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
     
-    if (personName === 'Samuel Holley') {
+    // Map of preset people with their contact info
+    const presetPeople: { [key: string]: { email: string; phone?: string } } = {
+      'Raul Chairez': { email: 'raulshealinghands3@gmail.com' },
+      'Don Damp': { email: 'donalddamp@gmail.com' },
+      'Edward Dick': { email: 'edwardpdick@gmail.com' },
+      'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
+      'Billy Jenne': { email: 'billyjenne2@gmail.com' },
+      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com' },
+      'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
+      'Trudy Morgan': { email: 'morganmiller@saber.net' },
+      'Vicki Okey': { email: 'vokey123@gmail.com' },
+      'Bonnie Reda': { email: 'bonireda@aol.com' },
+      'Michele Robbins': { email: 'shalompastor3@gmail.com' },
+      'Diana Waddle': { email: 'waddlediana@yahoo.com' }
+    }
+    
+    if (presetPeople[personName]) {
       setFormData(prev => ({
         ...prev,
-        email: 'sam@samuelholley.com',
-        phone: '714-496-7006',
+        email: presetPeople[personName].email,
+        phone: presetPeople[personName].phone || '',
         firstName: '',
         lastName: ''
       }))
@@ -303,7 +319,18 @@ export default function FoodDistribution() {
                       className="w-full border rounded-lg px-3 py-2"
                     >
                       <option value="">-- Choose --</option>
+                      <option value="Raul Chairez">Raul Chairez</option>
+                      <option value="Don Damp">Don Damp</option>
+                      <option value="Edward Dick">Edward Dick</option>
                       <option value="Samuel Holley">Samuel Holley</option>
+                      <option value="Billy Jenne">Billy Jenne</option>
+                      <option value="Daphne Macneil">Daphne Macneil</option>
+                      <option value="Cathy McKeon">Cathy McKeon</option>
+                      <option value="Trudy Morgan">Trudy Morgan</option>
+                      <option value="Vicki Okey">Vicki Okey</option>
+                      <option value="Bonnie Reda">Bonnie Reda</option>
+                      <option value="Michele Robbins">Michele Robbins</option>
+                      <option value="Diana Waddle">Diana Waddle</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
@@ -342,7 +369,7 @@ export default function FoodDistribution() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full border rounded-lg px-3 py-2"
-                      disabled={formData.selectedPerson === 'Samuel Holley'}
+                      disabled={formData.selectedPerson !== 'other' && formData.selectedPerson !== ''}
                     />
                   </div>
                   
@@ -353,7 +380,7 @@ export default function FoodDistribution() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full border rounded-lg px-3 py-2"
-                      disabled={formData.selectedPerson === 'Samuel Holley'}
+                      disabled={formData.selectedPerson !== 'other' && formData.selectedPerson !== ''}
                     />
                   </div>
                   
