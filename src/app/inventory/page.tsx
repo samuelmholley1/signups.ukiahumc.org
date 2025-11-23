@@ -218,6 +218,7 @@ export default function InventoryPage() {
               <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-800 rounded">Low: 1-5</span>
               <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-800 rounded">Moderate: 6-10</span>
               <span className="ml-2 px-2 py-1 bg-white text-gray-800 rounded border border-gray-300">Adequate: 11+</span>
+              <span className="ml-4 text-gray-600 italic">Items are sorted from lowest to highest quantity</span>
             </p>
           </div>
 
@@ -225,25 +226,23 @@ export default function InventoryPage() {
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Category</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Item</th>
                   <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-2 print:py-1 print:text-xs">Quantity</th>
-                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-2 print:py-1 print:text-xs">Unit</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Box Location(s)</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Category</th>
                 </tr>
               </thead>
               <tbody>
                 {allItemsSorted.map((item, idx) => {
                   const boxes = getBoxLocations(item.item);
                   const stockColorClass = getStockColorClass(item.quantity);
+                  const itemWithUnit = `${item.item} (${item.unit})`;
                   return (
                     <tr key={idx} className={`${stockColorClass} hover:bg-gray-50 print:hover:bg-transparent`}>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.category}</td>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.item}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{itemWithUnit}</td>
                       <td className="border border-gray-300 px-4 py-2 text-center text-base font-bold print:px-2 print:py-1 print:text-sm">
                         {item.quantity}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-sm print:px-2 print:py-1 print:text-xs">{item.unit}</td>
                       <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">
                         {boxes.length > 0 ? (
                           <span className="inline-flex gap-1 flex-wrap">
@@ -257,6 +256,7 @@ export default function InventoryPage() {
                           <span className="text-gray-400 italic text-xs">See misc.</span>
                         )}
                       </td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.category}</td>
                     </tr>
                   );
                 })}
