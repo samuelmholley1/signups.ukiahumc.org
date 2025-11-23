@@ -6,7 +6,15 @@ const airtable = new Airtable({
 })
 
 const base = airtable.base(process.env.AIRTABLE_BASE_ID || '')
-const table = base(process.env.AIRTABLE_TABLE_NAME || 'liturgists.ukiahumc.org')
+
+// Table constants for multi-table support
+export const TABLES = {
+  LITURGISTS: process.env.AIRTABLE_LITURGISTS_TABLE || 'Liturgists',
+  FOOD_DISTRIBUTION: process.env.AIRTABLE_FOOD_TABLE || 'Food Distribution'
+}
+
+// Helper to get table by name
+const getTable = (tableName: string) => base(tableName)
 
 export interface SignupData {
   serviceDate: string
@@ -22,8 +30,9 @@ export interface SignupData {
 /**
  * Submit a signup to Airtable
  */
-export async function submitSignup(data: SignupData) {
+export async function submitSignup(data: SignupData, tableName: string = TABLES.LITURGISTS) {
   try {
+    const table = getTable(tableName)
     const record = await table.create([
       {
         fields: {
@@ -50,8 +59,9 @@ export async function submitSignup(data: SignupData) {
 /**
  * Get all signups from Airtable
  */
-export async function getSignups() {
+export async function getSignups(tableName: string = TABLES.LITURGISTS) {
   try {
+    const table = getTable(tableName)
     const records = await table.select().all()
     
     return records.map((record) => ({
@@ -75,8 +85,9 @@ export async function getSignups() {
 /**
  * Get a single signup record by ID
  */
-export async function getSignupById(recordId: string) {
+export async function getSignupById(recordId: string, tableName: string = TABLES.LITURGISTS) {
   try {
+    const table = getTable(tableName)
     const record = await table.find(recordId)
     return {
       success: true,
@@ -102,8 +113,9 @@ export async function getSignupById(recordId: string) {
 /**
  * Delete a signup from Airtable by record ID
  */
-export async function deleteSignup(recordId: string) {
+export async function deleteSignup(recordId: string, tableName: string = TABLES.LITURGISTS) {
   try {
+    const table = getTable(tableName)
     await table.destroy([recordId])
     return { success: true }
   } catch (error) {
@@ -112,4 +124,4 @@ export async function deleteSignup(recordId: string) {
   }
 }
 
-export { table }
+export { base, getTable }
