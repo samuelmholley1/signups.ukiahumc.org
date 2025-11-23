@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
     
     console.log('Received signup request:', body)
     
+    // Determine which table to use
+    const tableName = body.table === 'food' ? 'Food Distribution' : 'Liturgists'
+    console.log('Using table:', tableName)
+    
     // Validate required fields
     if (!body.serviceDate || !body.displayDate || !body.name || !body.email || !body.role) {
       console.error('Missing required fields:', { 
@@ -58,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // CRITICAL: Server-side duplicate prevention (race condition fix)
-    const existingSignups = await getSignups()
+    const existingSignups = await getSignups(tableName)
     const duplicate = existingSignups.find(
       (s: any) => s.serviceDate === body.serviceDate && s.role === body.role
     )
@@ -89,7 +93,7 @@ export async function POST(request: NextRequest) {
       role: body.role,
       attendanceStatus: body.attendanceStatus,
       notes: body.notes,
-    })
+    }, tableName)
 
     if (result.success) {
       console.log('Signup successful:', result.record?.id)
@@ -413,12 +417,13 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const handlerStamp = stamp('signup.DELETE');
-  console.log('🚨🚨🚨 DELETE HANDLER CALLED - THIS SHOULD ALWAYS APPEAR! 🚨🚨��');
+  console.log('🚨🚨🚨 DELETE HANDLER CALLED - THIS SHOULD ALWAYS APPEAR! 🚨🚨🚨');
   console.log('🔍 HANDLER STAMP:', handlerStamp);
   
   try {
     const { searchParams } = new URL(request.url)
     const recordId = searchParams.get('recordId')
+    const table = searchParams.get('table') || 'liturgists'
     
     if (!recordId) {
       const errorResponse1 = NextResponse.json({ error: 'Missing recordId parameter', handler: handlerStamp }, { status: 400 });
@@ -426,11 +431,15 @@ export async function DELETE(request: NextRequest) {
       return errorResponse1;
     }
 
+    // Determine which table to use
+    const tableName = table === 'food' ? 'Food Distribution' : 'Liturgists'
+    console.log('Using table:', tableName)
+
     // Get record info before deleting (for email notification)
-    const recordData = await getSignupById(recordId)
+    const recordData = await getSignupById(recordId, tableName)
     
     // Delete from Airtable
-    const result = await deleteSignup(recordId)
+    const result = await deleteSignup(recordId, tableName)
 
     if (result.success) {
       console.log('Signup cancelled successfully:', recordId)

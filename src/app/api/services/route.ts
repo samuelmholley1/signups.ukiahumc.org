@@ -8,14 +8,18 @@ export const revalidate = 0
 
 export async function GET(request: NextRequest) {
   try {
-    // Get quarter from query params (format: "Q4-2025" or "Q1-2026")
+    // Get quarter and table from query params
     const { searchParams } = new URL(request.url)
     const quarter = searchParams.get('quarter') || 'Q4-2025' // Default to Q4 2025
+    const table = searchParams.get('table') || 'liturgists' // Default to liturgists
+    
+    // Create cache key with both quarter and table
+    const cacheKey = `${table}-${quarter}`
     
     // Check cache first
-    const cachedData = serviceCache.get(quarter)
+    const cachedData = serviceCache.get(cacheKey)
     if (cachedData) {
-      console.log(`[API] Returning cached data for quarter: ${quarter}`)
+      console.log(`[API] Returning cached data for ${table} - ${quarter}`)
       return NextResponse.json(
         cachedData,
         { 
@@ -29,20 +33,25 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    console.log(`[API] Cache miss for quarter: ${quarter}, fetching from Airtable`)
+    console.log(`[API] Cache miss for ${table} - ${quarter}, fetching from Airtable`)
     
-    // Generate Sundays for the requested quarter
-    const allSundays = generateSundaysForQuarter(quarter)
+    // Determine which table to use
+    const tableName = table === 'food' ? 'Food Distribution' : 'Liturgists'
+    
+    // Generate Sundays for the requested quarter (or Saturdays for food distribution)
+    const allDates = table === 'food' 
+      ? generateSaturdaysForDecember(quarter) 
+      : generateSundaysForQuarter(quarter)
     
     // Get all signups from Airtable
-    const signups = await getSignups()
+    const signups = await getSignups(tableName)
     console.log('🔍 API DEBUG: Fetched', signups.length, 'signups from Airtable')
 
-    // Create a map of services starting with all Sundays
+    // Create a map of services starting with all dates
     const serviceMap = new Map()
     
-    // Add all Sundays first (past and upcoming)
-    allSundays.forEach(service => {
+    // Add all dates first (past and upcoming)
+    allDates.forEach(service => {
       serviceMap.set(service.date, service)
     })
 
@@ -156,8 +165,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Store in cache
-    serviceCache.set(quarter, responseData)
-    console.log(`[API] Cached data for quarter: ${quarter}`)
+    serviceCache.set(cacheKey, responseData)
+    console.log(`[API] Cached data for ${table} - ${quarter}`)
 
     return NextResponse.json(
       responseData,
@@ -400,4 +409,36 @@ function generateUpcomingSundays() {
   }
   
   return sundays
+}
+
+// Generate December 2025 Saturdays for food distribution
+function generateSaturdaysForDecember(quarterString: string) {
+  const saturdays: any[] = []
+  
+  // Only support December 2025 for now
+  if (!quarterString.includes('2025')) {
+    return []
+  }
+  
+  // December 2025 Saturdays
+  const dates = [
+    { date: '2025-12-06', display: 'December 6, 2025' },
+    { date: '2025-12-13', display: 'December 13, 2025' },
+    { date: '2025-12-20', display: 'December 20, 2025' },
+    { date: '2025-12-27', display: 'December 27, 2025' },
+  ]
+  
+  dates.forEach(({ date, display }) => {
+    saturdays.push({
+      id: date,
+      date,
+      displayDate: display,
+      volunteer1: null,
+      volunteer2: null,
+      attendance: [],
+      notes: undefined
+    })
+  })
+  
+  return saturdays
 }
