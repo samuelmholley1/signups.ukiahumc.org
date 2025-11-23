@@ -35,8 +35,7 @@ const runningTotals = {
     { item: 'Raisins', unit: 'bags', quantity: 20, notes: '' },
   ],
   'Shelf-Stable / Canned Items': [
-    { item: 'Applesauce cups', unit: 'cups', quantity: 19, notes: '' },
-    { item: 'Applesauce', unit: 'cans', quantity: 5, notes: '' },
+    { item: 'Applesauce', unit: 'cans/cups', quantity: 24, notes: '' },
     { item: 'Fruit mix', unit: 'cans', quantity: 4, notes: '' },
     { item: 'Carrots', unit: 'cans', quantity: 1, notes: '' },
     { item: 'Cream of chicken soup', unit: 'cans', quantity: 2, notes: '' },
@@ -162,6 +161,11 @@ export default function InventoryPage() {
           .replace(/\(.*?\)/g, '')
           .replace(/\s+/g, ' ')
           .trim();
+        
+        // Special case: "Applesauce" should match both "Applesauce" and "Applesauce cups"
+        if (normalized === 'applesauce' && boxItemNormalized.includes('applesauce')) {
+          return true;
+        }
         
         // Match if either contains the other, or if they're very similar
         return boxItemNormalized === normalized || 
