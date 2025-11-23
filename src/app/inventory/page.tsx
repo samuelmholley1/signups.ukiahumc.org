@@ -384,10 +384,6 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Print footer */}
-      <div className="hidden print:block text-center text-sm text-gray-600 mt-8 pb-4">
-        <p>Generated: {new Date().toLocaleDateString()}</p>
-      </div>
       </div>
     </>
   );
