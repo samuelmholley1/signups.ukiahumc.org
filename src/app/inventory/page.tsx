@@ -21,7 +21,7 @@ function getStockColorClass(quantity: number): string {
 // Inventory data structures
 const runningTotals = {
   'Beans & Grains': [
-    { item: 'Canned pinto beans', unit: 'cans', quantity: 45, notes: '' },
+    { item: 'Pinto beans', unit: 'cans', quantity: 45, notes: '' },
     { item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 49, notes: '' },
     { item: 'Lentils', unit: 'bags', quantity: 55, notes: '' },
     { item: 'Split peas', unit: 'bags', quantity: 35, notes: '' },
@@ -55,7 +55,7 @@ const runningTotals = {
 };
 
 const boxContents = [
-  { box: 1, date: '11/22/25', item: 'Canned pinto beans', unit: 'cans', quantity: 24, notes: '' },
+  { box: 1, date: '11/22/25', item: 'Pinto beans', unit: 'cans', quantity: 24, notes: '' },
   { box: 2, date: '11/22/25', item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 19, notes: '' },
   { box: 3, date: '11/22/25', item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 21, notes: '' },
   { box: 4, date: '11/22/25', item: 'Lentils', unit: 'bags', quantity: 15, notes: '' },
@@ -72,14 +72,14 @@ const boxContents = [
   { box: 11, date: '11/22/25', item: 'Carrots', unit: 'cans', quantity: 1, notes: '' },
   { box: 11, date: '11/22/25', item: 'Baby food mini jars', unit: 'jars', quantity: 7, notes: '' },
   { box: 11, date: '11/22/25', item: 'Rotini dry pasta', unit: 'boxes', quantity: 1, notes: '' },
-  { box: 12, date: '11/22/25', item: 'Canned pinto beans', unit: 'cans', quantity: 14, notes: '' },
+  { box: 12, date: '11/22/25', item: 'Pinto beans', unit: 'cans', quantity: 14, notes: '' },
   { box: 12, date: '11/22/25', item: 'Chex cereal', unit: 'boxes', quantity: 1, notes: '' },
   { box: 12, date: '11/22/25', item: 'Overdose rescue kit', unit: 'kits', quantity: 1, notes: '' },
   { box: 12, date: '11/22/25', item: 'Military can openers', unit: 'each', quantity: 5, notes: '' },
   { box: 13, date: '11/22/25', item: 'Rice', unit: 'bags', quantity: 3, notes: '' },
   { box: 13, date: '11/22/25', item: 'Split peas', unit: 'bags', quantity: 10, notes: '' },
   { box: 13, date: '11/22/25', item: 'Chickpeas (garbanzo beans)', unit: 'bags', quantity: 3, notes: '' },
-  { box: 14, date: '11/22/25', item: 'Canned pinto beans', unit: 'cans', quantity: 7, notes: '' },
+  { box: 14, date: '11/22/25', item: 'Pinto beans', unit: 'cans', quantity: 7, notes: '' },
   { box: 14, date: '11/22/25', item: 'Cream of chicken soup', unit: 'cans', quantity: 2, notes: '' },
   { box: 14, date: '11/22/25', item: 'Salmon', unit: 'cans', quantity: 2, notes: '' },
   { box: 14, date: '11/22/25', item: 'Toothpaste', unit: 'tubes', quantity: 4, notes: '' },
@@ -343,7 +343,6 @@ export default function InventoryPage() {
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Box #</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Date</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Item</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Unit</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Qty</th>
                   <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Notes</th>
                 </tr>
@@ -382,8 +381,7 @@ export default function InventoryPage() {
                             </td>
                           </>
                         ) : null}
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{item.item}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px]">{item.unit}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{item.item} ({item.unit})</td>
                         <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-1 print:py-0.5 print:text-[10px]">{item.quantity}</td>
                         <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px]">{item.notes}</td>
                       </tr>
