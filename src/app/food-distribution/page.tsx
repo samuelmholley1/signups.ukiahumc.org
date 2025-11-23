@@ -31,40 +31,76 @@ export default function FoodDistribution() {
   })
 
   useEffect(() => {
-    // Initialize signups for all December Saturdays
-    const initialSignups = DECEMBER_SATURDAYS.map(sat => ({
-      date: sat.date,
-      displayDate: sat.display,
-      volunteer1: null,
-      volunteer2: null
-    }))
-    setSignups(initialSignups)
-    setLoading(false)
+    fetchSignups()
   }, [])
+  
+  const fetchSignups = async () => {
+    try {
+      const response = await fetch('/api/services?table=food&quarter=Q4-2025')
+      const data = await response.json()
+      
+      if (data.success && data.services) {
+        // Transform API data to our format
+        const transformed = data.services.map((service: any) => ({
+          date: service.date,
+          displayDate: service.displayDate,
+          volunteer1: service.volunteer1 || null,
+          volunteer2: service.volunteer2 || null
+        }))
+        setSignups(transformed)
+      }
+    } catch (error) {
+      console.error('Error fetching signups:', error)
+      // Fall back to empty signups
+      const initialSignups = DECEMBER_SATURDAYS.map(sat => ({
+        date: sat.date,
+        displayDate: sat.display,
+        volunteer1: null,
+        volunteer2: null
+      }))
+      setSignups(initialSignups)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // TODO: Submit to Airtable
-    console.log('Submitting:', { date: selectedDate, ...formData })
+    const signup = signups.find(s => s.date === selectedDate)
+    if (!signup) return
     
-    // Update local state
-    setSignups(prev => prev.map(signup => 
-      signup.date === selectedDate 
-        ? {
-            ...signup,
-            [formData.role]: {
-              name: formData.name,
-              email: formData.email,
-              phone: formData.phone
-            }
-          }
-        : signup
-    ))
-    
-    // Reset form
-    setFormData({ name: '', email: '', phone: '', role: 'volunteer1' })
-    setSelectedDate(null)
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table: 'food',
+          serviceDate: selectedDate,
+          displayDate: signup.displayDate,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          role: formData.role
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        // Refresh signups from server
+        await fetchSignups()
+        // Reset form
+        setFormData({ name: '', email: '', phone: '', role: 'volunteer1' })
+        setSelectedDate(null)
+        alert('Signup successful!')
+      } else {
+        alert(data.error || 'Signup failed')
+      }
+    } catch (error) {
+      console.error('Error submitting signup:', error)
+      alert('Error submitting signup. Please try again.')
+    }
   }
 
   return (
