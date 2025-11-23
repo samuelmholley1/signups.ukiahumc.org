@@ -49,34 +49,19 @@ Delete any default fields Airtable creates, then add these fields **in this exac
 #### Field 6: Role
 - **Field Name:** `Role`
 - **Field Type:** `Single select`
-- **Options (add these 3 choices):**
-  - `Coordinator`
-  - `Volunteer`
-  - `Donor`
+- **Options (add these 4 choices):**
+  - `volunteer1`
+  - `volunteer2`
+  - `volunteer3`
+  - `volunteer4`
 
-#### Field 7: Item Type
-- **Field Name:** `Item Type`
-- **Field Type:** `Single select`
-- **Options (add these 3 choices):**
-  - `Perishable`
-  - `Non-Perishable`
-  - `Prepared Food`
-
-#### Field 8: Quantity
-- **Field Name:** `Quantity`
-- **Field Type:** `Number`
-- **Options:**
-  - Number format: `Integer`
-  - Precision: `0` decimal places
-  - Allow negative numbers: ❌ (unchecked)
-
-#### Field 9: Notes
+#### Field 7: Notes
 - **Field Name:** `Notes`
 - **Field Type:** `Long text`
 - **Options:**
   - Enable rich text formatting: ✅ (optional)
 
-#### Field 10: Submitted At
+#### Field 8: Submitted At
 - **Field Name:** `Submitted At`
 - **Field Type:** `Date`
 - **Options:**
@@ -87,7 +72,7 @@ Delete any default fields Airtable creates, then add these fields **in this exac
 
 ### Step 4: Verify Table Structure
 
-Your table should now have exactly these 10 fields in this order:
+Your table should now have exactly these 8 fields in this order:
 
 | # | Field Name | Field Type |
 |---|------------|------------|
@@ -96,24 +81,20 @@ Your table should now have exactly these 10 fields in this order:
 | 3 | Name | Single line text |
 | 4 | Email | Email |
 | 5 | Phone | Phone number |
-| 6 | Role | Single select (3 options) |
-| 7 | Item Type | Single select (3 options) |
-| 8 | Quantity | Number (integer) |
-| 9 | Notes | Long text |
-| 10 | Submitted At | Date with time |
+| 6 | Role | Single select (4 options: volunteer1-4) |
+| 7 | Notes | Long text |
+| 8 | Submitted At | Date with time |
 
 ### Step 5: Add Test Record (Optional)
 
 Test that the table works by manually adding a record:
 
-- **Service Date:** `2025-12-25`
-- **Display Date:** `Christmas Day - December 25, 2025`
+- **Service Date:** `2025-12-06`
+- **Display Date:** `December 6, 2025`
 - **Name:** `Test Volunteer`
 - **Email:** `test@example.com`
 - **Phone:** `707-555-1234`
-- **Role:** `Volunteer`
-- **Item Type:** `Non-Perishable`
-- **Quantity:** `10`
+- **Role:** `volunteer1`
 - **Notes:** `Test record - can be deleted`
 - **Submitted At:** (will auto-fill when created)
 
@@ -137,11 +118,10 @@ Also update in Vercel:
 
 Once created, verify the table:
 
-1. **Table name is exactly:** `food-distribution` (lowercase, hyphenated)
-2. **All 10 fields exist** with correct names and types
-3. **Role field has 3 choices:** Coordinator, Volunteer, Donor
-4. **Item Type field has 3 choices:** Perishable, Non-Perishable, Prepared Food
-5. **Both date fields use Pacific time zone**
+1. **Table name is exactly:** `Food Distribution` (title case with space)
+2. **All 8 fields exist** with correct names and types
+3. **Role field has 4 choices:** volunteer1, volunteer2, volunteer3, volunteer4
+4. **Both date fields use Pacific time zone**
 
 ## 🎯 Next Steps
 

@@ -24,6 +24,8 @@ interface Signup {
   displayDate: string
   volunteer1: Volunteer | null
   volunteer2: Volunteer | null
+  volunteer3: Volunteer | null
+  volunteer4: Volunteer | null
 }
 
 export default function FoodDistribution() {
@@ -36,7 +38,7 @@ export default function FoodDistribution() {
     lastName: '',
     email: '',
     phone: '',
-    role: 'volunteer1' as 'volunteer1' | 'volunteer2'
+    role: 'volunteer1' as 'volunteer1' | 'volunteer2' | 'volunteer3' | 'volunteer4'
   })
 
   useEffect(() => {
@@ -54,7 +56,9 @@ export default function FoodDistribution() {
           date: service.date,
           displayDate: service.displayDate,
           volunteer1: service.volunteer1 || null,
-          volunteer2: service.volunteer2 || null
+          volunteer2: service.volunteer2 || null,
+          volunteer3: service.volunteer3 || null,
+          volunteer4: service.volunteer4 || null
         }))
         setSignups(transformed)
       }
@@ -65,7 +69,9 @@ export default function FoodDistribution() {
         date: sat.date,
         displayDate: sat.display,
         volunteer1: null,
-        volunteer2: null
+        volunteer2: null,
+        volunteer3: null,
+        volunteer4: null
       }))
       setSignups(initialSignups)
     } finally {
@@ -224,13 +230,15 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-green-600 text-white">
                   <tr>
-                    <th className="px-6 py-4 text-left font-semibold">Date</th>
-                    <th className="px-6 py-4 text-left font-semibold">Volunteer #1</th>
-                    <th className="px-6 py-4 text-left font-semibold">Volunteer #2</th>
+                    <th className="px-4 py-4 text-left font-semibold">Date</th>
+                    <th className="px-4 py-4 text-left font-semibold">Volunteer #1</th>
+                    <th className="px-4 py-4 text-left font-semibold">Volunteer #2</th>
+                    <th className="px-4 py-4 text-left font-semibold">Volunteer #3</th>
+                    <th className="px-4 py-4 text-left font-semibold">Volunteer #4</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -239,7 +247,7 @@ export default function FoodDistribution() {
                       <td className="px-6 py-4 font-medium text-gray-900">
                         {signup.displayDate}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4">
                         {signup.volunteer1 ? (
                           <div className="flex items-center justify-between">
                             <div>
@@ -248,7 +256,7 @@ export default function FoodDistribution() {
                             </div>
                             <button
                               onClick={() => handleCancel(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                              className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                             >
                               Cancel
                             </button>
@@ -265,7 +273,7 @@ export default function FoodDistribution() {
                           </button>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4">
                         {signup.volunteer2 ? (
                           <div className="flex items-center justify-between">
                             <div>
@@ -274,7 +282,7 @@ export default function FoodDistribution() {
                             </div>
                             <button
                               onClick={() => handleCancel(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                              className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                             >
                               Cancel
                             </button>
@@ -284,6 +292,58 @@ export default function FoodDistribution() {
                             onClick={() => {
                               setSelectedDate(signup.date)
                               setFormData({ ...formData, role: 'volunteer2' })
+                            }}
+                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                          >
+                            Sign Up
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        {signup.volunteer3 ? (
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-900">{signup.volunteer3.name}</p>
+                              <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
+                            </div>
+                            <button
+                              onClick={() => handleCancel(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setSelectedDate(signup.date)
+                              setFormData({ ...formData, role: 'volunteer3' })
+                            }}
+                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                          >
+                            Sign Up
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        {signup.volunteer4 ? (
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
+                              <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
+                            </div>
+                            <button
+                              onClick={() => handleCancel(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setSelectedDate(signup.date)
+                              setFormData({ ...formData, role: 'volunteer4' })
                             }}
                             className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
                           >
@@ -303,7 +363,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full">
                 <h3 className="text-xl font-bold mb-4">
-                  Sign Up as {formData.role === 'volunteer1' ? 'Volunteer #1' : 'Volunteer #2'}
+                  Sign Up as Volunteer #{formData.role === 'volunteer1' ? '1' : formData.role === 'volunteer2' ? '2' : formData.role === 'volunteer3' ? '3' : '4'}
                 </h3>
                 <p className="text-gray-600 mb-4">
                   {signups.find(s => s.date === selectedDate)?.displayDate}

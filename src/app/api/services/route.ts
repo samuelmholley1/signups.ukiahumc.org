@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       console.log(`🔍 API DEBUG: Normalized role: "${normalizedRole}"`)
 
       // Organize by role - check for all variants (old, new, and lowercase)
-      // Support volunteer1/volunteer2 for food distribution
+      // Support volunteer1/volunteer2/volunteer3/volunteer4 for food distribution
       if (signup.role === 'volunteer1' || normalizedRole === 'volunteer1') {
         console.log(`🔍 API DEBUG: Assigning as volunteer1: ${signup.name}`)
         service.volunteer1 = {
@@ -99,6 +99,24 @@ export async function GET(request: NextRequest) {
       } else if (signup.role === 'volunteer2' || normalizedRole === 'volunteer2') {
         console.log(`🔍 API DEBUG: Assigning as volunteer2: ${signup.name}`)
         service.volunteer2 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
+      } else if (signup.role === 'volunteer3' || normalizedRole === 'volunteer3') {
+        console.log(`🔍 API DEBUG: Assigning as volunteer3: ${signup.name}`)
+        service.volunteer3 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
+      } else if (signup.role === 'volunteer4' || normalizedRole === 'volunteer4') {
+        console.log(`🔍 API DEBUG: Assigning as volunteer4: ${signup.name}`)
+        service.volunteer4 = {
           id: signup.id,
           name: signup.name,
           email: signup.email,
@@ -454,6 +472,8 @@ function generateSaturdaysForDecember(quarterString: string) {
       displayDate: display,
       volunteer1: null,
       volunteer2: null,
+      volunteer3: null,
+      volunteer4: null,
       attendance: [],
       notes: undefined
     })
