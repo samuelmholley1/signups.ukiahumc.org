@@ -1,15 +1,14 @@
-'use client'
+import type { Metadata } from 'next'
 
-import { useEffect } from 'react'
+export const metadata: Metadata = {
+  title: 'UUMC Food Pantry Inventory',
+  description: 'Center for Hope Pantry Inventory - Ukiah United Methodist Church',
+}
 
 export default function InventoryLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  useEffect(() => {
-    console.log('[InventoryLayout] Layout mounted for /inventory route')
-  }, [])
-  
   return <>{children}</>;
 }
