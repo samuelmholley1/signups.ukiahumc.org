@@ -508,6 +508,54 @@ After deployment:
 
 ---
 
+## 🎯 GLOBAL NAVIGATION HEADER STRATEGY
+
+### Implementation: Option 1 - Minimal Context-Aware Header
+
+**Status:** ✅ IMPLEMENTED (November 23, 2025)
+
+**Architecture Decision:** Context-aware header component that shows section-specific navigation with single "Back to All Signups" link.
+
+**Component Created:** `/src/components/SectionHeader.tsx`
+
+**Features:**
+- 🔵 Blue header for `/liturgists` section
+- 🟢 Green header for `/food-distribution` section
+- ⬅️ Single "Back to All Signups" link (returns to `/`)
+- 📱 Mobile-responsive (shows "Home" on small screens)
+- 🚫 Hidden on homepage (landing page has no header)
+- 🎨 Section-specific icons (book for liturgists, coin for food)
+
+**Benefits:**
+1. **Data Integrity:** Prevents cross-signup confusion
+2. **User Focus:** Each workflow is independent
+3. **Mobile-First:** Minimal header = more content space
+4. **Scalable:** Easy to add more signup types
+
+**Layout Integration:**
+- Added to `/src/app/layout.tsx`
+- Renders below main `<Header />` component
+- Uses `usePathname()` to detect current section
+- Automatically styled based on route
+
+**User Flow:**
+```
+Homepage (/) → Choose Service
+  ↓
+/liturgists → Blue Header → "Back to All Signups"
+  ↓
+Homepage (/) → Choose Different Service
+  ↓
+/food-distribution → Green Header → "Back to All Signups"
+```
+
+**Files Modified:**
+- `/src/components/SectionHeader.tsx` (created)
+- `/src/app/layout.tsx` (added SectionHeader component)
+- `/src/app/layout.tsx` (updated metadata for multi-signup platform)
+
+---
+
 ## 🎉 SUCCESS CRITERIA
 
 Migration is complete when:
@@ -515,6 +563,7 @@ Migration is complete when:
 ✅ Both save to separate Airtable tables  
 ✅ Both have their own summary pages  
 ✅ Single landing page provides clear navigation  
+✅ Context-aware navigation header implemented  
 ✅ All documentation updated  
 ✅ All tests passing  
 ✅ Deployed to production at `signups.ukiahumc.org`  

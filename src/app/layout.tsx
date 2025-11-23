@@ -3,28 +3,29 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import Header from '@/components/Header'
+import SectionHeader from '@/components/SectionHeader'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Ukiah United Methodist Church - Liturgist Signup',
-  description: 'Sign up to serve as a liturgist for worship services at Ukiah United Methodist Church',
+  title: 'Ukiah United Methodist Church - Service Signups',
+  description: 'Sign up to serve at Ukiah United Methodist Church - Liturgist services and Food Distribution volunteer opportunities',
   manifest: '/site.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'UUMC Liturgists'
+    title: 'UUMC Signups'
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: 'website',
-    siteName: 'UUMC Liturgist Signup',
-    title: 'Ukiah United Methodist Church - Liturgist Signup',
-    description: 'Sign up to serve as a liturgist for worship services',
+    siteName: 'UUMC Service Signups',
+    title: 'Ukiah United Methodist Church - Service Signups',
+    description: 'Sign up to serve - Liturgist services and Food Distribution volunteers',
   },
-  keywords: ['church', 'liturgist', 'signup', 'ukiah', 'methodist', 'worship', 'volunteer']
+  keywords: ['church', 'liturgist', 'signup', 'ukiah', 'methodist', 'worship', 'volunteer', 'food distribution']
 }
 
 export const viewport: Viewport = {
@@ -72,6 +73,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <Header />
+          <SectionHeader />
           {children}
         </ErrorBoundary>
       </body>
