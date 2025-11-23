@@ -86,7 +86,26 @@ export async function GET(request: NextRequest) {
       console.log(`🔍 API DEBUG: Normalized role: "${normalizedRole}"`)
 
       // Organize by role - check for all variants (old, new, and lowercase)
-      if (signup.role === 'Liturgist' || normalizedRole === 'liturgist') {
+      // Support volunteer1/volunteer2 for food distribution
+      if (signup.role === 'volunteer1' || normalizedRole === 'volunteer1') {
+        console.log(`🔍 API DEBUG: Assigning as volunteer1: ${signup.name}`)
+        service.volunteer1 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
+      } else if (signup.role === 'volunteer2' || normalizedRole === 'volunteer2') {
+        console.log(`🔍 API DEBUG: Assigning as volunteer2: ${signup.name}`)
+        service.volunteer2 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
+      } else if (signup.role === 'Liturgist' || normalizedRole === 'liturgist') {
         console.log(`🔍 API DEBUG: Assigning as liturgist: ${signup.name}`)
         service.liturgist = {
           id: signup.id,

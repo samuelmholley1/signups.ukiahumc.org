@@ -12,11 +12,18 @@ const DECEMBER_SATURDAYS = [
   { date: '2025-12-27', display: 'December 27, 2025' },
 ]
 
+interface Volunteer {
+  id: string
+  name: string
+  email: string
+  phone?: string
+}
+
 interface Signup {
   date: string
   displayDate: string
-  volunteer1: { name: string; email: string; phone?: string } | null
-  volunteer2: { name: string; email: string; phone?: string } | null
+  volunteer1: Volunteer | null
+  volunteer2: Volunteer | null
 }
 
 export default function FoodDistribution() {
@@ -61,6 +68,28 @@ export default function FoodDistribution() {
       setSignups(initialSignups)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCancel = async (recordId: string, name: string, displayDate: string) => {
+    if (!confirm(`Cancel ${name}'s signup for ${displayDate}?`)) return
+    
+    try {
+      const response = await fetch(`/api/signup?recordId=${recordId}&table=food`, {
+        method: 'DELETE'
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        await fetchSignups()
+        alert('Signup cancelled successfully')
+      } else {
+        alert(data.error || 'Cancellation failed')
+      }
+    } catch (error) {
+      console.error('Error cancelling signup:', error)
+      alert('Error cancelling signup. Please try again.')
     }
   }
 
@@ -149,7 +178,7 @@ export default function FoodDistribution() {
                               <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
                             </div>
                             <button
-                              onClick={() => {/* TODO: Cancel */}}
+                              onClick={() => handleCancel(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
                               className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                             >
                               Cancel
@@ -175,7 +204,7 @@ export default function FoodDistribution() {
                               <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
                             </div>
                             <button
-                              onClick={() => {/* TODO: Cancel */}}
+                              onClick={() => handleCancel(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
                               className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                             >
                               Cancel
