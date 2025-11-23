@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import PasswordGate from '@/components/PasswordGate'
+import { getAllLiturgists } from '@/admin/liturgists'
 import { reportError } from '@/lib/errorReporting'
 
 // App version for cache busting - increment when you make changes
@@ -12,8 +13,10 @@ interface Service {
   id: string
   date: string
   displayDate: string
-  volunteer1: any | null
-  volunteer2: any | null
+  liturgist: any | null
+  liturgist2?: any | null  // Second liturgist for special services like Christmas Eve
+  backup: any | null
+  backup2?: any | null  // Second backup for special services like Christmas Eve
   attendance: any[]
   notes?: string
 }
@@ -69,7 +72,7 @@ export default function Home() {
     lastName: '',
     email: '',
     phone: '',
-    role: 'volunteer1' as 'volunteer1' | 'volunteer2'
+    role: 'liturgist' as 'liturgist' | 'liturgist2' | 'backup' | 'backup2'
   })
   const [isClient, setIsClient] = useState(false)
   const [services, setServices] = useState<Service[]>([])
@@ -112,6 +115,8 @@ export default function Home() {
     message: string
     onConfirm?: () => void
   } | null>(null)
+  
+  const liturgists = getAllLiturgists()
   
   // Check if viewing a locked future quarter
   const isLockedQuarter = currentQuarter === 'Q1-2026'
@@ -227,7 +232,7 @@ export default function Home() {
       lastName: '',
       email: '',
       phone: '',
-      role: 'volunteer1'
+      role: 'liturgist'
     })
     
     if (direction === 'next' && currentQuarter === 'Q4-2025') {
@@ -317,57 +322,76 @@ export default function Home() {
     generateCalendarData(services, mainServiceDate, month, calendarQuarter.year)
   )
 
-  const handleSignup = (serviceId: string, preferredRole?: 'volunteer1' | 'volunteer2') => {
+  const handleSignup = (serviceId: string, preferredRole?: 'liturgist' | 'liturgist2' | 'backup' | 'backup2') => {
     const service = services.find(s => s.id === serviceId)
     
     // Determine which role to sign up for
-    let roleToSignup: 'volunteer1' | 'volunteer2' = preferredRole || 'volunteer1'
+    let roleToSignup: 'liturgist' | 'liturgist2' | 'backup' | 'backup2' = preferredRole || 'liturgist'
     
     // For Christmas Eve, handle all four roles
     const isChristmasEve = service?.displayDate?.includes('Christmas Eve')
     
     if (isChristmasEve) {
       // If preferred role is already taken, find first available role
-      if (roleToSignup === 'volunteer1' && service?.volunteer1) {
-        if (!service?.volunteer2) {
-          roleToSignup = 'volunteer2'
+      if (roleToSignup === 'liturgist' && service?.liturgist) {
+        if (!service?.liturgist2) {
+          roleToSignup = 'liturgist2'
+        } else if (!service?.backup) {
+          roleToSignup = 'backup'
+        } else if (!service?.backup2) {
+          roleToSignup = 'backup2'
         }
-      } else if (roleToSignup === 'volunteer2' && service?.volunteer2) {
-        if (!service?.volunteer1) {
-          roleToSignup = 'volunteer1'
+      } else if (roleToSignup === 'liturgist2' && service?.liturgist2) {
+        if (!service?.liturgist) {
+          roleToSignup = 'liturgist'
+        } else if (!service?.backup) {
+          roleToSignup = 'backup'
+        } else if (!service?.backup2) {
+          roleToSignup = 'backup2'
         }
-        if (!service?.volunteer1) {
-          roleToSignup = 'volunteer1'
-        } else if (!service?.volunteer2) {
-          roleToSignup = 'volunteer2'
+      } else if (roleToSignup === 'backup' && service?.backup) {
+        if (!service?.liturgist) {
+          roleToSignup = 'liturgist'
+        } else if (!service?.liturgist2) {
+          roleToSignup = 'liturgist2'
+        } else if (!service?.backup2) {
+          roleToSignup = 'backup2'
         }
-        if (!service?.volunteer1) {
-          roleToSignup = 'volunteer1'
-        } else if (!service?.volunteer2) {
-          roleToSignup = 'volunteer2'
+      } else if (roleToSignup === 'backup2' && service?.backup2) {
+        if (!service?.liturgist) {
+          roleToSignup = 'liturgist'
+        } else if (!service?.liturgist2) {
+          roleToSignup = 'liturgist2'
+        } else if (!service?.backup) {
+          roleToSignup = 'backup'
         }
       }
       
       // Check if all four roles are taken for Christmas Eve
+      if (service?.liturgist && service?.liturgist2 && service?.backup && service?.backup2) {
         setModalState({
           isOpen: true,
           type: 'warning',
           title: 'Service Full',
-          message: 'All positions (Volunteer #1, Volunteer #2, First Backup, and Second Backup) are filled for Christmas Eve. Please choose a different Sunday.'
+          message: 'All positions (Main Liturgist, Second Liturgist, First Backup, and Second Backup) are filled for Christmas Eve. Please choose a different Sunday.'
         })
         return
       }
     } else {
-      if (roleToSignup === 'volunteer1' && service?.volunteer1) {
-        roleToSignup = 'volunteer1'
+      // Regular service logic (liturgist and backup only)
+      if (roleToSignup === 'liturgist' && service?.liturgist) {
+        roleToSignup = 'backup'
+      } else if (roleToSignup === 'backup' && service?.backup) {
+        roleToSignup = 'liturgist'
       }
       
       // Check if both roles are taken for regular services
+      if (service?.liturgist && service?.backup) {
         setModalState({
           isOpen: true,
           type: 'warning',
           title: 'Service Full',
-          message: 'Both the Volunteer #1 and Backup positions are filled for this service. Please choose a different Sunday.'
+          message: 'Both the Main Liturgist and Backup positions are filled for this service. Please choose a different Sunday.'
         })
         return
       }
@@ -437,12 +461,12 @@ export default function Home() {
     setSignupForm(prev => ({ ...prev, selectedPerson: personName }))
     
     if (personName !== 'other') {
-      const volunteer1 = volunteer1s.find(l => l.name === personName)
-      if (volunteer1) {
+      const liturgist = liturgists.find(l => l.name === personName)
+      if (liturgist) {
         setSignupForm(prev => ({
           ...prev,
-          email: volunteer1.email,
-          phone: '', // We don't have phone in the volunteer1 data
+          email: liturgist.email,
+          phone: '', // We don't have phone in the liturgist data
           firstName: '',
           lastName: ''
         }))
@@ -539,6 +563,7 @@ export default function Home() {
           name: fullName,
           email: signupForm.email,
           phone: signupForm.phone || '',
+          role: signupForm.role, // Send internal role value: 'liturgist', 'liturgist2', or 'backup'
           attendanceStatus: '', // No longer used
         }),
       })
@@ -547,7 +572,7 @@ export default function Home() {
 
       if (data.success) {
         // Success message includes role and date, and any special notes
-        const roleLabel = signupForm.role === 'volunteer1' ? 'Volunteer #1' : 'Backup Volunteer'
+        const roleLabel = signupForm.role === 'liturgist' ? 'Main Liturgist' : 'Backup Liturgist'
         const specialNote = service.notes ? `\n\n${service.notes}` : ''
         
         // Close modal first
@@ -558,7 +583,7 @@ export default function Home() {
           lastName: '',
           email: '',
           phone: '',
-          role: 'volunteer1'
+          role: 'liturgist'
         })
         
         // Show success modal
@@ -622,9 +647,9 @@ export default function Home() {
   if (loading) {
     return (
       <PasswordGate>
-        <main className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading services...</p>
           </div>
         </main>
@@ -671,8 +696,8 @@ export default function Home() {
                 </div>
               )}
               {modalState.type === 'confirm' && (
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -712,7 +737,7 @@ export default function Home() {
                   className={`px-8 py-2.5 rounded-lg font-medium transition-colors ${
                     modalState.type === 'success' ? 'bg-green-600 hover:bg-green-700 text-white' :
                     modalState.type === 'error' ? 'bg-red-600 hover:bg-red-700 text-white' :
-                    'bg-green-600 hover:bg-green-700 text-white'
+                    'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
                 >
                   OK
@@ -723,11 +748,11 @@ export default function Home() {
         </div>
       )}
       
-      <main className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       
       {/* Live Update Indicator */}
       {refreshing && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-green-600 text-white text-center py-1 text-xs">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white text-center py-1 text-xs">
           <span className="animate-pulse">● Updating...</span>
         </div>
       )}
@@ -738,7 +763,7 @@ export default function Home() {
           {/* Close Button - Above Calendar */}
           <button
             onClick={() => setCalendarOpen(false)}
-            className="w-full bg-green-600 text-white rounded-t-lg px-4 py-3 shadow-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
+            className="w-full bg-blue-600 text-white rounded-t-lg px-4 py-3 shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
             title="Close calendar"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -753,21 +778,21 @@ export default function Home() {
               <div className="flex items-center justify-between mb-3 sticky top-0 bg-white z-10 pb-2">
                 <div className="flex items-center space-x-2">
                   <div className="flex-1">
-                    <h1 className="text-sm font-bold text-gray-800">Food Distribution Schedule</h1>
+                    <h1 className="text-sm font-bold text-gray-800">Liturgist Schedule</h1>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleCalendarQuarterChange('prev')}
-                        className="text-green-600 hover:text-green-800 p-0.5"
+                        className="text-blue-600 hover:text-blue-800 p-0.5"
                         title="Previous quarter"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                       </button>
-                      <p className="text-xs text-green-600 font-medium">Q{calendarQuarter.quarter} {calendarQuarter.year}</p>
+                      <p className="text-xs text-blue-600 font-medium">Q{calendarQuarter.quarter} {calendarQuarter.year}</p>
                       <button
                         onClick={() => handleCalendarQuarterChange('next')}
-                        className="text-green-600 hover:text-green-800 p-0.5"
+                        className="text-blue-600 hover:text-blue-800 p-0.5"
                         title="Next quarter"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -804,7 +829,7 @@ export default function Home() {
                       key={index}
                       className={`text-center py-1 rounded text-xs transition-colors relative ${
                         !day ? '' :
-                        day.isMainService ? 'bg-green-600 text-white font-bold cursor-pointer hover:bg-green-700' :
+                        day.isMainService ? 'bg-purple-600 text-white font-bold cursor-pointer hover:bg-purple-700' :
                         day.isSunday && day.hasService ? (
                           hoveredService === day.serviceData?.id ? 'bg-yellow-300 font-bold border border-yellow-500' : 'bg-green-100 font-medium cursor-pointer hover:bg-green-200'
                         ) :
@@ -820,7 +845,7 @@ export default function Home() {
                     >
                       {day?.day || ''}
                       {day?.isMainService && (
-                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[9px] text-green-200 whitespace-nowrap font-semibold">
+                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[9px] text-purple-200 whitespace-nowrap font-semibold">
                           NEXT
                         </div>
                       )}
@@ -835,7 +860,7 @@ export default function Home() {
       ) : (
         <button
           onClick={() => setCalendarOpen(true)}
-          className="hidden md:flex fixed top-20 left-4 z-50 bg-green-600 text-white rounded-lg px-4 py-3 shadow-lg hover:bg-green-700 transition-colors items-center gap-2"
+          className="hidden md:flex fixed top-20 left-4 z-50 bg-blue-600 text-white rounded-lg px-4 py-3 shadow-lg hover:bg-blue-700 transition-colors items-center gap-2"
           title="Open calendar"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -864,18 +889,20 @@ export default function Home() {
               </h3>
               
               {/* Status Info Box */}
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="text-sm space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-700">Volunteer #1:</span>
-                    {selectedService?.volunteer1 ? (
-                      <span className="text-green-700 font-semibold">✓ Filled by {selectedService.volunteer1.name}</span>
+                    <span className="font-medium text-gray-700">Main Liturgist:</span>
+                    {selectedService?.liturgist ? (
+                      <span className="text-green-700 font-semibold">✓ Filled by {selectedService.liturgist.name}</span>
                     ) : (
                       <span className="text-red-600 font-semibold">Available</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-700">Backup Volunteer:</span>
+                    <span className="font-medium text-gray-700">Backup Liturgist:</span>
+                    {selectedService?.backup ? (
+                      <span className="text-orange-700 font-semibold">✓ Filled by {selectedService.backup.name}</span>
                     ) : (
                       <span className="text-gray-500">Available</span>
                     )}
@@ -883,15 +910,17 @@ export default function Home() {
                   {selectedService?.displayDate?.includes('Christmas Eve') && (
                     <>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-700">Volunteer #2:</span>
-                        {selectedService?.volunteer2 ? (
-                          <span className="text-green-700 font-semibold">✓ Filled by {selectedService.volunteer2.name}</span>
+                        <span className="font-medium text-gray-700">Second Liturgist:</span>
+                        {selectedService?.liturgist2 ? (
+                          <span className="text-green-700 font-semibold">✓ Filled by {selectedService.liturgist2.name}</span>
                         ) : (
                           <span className="text-red-600 font-semibold">Available</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-700">Second Backup:</span>
+                        {selectedService?.backup2 ? (
+                          <span className="text-orange-700 font-semibold">✓ Filled by {selectedService.backup2.name}</span>
                         ) : (
                           <span className="text-gray-500">Available</span>
                         )}
@@ -911,12 +940,12 @@ export default function Home() {
                     required
                     value={signupForm.selectedPerson}
                     onChange={(e) => handlePersonSelect(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">-- Select --</option>
-                    {volunteer1s.map((volunteer1) => (
-                      <option key={volunteer1.email} value={volunteer1.name}>
-                        {volunteer1.name}
+                    {liturgists.map((liturgist) => (
+                      <option key={liturgist.email} value={liturgist.name}>
+                        {liturgist.name}
                       </option>
                     ))}
                     <option value="other">Other (not listed)</option>
@@ -935,7 +964,7 @@ export default function Home() {
                         required
                         value={signupForm.firstName}
                         onChange={(e) => setSignupForm({ ...signupForm, firstName: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -948,7 +977,7 @@ export default function Home() {
                         required
                         value={signupForm.lastName}
                         onChange={(e) => setSignupForm({ ...signupForm, lastName: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </>
@@ -962,60 +991,60 @@ export default function Home() {
                     </label>
                     <div className="space-y-2">
                       <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
-                        signupForm.role === 'volunteer1' 
-                          ? 'bg-green-50 border-green-500 shadow-sm' 
+                        signupForm.role === 'liturgist' 
+                          ? 'bg-blue-50 border-blue-500 shadow-sm' 
                           : 'border-gray-200 hover:border-gray-300'
-                      } ${selectedService?.volunteer1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                      } ${selectedService?.liturgist ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                         <input
                           type="radio"
                           name="role"
-                          value="volunteer1"
-                          checked={signupForm.role === 'volunteer1'}
-                          onChange={(e) => setSignupForm({ ...signupForm, role: 'volunteer1' })}
-                          disabled={!!selectedService?.volunteer1}
-                          className="mr-3 w-4 h-4 text-green-600"
+                          value="liturgist"
+                          checked={signupForm.role === 'liturgist'}
+                          onChange={(e) => setSignupForm({ ...signupForm, role: 'liturgist' })}
+                          disabled={!!selectedService?.liturgist}
+                          className="mr-3 w-4 h-4 text-blue-600"
                         />
                         <div className="flex-1">
-                          <span className={`text-sm font-medium ${signupForm.role === 'volunteer1' ? 'text-green-900' : 'text-gray-700'}`}>
-                            Volunteer #1
-                            {signupForm.role === 'volunteer1' && (
-                              <span className="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs rounded-full">Selected</span>
+                          <span className={`text-sm font-medium ${signupForm.role === 'liturgist' ? 'text-blue-900' : 'text-gray-700'}`}>
+                            Main Liturgist
+                            {signupForm.role === 'liturgist' && (
+                              <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">Selected</span>
                             )}
                           </span>
-                          {selectedService?.volunteer1 && (
+                          {selectedService?.liturgist && (
                             <span className="ml-2 text-xs text-red-600 font-medium">
-                              (Taken by {selectedService.volunteer1.name})
+                              (Taken by {selectedService.liturgist.name})
                             </span>
                           )}
                         </div>
                       </label>
                       
-                      {/* Volunteer #2 - Only show for Christmas Eve */}
+                      {/* Second Liturgist - Only show for Christmas Eve */}
                       {selectedService?.displayDate?.includes('Christmas Eve') && (
                         <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
-                          signupForm.role === 'volunteer2' 
-                            ? 'bg-green-50 border-green-500 shadow-sm' 
+                          signupForm.role === 'liturgist2' 
+                            ? 'bg-blue-50 border-blue-500 shadow-sm' 
                             : 'border-gray-200 hover:border-gray-300'
-                        } ${selectedService?.volunteer2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                        } ${selectedService?.liturgist2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                           <input
                             type="radio"
                             name="role"
-                            value="volunteer2"
-                            checked={signupForm.role === 'volunteer2'}
-                            onChange={(e) => setSignupForm({ ...signupForm, role: 'volunteer2' })}
-                            disabled={!!selectedService?.volunteer2}
-                            className="mr-3 w-4 h-4 text-green-600"
+                            value="liturgist2"
+                            checked={signupForm.role === 'liturgist2'}
+                            onChange={(e) => setSignupForm({ ...signupForm, role: 'liturgist2' })}
+                            disabled={!!selectedService?.liturgist2}
+                            className="mr-3 w-4 h-4 text-blue-600"
                           />
                           <div className="flex-1">
-                            <span className={`text-sm font-medium ${signupForm.role === 'volunteer2' ? 'text-green-900' : 'text-gray-700'}`}>
-                              Volunteer #2 (Christmas Eve)
-                              {signupForm.role === 'volunteer2' && (
-                                <span className="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs rounded-full">Selected</span>
+                            <span className={`text-sm font-medium ${signupForm.role === 'liturgist2' ? 'text-blue-900' : 'text-gray-700'}`}>
+                              Second Liturgist (Christmas Eve)
+                              {signupForm.role === 'liturgist2' && (
+                                <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">Selected</span>
                               )}
                             </span>
-                            {selectedService?.volunteer2 && (
+                            {selectedService?.liturgist2 && (
                               <span className="ml-2 text-xs text-red-600 font-medium">
-                                (Taken by {selectedService.volunteer2.name})
+                                (Taken by {selectedService.liturgist2.name})
                               </span>
                             )}
                           </div>
@@ -1025,19 +1054,29 @@ export default function Home() {
                       {/* Second Backup - Only show for Christmas Eve */}
                       {selectedService?.displayDate?.includes('Christmas Eve') && (
                         <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
-                            ? 'bg-green-50 border-green-500 shadow-sm' 
+                          signupForm.role === 'backup2' 
+                            ? 'bg-blue-50 border-blue-500 shadow-sm' 
                             : 'border-gray-200 hover:border-gray-300'
+                        } ${selectedService?.backup2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                           <input
                             type="radio"
                             name="role"
-                            className="mr-3 w-4 h-4 text-green-600"
+                            value="backup2"
+                            checked={signupForm.role === 'backup2'}
+                            onChange={(e) => setSignupForm({ ...signupForm, role: 'backup2' })}
+                            disabled={!!selectedService?.backup2}
+                            className="mr-3 w-4 h-4 text-blue-600"
                           />
                           <div className="flex-1">
-                              Second Backup Volunteer (Christmas Eve)
-                                <span className="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs rounded-full">Selected</span>
+                            <span className={`text-sm font-medium ${signupForm.role === 'backup2' ? 'text-blue-900' : 'text-gray-700'}`}>
+                              Second Backup Liturgist (Christmas Eve)
+                              {signupForm.role === 'backup2' && (
+                                <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">Selected</span>
                               )}
                             </span>
+                            {selectedService?.backup2 && (
                               <span className="ml-2 text-xs text-red-600 font-medium">
+                                (Taken by {selectedService.backup2.name})
                               </span>
                             )}
                           </div>
@@ -1045,19 +1084,29 @@ export default function Home() {
                       )}
                       
                       <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
-                          ? 'bg-green-50 border-green-500 shadow-sm' 
+                        signupForm.role === 'backup' 
+                          ? 'bg-blue-50 border-blue-500 shadow-sm' 
                           : 'border-gray-200 hover:border-gray-300'
+                      } ${selectedService?.backup ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                         <input
                           type="radio"
                           name="role"
-                          className="mr-3 w-4 h-4 text-green-600"
+                          value="backup"
+                          checked={signupForm.role === 'backup'}
+                          onChange={(e) => setSignupForm({ ...signupForm, role: 'backup' })}
+                          disabled={!!selectedService?.backup}
+                          className="mr-3 w-4 h-4 text-blue-600"
                         />
                         <div className="flex-1">
-                            Backup Volunteer
-                              <span className="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs rounded-full">Selected</span>
+                          <span className={`text-sm font-medium ${signupForm.role === 'backup' ? 'text-blue-900' : 'text-gray-700'}`}>
+                            Backup Liturgist
+                            {signupForm.role === 'backup' && (
+                              <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">Selected</span>
                             )}
                           </span>
+                          {selectedService?.backup && (
                             <span className="ml-2 text-xs text-orange-600 font-medium">
+                              (Taken by {selectedService.backup.name})
                             </span>
                           )}
                         </div>
@@ -1073,6 +1122,8 @@ export default function Home() {
                     {(() => {
                       const isChristmasEve = selectedService?.displayDate?.includes('Christmas Eve')
                       const allPositionsFilled = isChristmasEve 
+                        ? selectedService?.liturgist && selectedService?.liturgist2 && selectedService?.backup && selectedService?.backup2
+                        : selectedService?.liturgist && selectedService?.backup
                       
                       return allPositionsFilled && (
                         <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
@@ -1096,7 +1147,7 @@ export default function Home() {
                         value={signupForm.email}
                         onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                         autoComplete="off"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         readOnly={signupForm.selectedPerson !== 'other'}
                       />
                     </div>
@@ -1109,7 +1160,7 @@ export default function Home() {
                         type="tel"
                         value={signupForm.phone}
                         onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="123-456-7890"
                       />
                     </div>
@@ -1120,10 +1171,14 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={isSubmitting || (selectedService?.displayDate?.includes('Christmas Eve') 
+                      ? selectedService?.liturgist && selectedService?.liturgist2 && selectedService?.backup && selectedService?.backup2
+                      : selectedService?.liturgist && selectedService?.backup)}
                     className={`flex-1 py-2 rounded-lg transition-colors ${
                       isSubmitting || (selectedService?.displayDate?.includes('Christmas Eve') 
+                        ? selectedService?.liturgist && selectedService?.liturgist2 && selectedService?.backup && selectedService?.backup2
+                        : selectedService?.liturgist && selectedService?.backup)
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-green-600 text-white hover:bg-green-700'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit'}
@@ -1138,7 +1193,7 @@ export default function Home() {
                         lastName: '',
                         email: '',
                         phone: '',
-                        role: 'volunteer1'
+                        role: 'liturgist'
                       })
                     }}
                     className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors"
@@ -1156,10 +1211,10 @@ export default function Home() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                 </svg>
-                Food Distribution - {currentQuarter.replace('-', ' ')}
+                Liturgist Services - {currentQuarter.replace('-', ' ')}
               </h2>
               {lastUpdated && !isLockedQuarter && (
                 <p className="text-xs text-gray-500 ml-8 mt-1">
@@ -1174,7 +1229,7 @@ export default function Home() {
                 className={`px-3 py-1 rounded-md text-sm font-medium flex items-center ${
                   currentQuarter === CURRENT_QUARTER
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1188,7 +1243,7 @@ export default function Home() {
                 className={`px-3 py-1 rounded-md text-sm font-medium flex items-center ${
                   currentQuarter === 'Q1-2026'
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
                 Next Quarter
@@ -1229,7 +1284,7 @@ export default function Home() {
                     isLockedQuarter 
                       ? 'border-gray-300 bg-gray-100 opacity-60'
                       : isMainService
-                        ? 'border-green-500 bg-green-50 shadow-md'
+                        ? 'border-purple-500 bg-purple-50 shadow-md'
                         : hoveredService === service.id 
                           ? 'border-yellow-400 bg-yellow-50' 
                           : 'border-gray-200 bg-white hover:border-gray-300'
@@ -1243,14 +1298,14 @@ export default function Home() {
                       {service.displayDate.replace(/, \d{4}/, '')}
                     </p>
                     {isMainService && (
-                      <span className="text-xs font-bold text-green-600 bg-green-200 px-2 py-0.5 rounded">NEXT SERVICE</span>
+                      <span className="text-xs font-bold text-purple-600 bg-purple-200 px-2 py-0.5 rounded">NEXT SERVICE</span>
                     )}
                     {service.notes && (() => {
                       // Check if it's Christmas Eve
                       if (service.notes.includes('Christmas Eve')) {
                         return (
                           <span className="text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-0.5 rounded">
-                            🕯️ CHRISTMAS EVE • Volunteer lights 5 candles
+                            🕯️ CHRISTMAS EVE • Liturgist lights 5 candles
                           </span>
                         )
                       }
@@ -1266,7 +1321,7 @@ export default function Home() {
                         
                         return (
                           <span className="text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-0.5 rounded">
-                            🕯️ ADVENT WEEK {week} • Volunteer lights {candleText}
+                            🕯️ ADVENT WEEK {week} • Liturgist lights {candleText}
                           </span>
                         )
                       }
@@ -1278,24 +1333,24 @@ export default function Home() {
                   {/* Service Rows - Different layout for Christmas Eve */}
                   {service.displayDate?.includes('Christmas Eve') ? (
                     <div className="space-y-2 text-sm">
-                      {/* Volunteer Row */}
+                      {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Volunteer:</span>
-                          {service.volunteer1 ? (
+                          <span className="font-medium text-gray-700 whitespace-nowrap">Liturgist:</span>
+                          {service.liturgist ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
-                              <span className="font-semibold text-green-900 truncate" title={service.volunteer1.name}>
-                                {service.volunteer1.name}
+                              <span className="font-semibold text-green-900 truncate" title={service.liturgist.name}>
+                                {service.liturgist.name}
                               </span>
-                              {service.volunteer1.email && (
-                                <span className="text-green-700 text-xs truncate" title={service.volunteer1.email}>
-                                  {service.volunteer1.email}
+                              {service.liturgist.email && (
+                                <span className="text-green-700 text-xs truncate" title={service.liturgist.email}>
+                                  {service.liturgist.email}
                                 </span>
                               )}
                             </div>
                           ) : (
                             <button
-                              onClick={() => handleSignup(service.id, 'volunteer1')}
+                              onClick={() => handleSignup(service.id, 'liturgist')}
                               disabled={isLockedQuarter}
                               className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
@@ -1305,10 +1360,10 @@ export default function Home() {
                         </div>
                         
                         {/* Cancel Button - Right Side (only if filled) */}
-                        {service.volunteer1 && (
+                        {service.liturgist && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
-                              onClick={() => handleCancelSignup(service.volunteer1!.id, service.volunteer1!.name, service.displayDate, 'Volunteer')}
+                              onClick={() => handleCancelSignup(service.liturgist!.id, service.liturgist!.name, service.displayDate, 'Liturgist')}
                               disabled={isLockedQuarter}
                               className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
@@ -1322,8 +1377,14 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
+                          {service.backup ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
+                              <span className="font-semibold text-blue-900 truncate" title={service.backup.name}>
+                                {service.backup.name}
                               </span>
+                              {service.backup.email && (
+                                <span className="text-blue-700 text-xs truncate" title={service.backup.email}>
+                                  {service.backup.email}
                                 </span>
                               )}
                             </div>
@@ -1333,8 +1394,10 @@ export default function Home() {
                         </div>
                         
                         {/* Cancel Button - Right Side (only if filled) */}
+                        {service.backup && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
+                              onClick={() => handleCancelSignup(service.backup!.id, service.backup!.name, service.displayDate, 'Backup')}
                               disabled={isLockedQuarter}
                               className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
@@ -1344,24 +1407,24 @@ export default function Home() {
                         )}
                       </div>
                       
-                      {/* Volunteer #2 Row */}
+                      {/* Second Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Volunteer #2:</span>
-                          {service.volunteer2 ? (
+                          <span className="font-medium text-gray-700 whitespace-nowrap">Second Liturgist:</span>
+                          {service.liturgist2 ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
-                              <span className="font-semibold text-green-900 truncate" title={service.volunteer2.name}>
-                                {service.volunteer2.name}
+                              <span className="font-semibold text-green-900 truncate" title={service.liturgist2.name}>
+                                {service.liturgist2.name}
                               </span>
-                              {service.volunteer2.email && (
-                                <span className="text-green-700 text-xs truncate" title={service.volunteer2.email}>
-                                  {service.volunteer2.email}
+                              {service.liturgist2.email && (
+                                <span className="text-green-700 text-xs truncate" title={service.liturgist2.email}>
+                                  {service.liturgist2.email}
                                 </span>
                               )}
                             </div>
                           ) : (
                             <button
-                              onClick={() => handleSignup(service.id, 'volunteer2')}
+                              onClick={() => handleSignup(service.id, 'liturgist2')}
                               disabled={isLockedQuarter}
                               className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
@@ -1371,10 +1434,10 @@ export default function Home() {
                         </div>
                         
                         {/* Cancel Button - Right Side (only if filled) */}
-                        {service.volunteer2 && (
+                        {service.liturgist2 && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
-                              onClick={() => handleCancelSignup(service.volunteer2!.id, service.volunteer2!.name, service.displayDate, 'Volunteer #2')}
+                              onClick={() => handleCancelSignup(service.liturgist2!.id, service.liturgist2!.name, service.displayDate, 'Second Liturgist')}
                               disabled={isLockedQuarter}
                               className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
@@ -1388,15 +1451,22 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
+                          {service.backup2 ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
+                              <span className="font-semibold text-blue-900 truncate" title={service.backup2.name}>
+                                {service.backup2.name}
                               </span>
+                              {service.backup2.email && (
+                                <span className="text-blue-700 text-xs truncate" title={service.backup2.email}>
+                                  {service.backup2.email}
                                 </span>
                               )}
                             </div>
                           ) : (
                             <button
+                              onClick={() => handleSignup(service.id, 'backup2')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1404,8 +1474,10 @@ export default function Home() {
                         </div>
                         
                         {/* Cancel Button - Right Side (only if filled) */}
+                        {service.backup2 && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
+                              onClick={() => handleCancelSignup(service.backup2!.id, service.backup2!.name, service.displayDate, 'Second Backup')}
                               disabled={isLockedQuarter}
                               className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
@@ -1418,24 +1490,24 @@ export default function Home() {
                   ) : (
                     /* Regular Service Layout */
                     <div className="space-y-2 text-sm">
-                      {/* Volunteer Row */}
+                      {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Volunteer:</span>
-                          {service.volunteer1 ? (
+                          <span className="font-medium text-gray-700 whitespace-nowrap">Liturgist:</span>
+                          {service.liturgist ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
-                              <span className="font-semibold text-green-900 truncate" title={service.volunteer1.name}>
-                                {service.volunteer1.name}
+                              <span className="font-semibold text-green-900 truncate" title={service.liturgist.name}>
+                                {service.liturgist.name}
                               </span>
-                              {service.volunteer1.email && (
-                                <span className="text-green-700 text-xs truncate" title={service.volunteer1.email}>
-                                  {service.volunteer1.email}
+                              {service.liturgist.email && (
+                                <span className="text-green-700 text-xs truncate" title={service.liturgist.email}>
+                                  {service.liturgist.email}
                                 </span>
                               )}
                             </div>
                           ) : (
                             <button
-                              onClick={() => handleSignup(service.id, 'volunteer1')}
+                              onClick={() => handleSignup(service.id, 'liturgist')}
                               disabled={isLockedQuarter}
                               className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
@@ -1445,10 +1517,10 @@ export default function Home() {
                         </div>
                         
                         {/* Cancel Button - Right Side (only if filled) */}
-                        {service.volunteer1 && (
+                        {service.liturgist && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
-                              onClick={() => handleCancelSignup(service.volunteer1!.id, service.volunteer1!.name, service.displayDate, 'Volunteer')}
+                              onClick={() => handleCancelSignup(service.liturgist!.id, service.liturgist!.name, service.displayDate, 'Liturgist')}
                               disabled={isLockedQuarter}
                               className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
@@ -1462,15 +1534,22 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
+                          {service.backup ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
+                              <span className="font-semibold text-blue-900 truncate" title={service.backup.name}>
+                                {service.backup.name}
                               </span>
+                              {service.backup.email && (
+                                <span className="text-blue-700 text-xs truncate" title={service.backup.email}>
+                                  {service.backup.email}
                                 </span>
                               )}
                             </div>
                           ) : (
                             <button
+                              onClick={() => handleSignup(service.id, 'backup')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1478,8 +1557,10 @@ export default function Home() {
                         </div>
                         
                         {/* Cancel Button - Right Side (only if filled) */}
+                        {service.backup && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
+                              onClick={() => handleCancelSignup(service.backup!.id, service.backup!.name, service.displayDate, 'Backup')}
                               disabled={isLockedQuarter}
                               className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
@@ -1498,10 +1579,10 @@ export default function Home() {
 
         {/* Information Section */}
         <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">What Does a Volunteer Do?</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">What Does a Liturgist Do?</h3>
           <div className="prose prose-blue max-w-none text-sm">
             <p className="text-gray-600 mb-4">
-              As a volunteer1, you'll help lead our congregation in worship by:
+              As a liturgist, you'll help lead our congregation in worship by:
             </p>
             <ul className="text-gray-600 space-y-1 mb-4 text-sm">
               <li>• Reading the Call to Worship</li>
@@ -1527,7 +1608,7 @@ export default function Home() {
           <p className="text-xs">
             <a 
               href="https://ukiahumc.org" 
-              className="text-green-600 hover:underline"
+              className="text-blue-600 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
