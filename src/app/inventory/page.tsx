@@ -268,37 +268,37 @@ export default function InventoryPage() {
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Item</th>
-                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Qty</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Box Location(s)</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Category</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Item</th>
+                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Qty</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Box Location(s)</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Category</th>
                 </tr>
               </thead>
               <tbody>
                 {allItemsSorted.map((item, idx) => {
                   const boxes = getBoxLocations(item.item);
                   const stockColorClass = getStockColorClass(item.quantity);
-                  const itemWithUnit = `${item.item} (${item.unit})`;
+                  const itemWithUnit = item.unit ? `${item.item} (${item.unit})` : item.item;
                   return (
                     <tr key={idx} className={`${stockColorClass} hover:bg-gray-50 print:hover:bg-transparent`}>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{itemWithUnit}</td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-base font-bold print:px-1 print:py-0.5 print:text-[10px]">
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[10px] print:leading-tight">{itemWithUnit}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center text-base font-bold print:px-1 print:py-0.5 print:text-[11px]">
                         {item.quantity}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[10px] print:leading-tight">
                         {boxes.length > 0 ? (
                           <span className="inline-flex gap-1 flex-wrap">
                             {boxes.map(boxNum => (
-                              <span key={boxNum} className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs print:px-1 print:py-0 print:text-[8px]">
+                              <span key={boxNum} className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs print:px-1 print:py-0 print:text-[9px]">
                                 Box {boxNum}
                               </span>
                             ))}
                           </span>
                         ) : (
-                          <span className="text-gray-400 italic text-xs print:text-[8px]">See misc.</span>
+                          <span className="text-gray-600 text-xs print:text-[9px]">See misc.</span>
                         )}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{item.category}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[10px] print:leading-tight">{item.category}</td>
                     </tr>
                   );
                 })}
@@ -321,10 +321,10 @@ export default function InventoryPage() {
 
           <div className="mb-4 print:mb-2">
             <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Perishable Produce</h3>
-            <p className="text-sm text-gray-600 italic mb-2 print:text-[9px] print:mb-1">(May be used by Center for Hope during the week)</p>
+            <p className="text-sm text-gray-600 italic mb-2 print:text-[10px] print:mb-1">(May be used by Center for Hope during the week)</p>
             <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
               {miscellaneous.perishables.map((item, idx) => (
-                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
+                <li key={idx} className="text-sm print:text-[10px] print:leading-tight">{item}</li>
               ))}
             </ul>
           </div>
@@ -333,7 +333,7 @@ export default function InventoryPage() {
             <h3 className="text-lg font-semibold text-gray-800 mb-2 print:text-sm">Other Miscellaneous Items</h3>
             <ul className="list-disc list-inside space-y-1 text-gray-700 print:space-y-0">
               {miscellaneous.other.map((item, idx) => (
-                <li key={idx} className="text-sm print:text-[9px] print:leading-tight">{item}</li>
+                <li key={idx} className="text-sm print:text-[10px] print:leading-tight">{item}</li>
               ))}
             </ul>
           </div>
@@ -355,11 +355,11 @@ export default function InventoryPage() {
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Box #</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Date</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Item</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Qty</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[10px]">Notes</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Box #</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Date</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Item</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Qty</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-1 print:py-0.5 print:text-[11px]">Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -384,21 +384,21 @@ export default function InventoryPage() {
                           <>
                             <td 
                               rowSpan={items.length}
-                              className="border border-gray-300 px-4 py-2 text-sm font-bold print:px-1 print:py-0.5 print:text-[10px] align-top"
+                              className="border border-gray-300 px-4 py-2 text-sm font-bold print:px-1 print:py-0.5 print:text-[11px] align-top"
                             >
                               {boxNum}
                             </td>
                             <td 
                               rowSpan={items.length}
-                              className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] align-top"
+                              className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[10px] align-top"
                             >
                               {item.date}
                             </td>
                           </>
                         ) : null}
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px] print:leading-tight">{item.item} ({item.unit})</td>
-                        <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-1 print:py-0.5 print:text-[10px]">{item.quantity}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[9px]">{item.notes}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[10px] print:leading-tight">{item.item} ({item.unit})</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm font-medium print:px-1 print:py-0.5 print:text-[11px]">{item.quantity}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-sm print:px-1 print:py-0.5 print:text-[10px]">{item.notes}</td>
                       </tr>
                     ));
                   });
