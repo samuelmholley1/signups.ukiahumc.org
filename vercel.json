@@ -4,24 +4,14 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/liturgists",
-      "destination": "/liturgists",
+      "source": "/:path*",
       "has": [
         {
           "type": "host",
-          "value": "liturgists.signups.ukiahumc.org"
+          "value": "liturgists.ukiahumc.org"
         }
-      ]
-    },
-    {
-      "source": "/food-distribution",
-      "destination": "/food-distribution",
-      "has": [
-        {
-          "type": "host",
-          "value": "food.signups.ukiahumc.org"
-        }
-      ]
+      ],
+      "destination": "/liturgists/:path*"
     }
   ],
   "headers": [
