@@ -143,12 +143,6 @@ function downloadCSV(filename: string, csvContent: string) {
 }
 
 export default function InventoryPage() {
-  // Calculate stock alerts
-  const allItems = Object.values(runningTotals).flat();
-  const criticalItems = allItems.filter(item => getStockLevel(item.quantity) === 'critical');
-  const lowItems = allItems.filter(item => getStockLevel(item.quantity) === 'low');
-  const totalItems = allItems.reduce((sum, item) => sum + item.quantity, 0);
-
   // Get box locations for items
   const getBoxLocations = (itemName: string): number[] => {
     const normalized = itemName.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -160,6 +154,13 @@ export default function InventoryPage() {
       .map(box => box.box);
     return Array.from(new Set(boxes)).sort((a, b) => a - b);
   };
+
+  // Flatten all items and sort by quantity (lowest to highest)
+  const allItemsSorted = Object.entries(runningTotals)
+    .flatMap(([category, items]) => 
+      items.map(item => ({ ...item, category }))
+    )
+    .sort((a, b) => a.quantity - b.quantity);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -199,139 +200,69 @@ export default function InventoryPage() {
           <p className="text-lg text-gray-600">Ukiah United Methodist Church – Center for Hope</p>
         </div>
 
-        {/* PRIORITY: Stock Alert Dashboard - AT A GLANCE */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 print:shadow-none print:mb-6 border-4 border-red-500">
-          <h2 className="text-3xl font-bold text-red-700 mb-4 print:text-2xl">🚨 PRIORITY: What to Buy First</h2>
-          
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 print:mb-4">
-            <div className="bg-red-100 border-2 border-red-500 rounded-lg p-4 text-center">
-              <div className="text-4xl font-bold text-red-700">{criticalItems.length}</div>
-              <div className="text-lg font-semibold text-red-800">CRITICAL (≤5)</div>
-              <div className="text-sm text-red-600">Buy NOW</div>
-            </div>
-            <div className="bg-yellow-100 border-2 border-yellow-500 rounded-lg p-4 text-center">
-              <div className="text-4xl font-bold text-yellow-700">{lowItems.length}</div>
-              <div className="text-lg font-semibold text-yellow-800">LOW (6-10)</div>
-              <div className="text-sm text-yellow-600">Buy Soon</div>
-            </div>
-            <div className="bg-green-100 border-2 border-green-500 rounded-lg p-4 text-center">
-              <div className="text-4xl font-bold text-green-700">{totalItems}</div>
-              <div className="text-lg font-semibold text-green-800">Total Items</div>
-              <div className="text-sm text-green-600">In Stock</div>
-            </div>
-          </div>
-
-          {/* Shopping List */}
-          {(criticalItems.length > 0 || lowItems.length > 0) && (
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 print:text-xl">📋 Shopping List (Largest Font)</h3>
-              
-              {criticalItems.length > 0 && (
-                <div className="bg-red-50 border-3 border-red-600 rounded-lg p-4 print:break-inside-avoid">
-                  <h4 className="text-xl font-bold text-red-800 mb-3 print:text-lg">⚠️ CRITICAL - Buy Immediately:</h4>
-                  <ul className="space-y-2">
-                    {criticalItems.map((item, idx) => (
-                      <li key={idx} className="text-xl font-semibold text-red-900 print:text-lg flex justify-between items-center">
-                        <span>✓ {item.item}</span>
-                        <span className="text-red-700 font-bold">Only {item.quantity} left!</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {lowItems.length > 0 && (
-                <div className="bg-yellow-50 border-3 border-yellow-600 rounded-lg p-4 print:break-inside-avoid">
-                  <h4 className="text-xl font-bold text-yellow-800 mb-3 print:text-lg">⚡ LOW STOCK - Buy Soon:</h4>
-                  <ul className="space-y-2">
-                    {lowItems.map((item, idx) => (
-                      <li key={idx} className="text-xl font-semibold text-yellow-900 print:text-lg flex justify-between items-center">
-                        <span>✓ {item.item}</span>
-                        <span className="text-yellow-700 font-bold">{item.quantity} remaining</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {criticalItems.length === 0 && lowItems.length === 0 && (
-            <div className="bg-green-50 border-2 border-green-500 rounded-lg p-6 text-center">
-              <div className="text-3xl mb-2">✅</div>
-              <div className="text-2xl font-bold text-green-800">All Stock Levels Look Good!</div>
-              <div className="text-lg text-green-600 mt-2">No immediate purchases needed</div>
-            </div>
-          )}
-        </div>
-
         {/* Section 1: All Items with Box Locations */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-6 print:break-after-page">
           <div className="flex justify-between items-center mb-4 print:mb-3">
-            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">📦 All Items (with Box Locations)</h2>
+            <h2 className="text-2xl font-bold text-gray-900 print:text-xl">Inventory (Sorted by Quantity: Low to High)</h2>
             <button
               onClick={() => downloadCSV('running-totals.csv', generateRunningTotalsCSV())}
-              className="print:hidden px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+              className="print:hidden px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
             >
-              📊 CSV
+              Download CSV
             </button>
           </div>
 
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded print:text-xs">
-            <p className="text-sm font-medium text-blue-900">
-              <strong>Color Guide:</strong> 
-              <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 rounded">🔴 Critical (≤5)</span>
-              <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded">🟡 Low (6-10)</span>
-              <span className="ml-2 px-2 py-1 bg-white text-gray-800 rounded">⚪ Good ({'>'}10)</span>
+          <div className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded print:text-xs">
+            <p className="text-sm text-gray-700">
+              <strong>Stock Level Guide:</strong> 
+              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-800 rounded">Low: 1-5</span>
+              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-800 rounded">Moderate: 6-10</span>
+              <span className="ml-2 px-2 py-1 bg-white text-gray-800 rounded border border-gray-300">Adequate: 11+</span>
             </p>
           </div>
 
-          {Object.entries(runningTotals).map(([category, items]) => (
-            <div key={category} className="mb-6 print:mb-4">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 bg-gray-100 p-2 rounded print:text-base">{category}</h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse border-2 border-gray-400">
-                  <thead>
-                    <tr className="bg-gray-200">
-                      <th className="border border-gray-400 px-4 py-3 text-left text-base font-bold print:px-2 print:py-2 print:text-sm">Item</th>
-                      <th className="border border-gray-400 px-4 py-3 text-center text-base font-bold print:px-2 print:py-2 print:text-sm">Quantity</th>
-                      <th className="border border-gray-400 px-4 py-3 text-center text-base font-bold print:px-2 print:py-2 print:text-sm">Unit</th>
-                      <th className="border border-gray-400 px-4 py-3 text-left text-base font-bold print:px-2 print:py-2 print:text-sm">Box Location(s)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((item, idx) => {
-                      const boxes = getBoxLocations(item.item);
-                      const stockColorClass = getStockColorClass(item.quantity);
-                      return (
-                        <tr key={idx} className={`${stockColorClass} hover:opacity-80 print:hover:opacity-100`}>
-                          <td className="border border-gray-400 px-4 py-3 text-base font-semibold print:px-2 print:py-2 print:text-sm">{item.item}</td>
-                          <td className="border border-gray-400 px-4 py-3 text-center text-xl font-bold print:px-2 print:py-2 print:text-base">
-                            {item.quantity}
-                          </td>
-                          <td className="border border-gray-400 px-4 py-3 text-center text-base print:px-2 print:py-2 print:text-sm">{item.unit}</td>
-                          <td className="border border-gray-400 px-4 py-3 text-base font-medium print:px-2 print:py-2 print:text-sm">
-                            {boxes.length > 0 ? (
-                              <span className="inline-flex gap-1 flex-wrap">
-                                {boxes.map(boxNum => (
-                                  <span key={boxNum} className="bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold">
-                                    Box {boxNum}
-                                  </span>
-                                ))}
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Category</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Item</th>
+                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-2 print:py-1 print:text-xs">Quantity</th>
+                  <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold print:px-2 print:py-1 print:text-xs">Unit</th>
+                  <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold print:px-2 print:py-1 print:text-xs">Box Location(s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allItemsSorted.map((item, idx) => {
+                  const boxes = getBoxLocations(item.item);
+                  const stockColorClass = getStockColorClass(item.quantity);
+                  return (
+                    <tr key={idx} className={`${stockColorClass} hover:bg-gray-50 print:hover:bg-transparent`}>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.category}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">{item.item}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center text-base font-bold print:px-2 print:py-1 print:text-sm">
+                        {item.quantity}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-center text-sm print:px-2 print:py-1 print:text-xs">{item.unit}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-sm print:px-2 print:py-1 print:text-xs">
+                        {boxes.length > 0 ? (
+                          <span className="inline-flex gap-1 flex-wrap">
+                            {boxes.map(boxNum => (
+                              <span key={boxNum} className="bg-gray-200 text-gray-800 px-2 py-0.5 rounded text-xs">
+                                Box {boxNum}
                               </span>
-                            ) : (
-                              <span className="text-gray-400 italic">See misc.</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
+                            ))}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 italic text-xs">See misc.</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Section 2: Box-by-Box Contents */}
