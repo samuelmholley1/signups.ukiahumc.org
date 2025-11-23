@@ -5,6 +5,17 @@
   "redirects": [
     {
       "source": "/inventory/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "liturgists.ukiahumc.org"
+        }
+      ],
+      "destination": "https://signups.ukiahumc.org/food-distribution/inventory/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/inventory/:path*",
       "destination": "/food-distribution/inventory/:path*",
       "permanent": true
     },
