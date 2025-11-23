@@ -242,7 +242,7 @@ export default function InventoryPage() {
         </div>
 
         {/* Section 1: All Items with Box Locations */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:bg-transparent print:rounded-none">
           <div className="flex justify-between items-center mb-4 print:mb-2">
             <h2 className="text-2xl font-bold text-gray-900 print:text-base">Inventory (Sorted by Quantity: Low to High)</h2>
             <button
@@ -297,7 +297,7 @@ export default function InventoryPage() {
         </div>
 
         {/* Section 2: Miscellaneous & Perishables */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:break-after-page">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:break-after-page print:bg-transparent print:rounded-none">
           <div className="flex justify-between items-center mb-4 print:mb-2">
             <h2 className="text-2xl font-bold text-gray-900 print:text-base">Miscellaneous & Perishables</h2>
             <button
@@ -329,7 +329,7 @@ export default function InventoryPage() {
         </div>
 
         {/* Section 3: Box-by-Box Contents */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 print:shadow-none print:mb-3 print:p-2 print:bg-transparent print:rounded-none">
           <div className="flex justify-between items-center mb-4 print:mb-2">
             <h2 className="text-2xl font-bold text-gray-900 print:text-base">Box-by-Box Contents</h2>
             <button
