@@ -4,6 +4,11 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/inventory/:path*",
+      "destination": "/food-distribution/inventory/:path*",
+      "permanent": true
+    },
+    {
       "source": "/",
       "has": [
         {
