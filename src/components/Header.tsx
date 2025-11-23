@@ -1,11 +1,29 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+
 export default function Header() {
+  const pathname = usePathname()
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('[Header] Current pathname:', pathname)
+    console.log('[Header] Should hide header:', pathname === '/inventory')
+  }, [pathname])
+
   const handleSignOut = () => {
     sessionStorage.removeItem('liturgist-auth')
     window.location.reload()
   }
 
+  // Don't render header on inventory page
+  if (pathname === '/inventory') {
+    console.log('[Header] Rendering: NONE (inventory page)')
+    return null
+  }
+
+  console.log('[Header] Rendering: VISIBLE')
   return (
     <header className="bg-blue-600 text-white shadow-lg print:hidden">
       <div className="container mx-auto px-4 py-4">

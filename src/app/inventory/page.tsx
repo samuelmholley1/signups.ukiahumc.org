@@ -144,6 +144,10 @@ function downloadCSV(filename: string, csvContent: string) {
 }
 
 export default function InventoryPage() {
+  // Debug logging
+  console.log('[Inventory] Page component mounted')
+  console.log('[Inventory] Location:', typeof window !== 'undefined' ? window.location.pathname : 'SSR')
+  
   // Get box locations for items
   const getBoxLocations = (itemName: string): number[] => {
     const normalized = itemName.toLowerCase().replace(/\s+/g, ' ').trim();

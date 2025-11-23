@@ -53,14 +53,15 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              console.log('[RootLayout] Initializing app');
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
-                      console.log('SW registered: ', registration);
+                      console.log('[SW] Service Worker registered:', registration);
                     })
                     .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
+                      console.log('[SW] Service Worker registration failed:', registrationError);
                     });
                 });
               }
