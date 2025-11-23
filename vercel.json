@@ -4,14 +4,24 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "liturgists.ukiahumc.org"
         }
       ],
-      "destination": "/liturgists/:path*"
+      "destination": "/liturgists"
+    },
+    {
+      "source": "/:path(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "liturgists.ukiahumc.org"
+        }
+      ],
+      "destination": "/liturgists/:path"
     }
   ],
   "headers": [
