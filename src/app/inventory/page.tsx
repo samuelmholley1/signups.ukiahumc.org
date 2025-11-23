@@ -12,9 +12,9 @@ function getStockLevel(quantity: number): 'critical' | 'low' | 'adequate' {
 // Helper function to get stock color classes
 function getStockColorClass(quantity: number): string {
   const level = getStockLevel(quantity);
-  if (level === 'critical') return 'bg-red-50 border-l-4 border-red-500';
-  if (level === 'low') return 'bg-yellow-50 border-l-4 border-yellow-500';
-  if (quantity > 20) return 'bg-green-50 border-l-4 border-green-500';
+  if (level === 'critical') return 'bg-red-50 border-l-4 border-red-500 print:!bg-red-100 print:!border-red-500';
+  if (level === 'low') return 'bg-yellow-50 border-l-4 border-yellow-500 print:!bg-yellow-100 print:!border-yellow-500';
+  if (quantity > 20) return 'bg-green-50 border-l-4 border-green-500 print:!bg-green-100 print:!border-green-500';
   return '';
 }
 
@@ -164,9 +164,19 @@ export default function InventoryPage() {
     .sort((a, b) => a.quantity - b.quantity);
 
   return (
-    <div className="min-h-screen bg-gray-50 print:bg-white">
-      {/* Header - hidden when printing */}
-      <div className="print:hidden bg-white shadow-sm sticky top-0 z-10">
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+        }
+      `}} />
+      <div className="min-h-screen bg-gray-50 print:bg-white">
+        {/* Header - hidden when printing */}
+        <div className="print:hidden bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">Pantry Inventory</h1>
@@ -294,7 +304,7 @@ export default function InventoryPage() {
                   return sortedBoxNumbers.map((boxNum, boxIdx) => {
                     const items = boxGroups[boxNum];
                     const isEvenBox = boxIdx % 2 === 0;
-                    const bgColor = isEvenBox ? 'bg-gray-50' : 'bg-white';
+                    const bgColor = isEvenBox ? 'bg-gray-50 print:!bg-gray-200' : 'bg-white print:!bg-white';
                     
                     return items.map((item, itemIdx) => (
                       <tr key={`${boxNum}-${itemIdx}`} className={`${bgColor} hover:opacity-80 print:hover:opacity-100`}>
@@ -364,6 +374,7 @@ export default function InventoryPage() {
       <div className="hidden print:block text-center text-sm text-gray-600 mt-8 pb-4">
         <p>Generated: {new Date().toLocaleDateString()}</p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
