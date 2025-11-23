@@ -15,7 +15,7 @@ export default function SectionHeader() {
   
   if (!isLiturgists && !isFoodDistribution) return null
   
-  const sectionTitle = isLiturgists ? 'UUMC Liturgist Signup' : 'UUMC Food Distribution'
+  const sectionTitle = isLiturgists ? 'Liturgist Signup' : 'Food Distribution'
   const bgColor = isLiturgists ? 'bg-blue-600' : 'bg-green-600'
   const homeLink = isLiturgists ? '/liturgists' : '/food-distribution'
   const summaryLink = isLiturgists ? '/liturgists/schedule-summary' : '/food-distribution/schedule-summary'
@@ -31,7 +31,11 @@ export default function SectionHeader() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <h1 className="text-xl font-bold">{sectionTitle}</h1>
+            <h1 className="text-xl font-bold">
+              <span className="hidden sm:inline">Ukiah United Methodist Church - </span>
+              <span className="sm:hidden">UUMC </span>
+              {sectionTitle}
+            </h1>
           </div>
           <nav className="flex items-center space-x-6">
             <a href={homeLink} className="hover:text-blue-200 transition-colors">
