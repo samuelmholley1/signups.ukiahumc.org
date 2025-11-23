@@ -31,7 +31,9 @@ export default function FoodDistribution() {
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [formData, setFormData] = useState({
-    name: '',
+    selectedPerson: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     role: 'volunteer1' as 'volunteer1' | 'volunteer2'
@@ -71,6 +73,29 @@ export default function FoodDistribution() {
     }
   }
 
+  const handlePersonSelect = (personName: string) => {
+    setFormData(prev => ({ ...prev, selectedPerson: personName }))
+    
+    if (personName === 'Samuel Holley') {
+      setFormData(prev => ({
+        ...prev,
+        email: 'sam@samuelholley.com',
+        phone: '714-496-7006',
+        firstName: '',
+        lastName: ''
+      }))
+    } else if (personName === 'other') {
+      // Clear fields for "other"
+      setFormData(prev => ({
+        ...prev,
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: ''
+      }))
+    }
+  }
+
   const handleCancel = async (recordId: string, name: string, displayDate: string) => {
     if (!confirm(`Cancel ${name}'s signup for ${displayDate}?`)) return
     
@@ -99,6 +124,27 @@ export default function FoodDistribution() {
     const signup = signups.find(s => s.date === selectedDate)
     if (!signup) return
     
+    // Determine the name based on selection
+    let fullName = ''
+    if (formData.selectedPerson === 'other') {
+      fullName = `${formData.firstName} ${formData.lastName}`.trim()
+    } else {
+      fullName = formData.selectedPerson
+    }
+
+    // Validate name is not empty
+    if (!fullName || fullName.trim().length === 0) {
+      alert('Please enter a valid name before submitting.')
+      return
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+    if (!emailRegex.test(formData.email) || formData.email.endsWith('.')) {
+      alert('Please enter a valid email address.')
+      return
+    }
+    
     try {
       const response = await fetch('/api/signup', {
         method: 'POST',
@@ -107,7 +153,7 @@ export default function FoodDistribution() {
           table: 'food',
           serviceDate: selectedDate,
           displayDate: signup.displayDate,
-          name: formData.name,
+          name: fullName,
           email: formData.email,
           phone: formData.phone,
           role: formData.role
@@ -120,7 +166,14 @@ export default function FoodDistribution() {
         // Refresh signups from server
         await fetchSignups()
         // Reset form
-        setFormData({ name: '', email: '', phone: '', role: 'volunteer1' })
+        setFormData({ 
+          selectedPerson: '',
+          firstName: '', 
+          lastName: '',
+          email: '', 
+          phone: '', 
+          role: 'volunteer1' 
+        })
         setSelectedDate(null)
         alert('Signup successful!')
       } else {
@@ -242,15 +295,44 @@ export default function FoodDistribution() {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Name *</label>
-                    <input
-                      type="text"
+                    <label className="block text-sm font-medium mb-1">Select Person *</label>
+                    <select
                       required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      value={formData.selectedPerson}
+                      onChange={(e) => handlePersonSelect(e.target.value)}
                       className="w-full border rounded-lg px-3 py-2"
-                    />
+                    >
+                      <option value="">-- Choose --</option>
+                      <option value="Samuel Holley">Samuel Holley</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
+
+                  {formData.selectedPerson === 'other' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">First Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.firstName}
+                          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                          className="w-full border rounded-lg px-3 py-2"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Last Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.lastName}
+                          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                          className="w-full border rounded-lg px-3 py-2"
+                        />
+                      </div>
+                    </>
+                  )}
                   
                   <div>
                     <label className="block text-sm font-medium mb-1">Email *</label>
@@ -260,16 +342,18 @@ export default function FoodDistribution() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full border rounded-lg px-3 py-2"
+                      disabled={formData.selectedPerson === 'Samuel Holley'}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium mb-1">Phone (optional)</label>
+                    <label className="block text-sm font-medium mb-1">Phone</label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full border rounded-lg px-3 py-2"
+                      disabled={formData.selectedPerson === 'Samuel Holley'}
                     />
                   </div>
                   
