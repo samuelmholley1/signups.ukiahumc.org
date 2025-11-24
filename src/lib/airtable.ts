@@ -128,4 +128,22 @@ export async function deleteSignup(recordId: string, tableName: string = TABLES.
   }
 }
 
+export async function updateSignupRole(recordId: string, newRole: string, tableName: string = TABLES.LITURGISTS) {
+  try {
+    const table = getTable(tableName)
+    await table.update([
+      {
+        id: recordId,
+        fields: {
+          role: newRole
+        }
+      }
+    ])
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating role in Airtable:', error)
+    return { success: false, error }
+  }
+}
+
 export { base, getTable }

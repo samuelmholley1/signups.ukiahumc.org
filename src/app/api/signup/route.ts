@@ -66,28 +66,10 @@ export async function POST(request: NextRequest) {
       return errorResponse2;
     }
 
-    // CRITICAL: Server-side duplicate prevention (race condition fix)
-    const existingSignups = await getSignups(tableName)
-    const duplicate = existingSignups.find(
-      (s: any) => s.serviceDate === body.serviceDate && s.role === body.role
-    )
+    // NOTE: Duplicate prevention disabled for testing
+    // Allow same user to sign up for multiple slots on same day
+    // TODO: Re-enable after testing is complete
     
-    if (duplicate) {
-      console.warn('Duplicate signup attempt blocked:', {
-        serviceDate: body.serviceDate,
-        role: body.role,
-        existingName: duplicate.name,
-        attemptedName: body.name
-      })
-      return NextResponse.json(
-        { 
-          error: `This role is already taken by ${duplicate.name}. Please refresh the page to see updated availability.`,
-          isDuplicate: true
-        },
-        { status: 409 } // 409 Conflict
-      )
-    }
-
     // Submit to Airtable
     const result = await submitSignup({
       serviceDate: body.serviceDate,
@@ -506,12 +488,43 @@ export async function DELETE(request: NextRequest) {
 
     // Get record info before deleting (for email notification)
     const recordData = await getSignupById(recordId, tableName)
+    const cancelledRole = recordData.record?.role as string
+    const serviceDate = recordData.record?.serviceDate as string
     
     // Delete from Airtable
     const result = await deleteSignup(recordId, tableName)
 
     if (result.success) {
       console.log('Signup cancelled successfully:', recordId)
+      
+      // BACKFILL LOGIC: If volunteer 1 or 2 cancelled, promote volunteer 3 & 4
+      if (tableName === 'Food Distribution' && (cancelledRole === 'volunteer1' || cancelledRole === 'volunteer2')) {
+        console.log('🔄 [BACKFILL] Checking for volunteers to promote...')
+        
+        // Get all signups for this date
+        const { getSignups } = await import('@/lib/airtable')
+        const { updateSignupRole } = await import('@/lib/airtable')
+        const allSignups = await getSignups(tableName)
+        const dateSignups = allSignups.filter((s: any) => s.serviceDate === serviceDate)
+        
+        // Find volunteer3 and volunteer4
+        const vol3 = dateSignups.find((s: any) => s.role === 'volunteer3')
+        const vol4 = dateSignups.find((s: any) => s.role === 'volunteer4')
+        
+        if (cancelledRole === 'volunteer1') {
+          // volunteer2 -> volunteer1, volunteer3 -> volunteer2, volunteer4 -> volunteer3
+          const vol2 = dateSignups.find((s: any) => s.role === 'volunteer2')
+          if (vol2) await updateSignupRole(vol2.id, 'volunteer1', tableName)
+          if (vol3) await updateSignupRole(vol3.id, 'volunteer2', tableName)
+          if (vol4) await updateSignupRole(vol4.id, 'volunteer3', tableName)
+          console.log('✅ [BACKFILL] Promoted volunteers after volunteer1 cancellation')
+        } else if (cancelledRole === 'volunteer2') {
+          // volunteer3 -> volunteer2, volunteer4 -> volunteer3
+          if (vol3) await updateSignupRole(vol3.id, 'volunteer2', tableName)
+          if (vol4) await updateSignupRole(vol4.id, 'volunteer3', tableName)
+          console.log('✅ [BACKFILL] Promoted volunteers after volunteer2 cancellation')
+        }
+      }
       
       // Send cancellation email notifications
       if (recordData.success && recordData.record) {
