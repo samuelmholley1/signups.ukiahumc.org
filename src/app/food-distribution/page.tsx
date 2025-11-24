@@ -33,6 +33,8 @@ export default function FoodDistribution() {
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [showExtraColumns, setShowExtraColumns] = useState<{ [key: string]: boolean }>({})
+  const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
+  const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [formData, setFormData] = useState({
     selectedPerson: '',
     firstName: '',
@@ -132,13 +134,36 @@ export default function FoodDistribution() {
       
       if (data.success) {
         await fetchSignups()
-        alert('Signup cancelled successfully')
+        setSuccessModal({ show: true, message: 'Signup cancelled successfully.' })
       } else {
-        alert(data.error || 'Cancellation failed')
+        setErrorModal({ show: true, title: 'Cancellation Failed', message: data.error || 'Unable to cancel signup. Please try again.' })
       }
     } catch (error) {
       console.error('Error cancelling signup:', error)
-      alert('Error cancelling signup. Please try again.')
+      setErrorModal({ show: true, title: 'Network Error', message: 'Unable to connect to the server. Please try again.' })
+      
+      // Report error to server
+      try {
+        await fetch('/api/report-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: {
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined
+            },
+            context: {
+              userName: name,
+              explanation: 'Food distribution signup cancellation failed',
+              userAgent: navigator.userAgent,
+              url: window.location.href,
+              timestamp: new Date().toISOString()
+            }
+          })
+        })
+      } catch (reportError) {
+        console.error('Failed to report error:', reportError)
+      }
     }
   }
 
@@ -158,14 +183,14 @@ export default function FoodDistribution() {
 
     // Validate name is not empty
     if (!fullName || fullName.trim().length === 0) {
-      alert('Please enter a valid name before submitting.')
+      setErrorModal({ show: true, title: 'Name Required', message: 'Please enter a valid name before submitting.' })
       return
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
     if (!emailRegex.test(formData.email) || formData.email.endsWith('.')) {
-      alert('Please enter a valid email address.')
+      setErrorModal({ show: true, title: 'Invalid Email', message: 'Please enter a valid email address.' })
       return
     }
     
@@ -199,13 +224,38 @@ export default function FoodDistribution() {
           role: 'volunteer1' 
         })
         setSelectedDate(null)
-        alert('Signup successful!')
+        setSuccessModal({ show: true, message: 'Signup successful! You will receive a confirmation email shortly.' })
       } else {
-        alert(data.error || 'Signup failed')
+        setErrorModal({ show: true, title: 'Signup Failed', message: data.error || 'Unable to complete signup. Please try again.' })
       }
     } catch (error) {
       console.error('Error submitting signup:', error)
-      alert('Error submitting signup. Please try again.')
+      setErrorModal({ show: true, title: 'Network Error', message: 'Unable to connect to the server. Please check your internet connection and try again.' })
+      
+      // Report error to server
+      try {
+        await fetch('/api/report-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: {
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined
+            },
+            context: {
+              userName: fullName,
+              userEmail: formData.email,
+              serviceDate: signup.displayDate,
+              explanation: 'Food distribution signup submission failed',
+              userAgent: navigator.userAgent,
+              url: window.location.href,
+              timestamp: new Date().toISOString()
+            }
+          })
+        })
+      } catch (reportError) {
+        console.error('Failed to report error:', reportError)
+      }
     }
   }
 
@@ -408,7 +458,16 @@ export default function FoodDistribution() {
           {selectedDate && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                <h3 className="text-xl font-bold mb-4">
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src="/logo-for-church-larger.jpg"
+                    alt="UUMC"
+                    width={80}
+                    height={53}
+                    className="rounded-lg"
+                  />
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-center">
                   Sign Up as Volunteer #{formData.role === 'volunteer1' ? '1' : formData.role === 'volunteer2' ? '2' : formData.role === 'volunteer3' ? '3' : '4'}
                 </h3>
                 <p className="text-gray-600 mb-4">
@@ -508,6 +567,62 @@ export default function FoodDistribution() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* Error Modal */}
+          {errorModal.show && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src="/logo-for-church-larger.jpg"
+                    alt="UUMC"
+                    width={80}
+                    height={53}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="text-center mb-4">
+                  <div className="text-5xl mb-2">⚠️</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{errorModal.title}</h3>
+                  <p className="text-gray-600">{errorModal.message}</p>
+                </div>
+                <button
+                  onClick={() => setErrorModal({ show: false, title: '', message: '' })}
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Success Modal */}
+          {successModal.show && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src="/logo-for-church-larger.jpg"
+                    alt="UUMC"
+                    width={80}
+                    height={53}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="text-center mb-4">
+                  <div className="text-5xl mb-2">✅</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Success!</h3>
+                  <p className="text-gray-600">{successModal.message}</p>
+                </div>
+                <button
+                  onClick={() => setSuccessModal({ show: false, message: '' })}
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  Close
+                </button>
               </div>
             </div>
           )}
