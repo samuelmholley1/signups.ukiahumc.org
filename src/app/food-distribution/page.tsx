@@ -497,8 +497,7 @@ export default function FoodDistribution() {
                       <option value="Michele Robbins">Michele Robbins</option>
                       <option value="Test User">Test User</option>
                       <option value="Diana Waddle">Diana Waddle</option>
-                      <option value="other">Other</option>
-                      <option value="other">Other</option>
+                      <option value="other">Other (not listed)</option>
                     </select>
                   </div>
 

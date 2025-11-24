@@ -20,13 +20,18 @@ function stamp(tag: string) {
 export async function POST(request: NextRequest) {
   const handlerStamp = stamp('signup.POST');
   console.log('🔍 HANDLER STAMP:' , handlerStamp);
+  
+  // Parse body and determine table name BEFORE try block so it's accessible in catch
+  let body: any;
+  let tableName = 'Liturgists'; // default to Liturgists
+  
   try {
-    const body = await request.json()
+    body = await request.json()
     
     console.log('Received signup request:', body)
     
     // Determine which table to use
-    const tableName = body.table === 'food' ? 'Food Distribution' : 'Liturgists'
+    tableName = body.table === 'food' ? 'Food Distribution' : 'Liturgists'
     console.log('Using table:', tableName)
     
     // Validate required fields
@@ -114,18 +119,31 @@ export async function POST(request: NextRequest) {
         // If Sam signs up: TO sam@ only (no CC)
         // If others sign up: TO their email, CC sam@
         const isSamSigningUp = body.email.toLowerCase() === 'sam@samuelholley.com'
+        const isFoodDistribution = tableName === 'Food Distribution'
         const role = body.role.toLowerCase().trim()
-        const isBackup = role === 'backup'
-        const isSecondLiturgist = role === 'liturgist2'
-        const roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+        
+        // Determine role label based on table type
+        let roleLabel = ''
+        if (isFoodDistribution) {
+          // Food distribution roles: volunteer1, volunteer2, volunteer3, volunteer4
+          roleLabel = 'Food Distribution Volunteer'
+        } else {
+          // Liturgist roles: liturgist, backup, liturgist2
+          const isBackup = role === 'backup'
+          const isSecondLiturgist = role === 'liturgist2'
+          roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+        }
+        
         const firstName = body.name.split(' ')[0] || body.name || 'Unknown'
+        const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
         
         await sendEmail({
           to: body.email,
           cc: isSamSigningUp ? undefined : 'sam@samuelholley.com',
           replyTo: 'sam@samuelholley.com',
           subject: `✅ ${roleLabel} Sign-up Confirmed: ${firstName} | ${body.displayDate}`,
-          html: emailHtml
+          html: emailHtml,
+          fromName
         })
         
         console.log('Email notification sent successfully')
@@ -153,10 +171,16 @@ export async function POST(request: NextRequest) {
           stackTrace: result.error instanceof Error ? result.error.stack : undefined
         })
         
+        const errorSubject = tableName === 'Food Distribution' 
+          ? '🚨 ERROR: Food Distribution Signup Failed'
+          : '🚨 ERROR: Liturgist Signup Failed'
+        const errorFromName = tableName === 'Food Distribution' ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        
         await sendEmail({
           to: 'sam@samuelholley.com',
-          subject: '🚨 ERROR: Liturgist Signup Failed',
-          html: errorEmailHtml
+          subject: errorSubject,
+          html: errorEmailHtml,
+          fromName: errorFromName
         })
       } catch (emailError) {
         console.error('Failed to send error notification email:', emailError)
@@ -178,10 +202,16 @@ export async function POST(request: NextRequest) {
         stackTrace: error instanceof Error ? error.stack : undefined
       })
       
+      const systemErrorSubject = tableName === 'Food Distribution'
+        ? '🚨 ERROR: Food Distribution System Error'
+        : '🚨 ERROR: Liturgist Signup System Error'
+      const systemErrorFromName = tableName === 'Food Distribution' ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+      
       await sendEmail({
         to: 'sam@samuelholley.com',
-        subject: '🚨 ERROR: Liturgist Signup System Error',
-        html: errorEmailHtml
+        subject: systemErrorSubject,
+        html: errorEmailHtml,
+        fromName: systemErrorFromName
       })
     } catch (emailError) {
       console.error('Failed to send error notification email:', emailError)
@@ -251,18 +281,38 @@ export async function GET(request: NextRequest) {
           const userName = recordData.record.name as string
           const isSamCancelling = userEmail.toLowerCase() === 'sam@samuelholley.com'
           
-          // Determine role label and name
+          // Detect if this is food distribution based on role
           const role = userRole.toLowerCase().trim()
-          const isBackup = role === 'backup'
-          const isSecondLiturgist = role === 'liturgist2'
-          const roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+          const isFoodDistribution = role.startsWith('volunteer')
+          
+          // Determine role label based on table type
+          let roleLabel = ''
+          if (isFoodDistribution) {
+            roleLabel = 'Food Distribution Volunteer'
+          } else {
+            const isBackup = role === 'backup'
+            const isSecondLiturgist = role === 'liturgist2'
+            roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+          }
+          
           const firstName = userName.split(' ' )[0] || userName || 'Unknown'
+          const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
           
           // CC logic: always CC sam@ except when sam@ is TO recipient
           const shouldCCSam = !isSamCancelling
           
           const finalSubject = `❌ ${roleLabel} Sign-up Cancelled: ${firstName} | ${formattedDateForSubject}`
           const finalCC = shouldCCSam ? 'sam@samuelholley.com' : undefined
+          
+          await sendEmail({
+            to: userEmail,
+            cc: finalCC,
+            replyTo: 'sam@samuelholley.com',
+            subject: finalSubject,
+            html: emailHtml,
+            fromName
+          })
+        
         console.log(`Cancellation email: userEmail="${userEmail}", isSamCancelling=${isSamCancelling}, to=${isSamCancelling ? 'alerts@' : userEmail}`)
         
         console.log('Cancellation email notification sent successfully')
@@ -318,10 +368,19 @@ export async function GET(request: NextRequest) {
           stackTrace: result.error instanceof Error ? result.error.stack : undefined
         })
         
+        // Detect table type from role for error email
+        const userRole = recordData.record.role as string
+        const isFoodDistribution = userRole && userRole.toLowerCase().startsWith('volunteer')
+        const errorFromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        const errorSubject = isFoodDistribution 
+          ? '🚨 ERROR: Food Distribution Email Link Cancellation Failed'
+          : '🚨 ERROR: Liturgist Email Link Cancellation Failed'
+        
         await sendEmail({
           to: 'sam@samuelholley.com',
-          subject: '🚨 ERROR: Email Link Cancellation Failed',
-          html: errorEmailHtml
+          subject: errorSubject,
+          html: errorEmailHtml,
+          fromName: errorFromName
         })
       } catch (emailError) {
         console.error('Failed to send error notification email:', emailError)
@@ -371,10 +430,12 @@ export async function GET(request: NextRequest) {
         stackTrace: error instanceof Error ? error.stack : undefined
       })
       
+      // Can't detect table type here, default to liturgist
       await sendEmail({
         to: 'sam@samuelholley.com',
         subject: '🚨 ERROR: Email Link Cancellation System Error',
-        html: errorEmailHtml
+        html: errorEmailHtml,
+        fromName: 'UUMC System'
       })
     } catch (emailError) {
       console.error('Failed to send error notification email:', emailError)
@@ -420,19 +481,19 @@ export async function DELETE(request: NextRequest) {
   console.log('🚨🚨🚨 DELETE HANDLER CALLED - THIS SHOULD ALWAYS APPEAR! 🚨🚨🚨');
   console.log('🔍 HANDLER STAMP:', handlerStamp);
   
+  // Extract params BEFORE try block so tableName is accessible in catch
+  const { searchParams } = new URL(request.url)
+  const recordId = searchParams.get('recordId')
+  const table = searchParams.get('table') || 'liturgists'
+  const tableName = table === 'food' ? 'Food Distribution' : 'Liturgists'
+  
   try {
-    const { searchParams } = new URL(request.url)
-    const recordId = searchParams.get('recordId')
-    const table = searchParams.get('table') || 'liturgists'
-    
     if (!recordId) {
       const errorResponse1 = NextResponse.json({ error: 'Missing recordId parameter', handler: handlerStamp }, { status: 400 });
       errorResponse1.headers.set('X-Handler', JSON.stringify(handlerStamp));
       return errorResponse1;
     }
 
-    // Determine which table to use
-    const tableName = table === 'food' ? 'Food Distribution' : 'Liturgists'
     console.log('Using table:', tableName)
 
     // Get record info before deleting (for email notification)
@@ -472,12 +533,19 @@ export async function DELETE(request: NextRequest) {
           const userRole = recordData.record.role as string
           const userName = recordData.record.name as string
           const isSamCancelling = userEmail.toLowerCase() === 'sam@samuelholley.com'
+          const isFoodDistribution = tableName === 'Food Distribution'
           
-          // Determine role label and name
-          const role = userRole.toLowerCase().trim()
-          const isBackup = role === 'backup'
-          const isSecondLiturgist = role === 'liturgist2'
-          const roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+          // Determine role label based on table type
+          let roleLabel = ''
+          if (isFoodDistribution) {
+            roleLabel = 'Food Distribution Volunteer'
+          } else {
+            const role = userRole.toLowerCase().trim()
+            const isBackup = role === 'backup'
+            const isSecondLiturgist = role === 'liturgist2'
+            roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+          }
+          
           const firstName = userName.split(' ' )[0] || userName || 'Unknown'
           
           // CC logic: always CC sam@ except when sam@ is TO recipient
@@ -485,13 +553,15 @@ export async function DELETE(request: NextRequest) {
           
           const finalSubject = `❌ ${roleLabel} Sign-up Cancelled: ${firstName} | ${formattedDateForSubject}`
           const finalCC = shouldCCSam ? 'sam@samuelholley.com' : undefined
+          const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
           
           await sendEmail({
             to: userEmail,
             cc: finalCC,
             replyTo: 'sam@samuelholley.com',
             subject: finalSubject,
-            html: emailHtml
+            html: emailHtml,
+            fromName
           })
           
           console.log('Cancellation email notification sent successfully')
@@ -515,10 +585,16 @@ export async function DELETE(request: NextRequest) {
           stackTrace: result.error instanceof Error ? result.error.stack : undefined
         })
         
+        const cancelErrorSubject = tableName === 'Food Distribution'
+          ? '🚨 ERROR: Food Distribution Cancellation Failed'
+          : '🚨 ERROR: Liturgist Cancellation Failed'
+        const cancelErrorFromName = tableName === 'Food Distribution' ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        
         await sendEmail({
           to: 'sam@samuelholley.com',
-          subject: '❌ Cancellation Failed',
-          html: errorEmailHtml
+          subject: cancelErrorSubject,
+          html: errorEmailHtml,
+          fromName: cancelErrorFromName
         })
       } catch (emailError) {
         console.error('Failed to send error email:', emailError)
@@ -538,10 +614,16 @@ export async function DELETE(request: NextRequest) {
         stackTrace: error instanceof Error ? error.stack : undefined
       })
       
+      const cancelSystemErrorSubject = tableName === 'Food Distribution'
+        ? '🚨 ERROR: Food Distribution Cancellation System Error'
+        : '🚨 ERROR: Liturgist Cancellation System Error'
+      const cancelSystemErrorFromName = tableName === 'Food Distribution' ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+      
       await sendEmail({
         to: 'sam@samuelholley.com',
-        subject: '🚨 ERROR: Liturgist Cancellation System Error',
-        html: errorEmailHtml
+        subject: cancelSystemErrorSubject,
+        html: errorEmailHtml,
+        fromName: cancelSystemErrorFromName
       })
     } catch (emailError) {
       console.error('Failed to send error notification email:', emailError)

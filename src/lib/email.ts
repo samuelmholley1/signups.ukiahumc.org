@@ -8,9 +8,10 @@ interface EmailParams {
   replyTo?: string
   subject: string
   html: string
+  fromName?: string
 }
 
-export async function sendEmail({ to, cc, replyTo, subject, html }: EmailParams) {
+export async function sendEmail({ to, cc, replyTo, subject, html, fromName }: EmailParams) {
   // Create transporter using Zoho SMTP
   const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.com',
@@ -22,8 +23,9 @@ export async function sendEmail({ to, cc, replyTo, subject, html }: EmailParams)
     },
   })
 
+  const senderName = fromName || 'UUMC Liturgist Scheduling'
   const mailOptions = {
-    from: '"UUMC Liturgist Scheduling" <alerts@samuelholley.com>',
+    from: `"${senderName}" <alerts@samuelholley.com>`,
     to,
     cc,
     replyTo: replyTo || 'sam@samuelholley.com',
