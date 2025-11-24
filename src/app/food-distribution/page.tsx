@@ -32,6 +32,7 @@ export default function FoodDistribution() {
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [showExtraColumns, setShowExtraColumns] = useState<{ [key: string]: boolean }>({})
   const [formData, setFormData] = useState({
     selectedPerson: '',
     firstName: '',
@@ -238,122 +239,166 @@ export default function FoodDistribution() {
                     <th className="px-4 py-4 text-left font-semibold">Date</th>
                     <th className="px-4 py-4 text-left font-semibold">Volunteer #1</th>
                     <th className="px-4 py-4 text-left font-semibold">Volunteer #2</th>
-                    <th className="px-4 py-4 text-left font-semibold">Volunteer #3</th>
-                    <th className="px-4 py-4 text-left font-semibold">Volunteer #4</th>
+                    {Object.values(showExtraColumns).some(v => v) && (
+                      <th className="px-4 py-4 text-left font-semibold">Additional Volunteers</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {signups.map((signup, index) => (
-                    <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                      <td className="px-6 py-4 font-medium text-gray-900">
-                        {signup.displayDate}
-                      </td>
-                      <td className="px-4 py-4">
-                        {signup.volunteer1 ? (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{signup.volunteer1.name}</p>
-                              <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
+                  {signups.map((signup, index) => {
+                    const bothFilled = signup.volunteer1 && signup.volunteer2
+                    const hasThirdVolunteer = signup.volunteer3
+                    const hasFourthVolunteer = signup.volunteer4
+                    const showExtra = showExtraColumns[signup.date]
+                    
+                    return (
+                      <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                          {signup.displayDate}
+                        </td>
+                        <td className="px-4 py-4">
+                          {signup.volunteer1 ? (
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium text-gray-900">{signup.volunteer1.name}</p>
+                                <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
+                              </div>
+                              <button
+                                onClick={() => handleCancel(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
+                                className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                              >
+                                Cancel
+                              </button>
                             </div>
+                          ) : (
                             <button
-                              onClick={() => handleCancel(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                              onClick={() => {
+                                setSelectedDate(signup.date)
+                                setFormData({ ...formData, role: 'volunteer1' })
+                              }}
+                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
                             >
-                              Cancel
+                              Sign Up
                             </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedDate(signup.date)
-                              setFormData({ ...formData, role: 'volunteer1' })
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                          >
-                            Sign Up
-                          </button>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        {signup.volunteer2 ? (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
-                              <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
+                          )}
+                        </td>
+                        <td className="px-4 py-4">
+                          {signup.volunteer2 ? (
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
+                                <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
+                              </div>
+                              <button
+                                onClick={() => handleCancel(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
+                                className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                              >
+                                Cancel
+                              </button>
                             </div>
-                            <button
-                              onClick={() => handleCancel(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedDate(signup.date)
-                              setFormData({ ...formData, role: 'volunteer2' })
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                          >
-                            Sign Up
-                          </button>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        {signup.volunteer3 ? (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{signup.volunteer3.name}</p>
-                              <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
+                          ) : (
+                            <div className="space-y-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedDate(signup.date)
+                                  setFormData({ ...formData, role: 'volunteer2' })
+                                }}
+                                className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                              >
+                                Sign Up
+                              </button>
+                              {bothFilled && !showExtra && !hasThirdVolunteer && (
+                                <button
+                                  onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
+                                  className="w-full px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-lg transition-colors font-medium"
+                                >
+                                  Add a third volunteer?
+                                </button>
+                              )}
                             </div>
-                            <button
-                              onClick={() => handleCancel(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedDate(signup.date)
-                              setFormData({ ...formData, role: 'volunteer3' })
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                          >
-                            Sign Up
-                          </button>
+                          )}
+                        </td>
+                        {Object.values(showExtraColumns).some(v => v) && (
+                          <td className="px-4 py-4">
+                            {showExtra || hasThirdVolunteer || hasFourthVolunteer ? (
+                              <div className="space-y-2">
+                                {/* Volunteer 3 */}
+                                {signup.volunteer3 ? (
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div>
+                                      <p className="font-medium text-gray-900">{signup.volunteer3.name}</p>
+                                      <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
+                                    </div>
+                                    <button
+                                      onClick={() => handleCancel(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                                      className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => {
+                                      setSelectedDate(signup.date)
+                                      setFormData({ ...formData, role: 'volunteer3' })
+                                    }}
+                                    className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                                  >
+                                    Sign Up (#3)
+                                  </button>
+                                )}
+                                
+                                {/* Volunteer 4 */}
+                                {hasThirdVolunteer && (
+                                  <>
+                                    {signup.volunteer4 ? (
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
+                                          <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
+                                        </div>
+                                        <button
+                                          onClick={() => handleCancel(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                          className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-2">
+                                        <button
+                                          onClick={() => {
+                                            setSelectedDate(signup.date)
+                                            setFormData({ ...formData, role: 'volunteer4' })
+                                          }}
+                                          className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                                        >
+                                          Sign Up (#4)
+                                        </button>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                                
+                                {/* Add fourth volunteer button */}
+                                {hasThirdVolunteer && !hasFourthVolunteer && (
+                                  <button
+                                    onClick={() => {
+                                      setSelectedDate(signup.date)
+                                      setFormData({ ...formData, role: 'volunteer4' })
+                                    }}
+                                    className="w-full px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-lg transition-colors font-medium"
+                                  >
+                                    Add a fourth volunteer?
+                                  </button>
+                                )}
+                              </div>
+                            ) : null}
+                          </td>
                         )}
-                      </td>
-                      <td className="px-4 py-4">
-                        {signup.volunteer4 ? (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
-                              <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
-                            </div>
-                            <button
-                              onClick={() => handleCancel(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                              className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedDate(signup.date)
-                              setFormData({ ...formData, role: 'volunteer4' })
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                          >
-                            Sign Up
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
