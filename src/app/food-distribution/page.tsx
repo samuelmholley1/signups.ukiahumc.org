@@ -405,7 +405,7 @@ export default function FoodDistribution() {
                         <td className="px-4 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
                           {signup.displayDate}
                         </td>
-                        <td className="px-4 py-4 align-top">
+                        <td className="px-4 py-4 align-top w-64">
                           {signup.volunteer1 ? (
                             <div>
                               <div className="mb-2 text-center">
@@ -438,7 +438,7 @@ export default function FoodDistribution() {
                             </div>
                           )}
                         </td>
-                        <td className="px-4 py-4 align-top">
+                        <td className="px-4 py-4 align-top w-64">
                           {signup.volunteer2 ? (
                             <div>
                               <div className="mb-2 text-center">
@@ -473,7 +473,7 @@ export default function FoodDistribution() {
                         </td>
                         {/* Volunteer 3 & 4 - Desktop only */}
                         {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                          <td className="px-4 py-4 align-top hidden lg:table-cell">
+                          <td className="px-4 py-4 align-top w-64 hidden lg:table-cell">
                             {signup.volunteer3 ? (
                                 <div>
                                   <div className="mb-2 text-center">
@@ -508,7 +508,7 @@ export default function FoodDistribution() {
                           </td>
                         )}
                         {signups.some(s => s.volunteer3) && (
-                          <td className="px-4 py-4 align-top hidden lg:table-cell">
+                          <td className="px-4 py-4 align-top w-64 hidden lg:table-cell">
                             {signup.volunteer4 ? (
                                 <div>
                                   <div className="mb-2 text-center">
