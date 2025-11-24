@@ -362,12 +362,34 @@ export default function FoodDistribution() {
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
-                      {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                        <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #3</th>
-                      )}
-                      {signups.some(s => s.volunteer3) && (
-                        <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #4</th>
-                      )}
+                      {(() => {
+                        const shouldShowVol3 = signups.some(s => s.volunteer1 && s.volunteer2)
+                        console.log('🔍 [VOL3 COLUMN CHECK]', {
+                          shouldShow: shouldShowVol3,
+                          signups: signups.map(s => ({
+                            date: s.displayDate,
+                            hasVol1: !!s.volunteer1,
+                            hasVol2: !!s.volunteer2,
+                            bothFilled: !!(s.volunteer1 && s.volunteer2)
+                          }))
+                        })
+                        return shouldShowVol3 ? (
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #3</th>
+                        ) : null
+                      })()}
+                      {(() => {
+                        const shouldShowVol4 = signups.some(s => s.volunteer3)
+                        console.log('🔍 [VOL4 COLUMN CHECK]', {
+                          shouldShow: shouldShowVol4,
+                          signups: signups.map(s => ({
+                            date: s.displayDate,
+                            hasVol3: !!s.volunteer3
+                          }))
+                        })
+                        return shouldShowVol4 ? (
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #4</th>
+                        ) : null
+                      })()}
                     </tr>
                   </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -386,7 +408,7 @@ export default function FoodDistribution() {
                         <td className="px-4 py-4 align-top">
                           {signup.volunteer1 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 text-center">
                                 <p className="font-medium text-gray-900 text-base">{signup.volunteer1.name}</p>
                                 <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.email}</p>
                                 <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer1.phone ? 'visible' : 'hidden' }}>
@@ -419,7 +441,7 @@ export default function FoodDistribution() {
                         <td className="px-4 py-4 align-top">
                           {signup.volunteer2 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 text-center">
                                 <p className="font-medium text-gray-900 text-base">{signup.volunteer2.name}</p>
                                 <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.email}</p>
                                 <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
