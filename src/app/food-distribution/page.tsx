@@ -91,11 +91,12 @@ export default function FoodDistribution() {
       'Billy Jenne': { email: 'billyjenne2@gmail.com' },
       'Daphne Macneil': { email: 'daphnemacneil@yahoo.com' },
       'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
-      'Trudy Morgan': { email: 'morganmiller@saber.net' },
+      'Trudy Morgan': { email: 'morganmiller@pacific.net' },
       'Vicki Okey': { email: 'vokey123@gmail.com' },
       'Bonnie Reda': { email: 'bonireda@aol.com' },
       'Michele Robbins': { email: 'shalompastor3@gmail.com' },
-      'Diana Waddle': { email: 'waddlediana@yahoo.com' }
+      'Diana Waddle': { email: 'waddlediana@yahoo.com' },
+      'Test User': { email: 'sam+test@samuelholley.com' }
     }
     
     if (presetPeople[personName]) {
@@ -390,7 +391,9 @@ export default function FoodDistribution() {
                       <option value="Vicki Okey">Vicki Okey</option>
                       <option value="Bonnie Reda">Bonnie Reda</option>
                       <option value="Michele Robbins">Michele Robbins</option>
+                      <option value="Test User">Test User</option>
                       <option value="Diana Waddle">Diana Waddle</option>
+                      <option value="other">Other</option>
                       <option value="other">Other</option>
                     </select>
                   </div>

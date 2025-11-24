@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
         })
         
         await sendEmail({
-          to: 'alerts@samuelholley.com',
+          to: 'sam@samuelholley.com',
           subject: '🚨 ERROR: Liturgist Signup Failed',
           html: errorEmailHtml
         })
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
       })
       
       await sendEmail({
-        to: 'alerts@samuelholley.com',
+        to: 'sam@samuelholley.com',
         subject: '🚨 ERROR: Liturgist Signup System Error',
         html: errorEmailHtml
       })
@@ -319,7 +319,7 @@ export async function GET(request: NextRequest) {
         })
         
         await sendEmail({
-          to: 'alerts@samuelholley.com',
+          to: 'sam@samuelholley.com',
           subject: '🚨 ERROR: Email Link Cancellation Failed',
           html: errorEmailHtml
         })
@@ -372,7 +372,7 @@ export async function GET(request: NextRequest) {
       })
       
       await sendEmail({
-        to: 'alerts@samuelholley.com',
+        to: 'sam@samuelholley.com',
         subject: '🚨 ERROR: Email Link Cancellation System Error',
         html: errorEmailHtml
       })
@@ -516,7 +516,7 @@ export async function DELETE(request: NextRequest) {
         })
         
         await sendEmail({
-          to: 'alerts@samuelholley.com',
+          to: 'sam@samuelholley.com',
           subject: '❌ Cancellation Failed',
           html: errorEmailHtml
         })
@@ -539,7 +539,7 @@ export async function DELETE(request: NextRequest) {
       })
       
       await sendEmail({
-        to: 'alerts@samuelholley.com',
+        to: 'sam@samuelholley.com',
         subject: '🚨 ERROR: Liturgist Cancellation System Error',
         html: errorEmailHtml
       })
