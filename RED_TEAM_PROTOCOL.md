@@ -209,9 +209,59 @@ Added to checklist: "When using Vercel preview deployments, test with regular `<
 
 ---
 
+### Failure #6: Branch/Environment Strategy Not Documented (November 24, 2025)
+
+**Severity**: 🟢 MEDIUM
+
+**What Happened**:
+- User wanted to test without emailing stakeholder (Trudy)
+- Used preview branch deployment with protection enabled
+- Got 401 errors on API calls and images
+- Confusion about which URL to use for testing
+
+**Root Cause**:
+- No clear documentation of branch strategy
+- No documentation of which environment serves which purpose
+- Vercel deployment protection not understood or configured
+
+**Impact**:
+- Testing friction - harder to iterate quickly
+- Risk of accidentally spamming stakeholders during development
+- Unclear which URL is safe for testing vs production
+
+**What Should Have Been Done**:
+1. ✅ Document branch strategy in README
+2. ✅ Configure Vercel deployment protection appropriately
+3. ✅ Clarify: `main` = production (emails stakeholders), `testing-*` branches = no stakeholder emails
+4. ✅ Keep testing branches open permanently for safe iteration
+
+**Solution**:
+- Created branch strategy:
+  - `main` = Production (Trudy CC'd on food distribution emails)
+  - `testing-trudy-email-flow` = Testing (Sam only, no Trudy)
+  - Both branches identical except email destinations
+- Documented in conversation, but should be in README
+
+**Protocol Update**:
+Added to checklist: "Document branch/environment strategy and email routing differences in README"
+
+---
+
 ## Red Team Testing Protocol v2.0
 
 ### Pre-Deployment Checklist
+
+#### Branch & Environment Strategy
+- [ ] **Document branch purposes** in README
+  - Which branch is production?
+  - Which branches are safe for testing?
+  - What differs between branches? (email destinations, etc.)
+- [ ] **Configure Vercel deployment protection**
+  - Disable protection on testing branches OR
+  - Document how to authenticate for preview URLs
+- [ ] **Email routing differences documented**
+  - Which emails go where in each branch?
+  - How to avoid spamming stakeholders during testing?
 
 #### Deployment Environment
 - [ ] **Test on actual production domain**, not preview URLs
