@@ -106,10 +106,17 @@ export async function POST(request: NextRequest) {
     if (result.success) {
       console.log('Signup successful:', result.record?.id)
       
-      // CRITICAL: Invalidate cache so fresh data is returned
-      const cacheKey = tableName === 'Food Distribution' ? 'food-Q4-2025' : 'liturgists-Q4-2025'
-      serviceCache.invalidate(cacheKey)
-      console.log(`✅ [CACHE] Invalidated cache key: ${cacheKey}`)
+      // CRITICAL: Invalidate ALL cache entries for this table type
+      // Don't try to guess the quarter - just invalidate everything
+      const tablePrefix = tableName === 'Food Distribution' ? 'food' : 'liturgists'
+      const allKeys = serviceCache.getAllQuarters()
+      const keysToInvalidate = allKeys.filter(key => key.startsWith(tablePrefix))
+      keysToInvalidate.forEach(key => {
+        serviceCache.invalidate(key)
+        console.log(`✅ [CACHE] Invalidated cache key: ${key}`)
+      })
+      if (keysToInvalidate.length === 0) {
+        console.log(`⚠️ [CACHE] No cache entries found for ${tablePrefix}`)
       
       // Send email notifications
       try {
@@ -557,10 +564,17 @@ export async function DELETE(request: NextRequest) {
     if (result.success) {
       console.log('Signup cancelled successfully:', recordId)
       
-      // CRITICAL: Invalidate cache so fresh data is returned
-      const cacheKey = tableName === 'Food Distribution' ? 'food-Q4-2025' : 'liturgists-Q4-2025'
-      serviceCache.invalidate(cacheKey)
-      console.log(`✅ [CACHE] Invalidated cache key: ${cacheKey}`)
+      // CRITICAL: Invalidate ALL cache entries for this table type
+      // Don't try to guess the quarter - just invalidate everything
+      const tablePrefix = tableName === 'Food Distribution' ? 'food' : 'liturgists'
+      const allKeys = serviceCache.getAllQuarters()
+      const keysToInvalidate = allKeys.filter(key => key.startsWith(tablePrefix))
+      keysToInvalidate.forEach(key => {
+        serviceCache.invalidate(key)
+        console.log(`✅ [CACHE] Invalidated cache key: ${key}`)
+      })
+      if (keysToInvalidate.length === 0) {
+        console.log(`⚠️ [CACHE] No cache entries found for ${tablePrefix}`)
       
       // BACKFILL LOGIC: If volunteer 1 or 2 cancelled, promote volunteer 3 & 4
       if (tableName === 'Food Distribution' && (cancelledRole === 'volunteer1' || cancelledRole === 'volunteer2')) {
