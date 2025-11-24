@@ -629,13 +629,12 @@ export async function DELETE(request: NextRequest) {
         try {
           const verifySignups = await getSignups(tableName)
           const verifyDateSignups = verifySignups.filter((s: any) => s.serviceDate === serviceDate)
-          const stillHasGap = verifyDateSignups.some((s: any) => {
-            // Check if volunteer3 exists but volunteer2 doesn't (gap after backfill)
-            const hasVol3 = verifyDateSignups.some((v: any) => v.role === 'volunteer3')
-            const hasVol2 = verifyDateSignups.some((v: any) => v.role === 'volunteer2')
-            const hasVol1 = verifyDateSignups.some((v: any) => v.role === 'volunteer1')
-            return (hasVol3 && !hasVol2) || (hasVol2 && !hasVol1)
-          })
+          
+          // Check if volunteer3 exists but volunteer2 doesn't (gap after backfill)
+          const hasVol3 = verifyDateSignups.some((v: any) => v.role === 'volunteer3')
+          const hasVol2 = verifyDateSignups.some((v: any) => v.role === 'volunteer2')
+          const hasVol1 = verifyDateSignups.some((v: any) => v.role === 'volunteer1')
+          const stillHasGap = (hasVol3 && !hasVol2) || (hasVol2 && !hasVol1)
           
           if (stillHasGap) {
             // CRITICAL: Backfill failed - send alert email
