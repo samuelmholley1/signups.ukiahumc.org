@@ -322,14 +322,14 @@ export default function FoodDistribution() {
             <Image
               src="/logo-for-church-larger.jpg"
               alt="Ukiah United Methodist Church"
-              width={300}
-              height={200}
-              className="mx-auto rounded-lg shadow-md mb-4"
+              width={320}
+              height={213}
+              className="mx-auto rounded-lg shadow-md mb-4 w-80 md:w-[300px]"
             />
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               Food Distribution Signups
             </h1>
-            <p className="text-gray-600">December 2025 - Saturdays</p>
+            <p className="text-lg md:text-base text-gray-600">December 2025 - Saturdays</p>
           </div>
 
           {loading ? (
@@ -337,21 +337,22 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden overflow-x-auto">
-              <table className="w-full table-auto" key={lastUpdate}>
-                <thead className="bg-green-600 text-white">
-                  <tr>
-                    <th className="px-4 py-4 text-center font-semibold whitespace-nowrap">Date</th>
-                    <th className="px-4 py-4 text-center font-semibold">Volunteer #1</th>
-                    <th className="px-4 py-4 text-center font-semibold">Volunteer #2</th>
-                    {Object.values(showExtraColumns).some(v => v) && (
-                      <>
-                        <th className="px-4 py-4 text-center font-semibold">Volunteer #3</th>
-                        <th className="px-4 py-4 text-center font-semibold">Volunteer #4</th>
-                      </>
-                    )}
-                  </tr>
-                </thead>
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full table-auto min-w-[800px]" key={lastUpdate}>
+                  <thead className="bg-green-600 text-white">
+                    <tr>
+                      <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
+                      {Object.values(showExtraColumns).some(v => v) && (
+                        <>
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #3</th>
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #4</th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
                 <tbody className="divide-y divide-gray-200">
                   {signups.map((signup, index) => {
                     const bothFilled = signup.volunteer1 && signup.volunteer2
@@ -361,29 +362,29 @@ export default function FoodDistribution() {
                     
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap">
+                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
                           {signup.displayDate}
                         </td>
                         <td className="px-4 py-4 align-top">
                           {signup.volunteer1 ? (
                             <div>
                               <div className="mb-2">
-                                <p className="font-medium text-gray-900">{signup.volunteer1.name}</p>
-                                <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
+                                <p className="font-medium text-gray-900 text-base">{signup.volunteer1.name}</p>
+                                <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.email}</p>
                                 {signup.volunteer1.phone && (
-                                  <p className="text-sm text-gray-600">{signup.volunteer1.phone}</p>
+                                  <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.phone}</p>
                                 )}
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                                className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                               >
                                 Cancel
                               </button>
                               {bothFilled && !showExtra && !hasThirdVolunteer && (
                                 <button
                                   onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
-                                  className="mt-2 px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-full transition-colors font-medium"
+                                  className="mt-2 px-4 py-2.5 md:px-3 md:py-1.5 text-base md:text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 min-h-[44px] rounded-full transition-colors font-medium"
                                 >
                                   Add a third volunteer?
                                 </button>
@@ -395,7 +396,7 @@ export default function FoodDistribution() {
                                 setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer1' })
                               }}
-                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                              className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
@@ -405,15 +406,15 @@ export default function FoodDistribution() {
                           {signup.volunteer2 ? (
                             <div>
                               <div className="mb-2">
-                                <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
-                                <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
+                                <p className="font-medium text-gray-900 text-base">{signup.volunteer2.name}</p>
+                                <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.email}</p>
                                 {signup.volunteer2.phone && (
-                                  <p className="text-sm text-gray-600">{signup.volunteer2.phone}</p>
+                                  <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.phone}</p>
                                 )}
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                               >
                                 Cancel
                               </button>
@@ -424,7 +425,7 @@ export default function FoodDistribution() {
                                 setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer2' })
                               }}
-                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                              className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
@@ -437,15 +438,15 @@ export default function FoodDistribution() {
                                 signup.volunteer3 ? (
                                   <div>
                                     <div className="mb-2">
-                                      <p className="font-medium text-gray-900">{signup.volunteer3.name}</p>
-                                      <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
+                                      <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
+                                      <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
                                       {signup.volunteer3.phone && (
-                                        <p className="text-sm text-gray-600">{signup.volunteer3.phone}</p>
+                                        <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.phone}</p>
                                       )}
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                                      className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                      className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                                     >
                                       Cancel
                                     </button>
@@ -456,7 +457,7 @@ export default function FoodDistribution() {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer3' })
                                     }}
-                                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                                    className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                                   >
                                     Sign Up
                                   </button>
@@ -468,15 +469,15 @@ export default function FoodDistribution() {
                                 signup.volunteer4 ? (
                                   <div>
                                     <div className="mb-2">
-                                      <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
-                                      <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
+                                      <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
+                                      <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
                                       {signup.volunteer4.phone && (
-                                        <p className="text-sm text-gray-600">{signup.volunteer4.phone}</p>
+                                        <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.phone}</p>
                                       )}
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                                      className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                      className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                                     >
                                       Cancel
                                     </button>
@@ -498,7 +499,7 @@ export default function FoodDistribution() {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer4' })
                                     }}
-                                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                                    className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                                   >
                                     Sign Up
                                   </button>
@@ -510,8 +511,9 @@ export default function FoodDistribution() {
                       </tr>
                     )
                   })}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 

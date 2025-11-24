@@ -876,7 +876,7 @@ export default function Home() {
           <img 
             src="/logo-for-church-larger.jpg" 
             alt="Ukiah United Methodist Church" 
-            className="w-64 md:w-80 h-auto rounded-lg shadow-lg"
+            className="w-80 md:w-96 h-auto rounded-lg shadow-lg"
           />
         </div>
 
@@ -1210,8 +1210,8 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h2 className="text-3xl md:text-2xl font-semibold text-gray-800 flex items-center">
+                <svg className="w-8 h-8 md:w-6 md:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                 </svg>
                 Liturgist Services - {currentQuarter.replace('-', ' ')}
@@ -1226,28 +1226,30 @@ export default function Home() {
               <button
                 onClick={() => handleQuarterChange('prev')}
                 disabled={currentQuarter === CURRENT_QUARTER}
-                className={`px-3 py-1 rounded-md text-sm font-medium flex items-center ${
+                className={`px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] ${
                   currentQuarter === CURRENT_QUARTER
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Previous Quarter
+                <span className="hidden sm:inline">Previous Quarter</span>
+                <span className="sm:hidden">Prev</span>
               </button>
               <button
                 onClick={() => handleQuarterChange('next')}
                 disabled={currentQuarter === 'Q1-2026'}
-                className={`px-3 py-1 rounded-md text-sm font-medium flex items-center ${
+                className={`px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] ${
                   currentQuarter === 'Q1-2026'
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
-                Next Quarter
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="hidden sm:inline">Next Quarter</span>
+                <span className="sm:hidden">Next</span>
+                <svg className="w-5 h-5 md:w-4 md:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -1293,18 +1295,18 @@ export default function Home() {
                   onMouseLeave={() => !isLockedQuarter && setHoveredService(null)}
                 >
                   {/* Date and Special Badges */}
-                  <div className="flex items-center space-x-2 mb-3">
-                    <p className="font-semibold text-gray-800 text-sm">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <p className="font-semibold text-gray-800 text-lg md:text-base">
                       {service.displayDate.replace(/, \d{4}/, '')}
                     </p>
                     {isMainService && (
-                      <span className="text-xs font-bold text-purple-600 bg-purple-200 px-2 py-0.5 rounded">NEXT SERVICE</span>
+                      <span className="text-sm md:text-xs font-bold text-purple-600 bg-purple-200 px-2 py-1 md:py-0.5 rounded">NEXT SERVICE</span>
                     )}
                     {service.notes && (() => {
                       // Check if it's Christmas Eve
                       if (service.notes.includes('Christmas Eve')) {
                         return (
-                          <span className="text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-0.5 rounded">
+                          <span className="text-sm md:text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-1 md:py-0.5 rounded">
                             🕯️ CHRISTMAS EVE • Liturgist lights 5 candles
                           </span>
                         )
@@ -1320,7 +1322,7 @@ export default function Home() {
                         const candleText = count === '1' ? '1 candle' : `${count} candles`
                         
                         return (
-                          <span className="text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-0.5 rounded">
+                          <span className="text-sm md:text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-1 md:py-0.5 rounded">
                             🕯️ ADVENT WEEK {week} • Liturgist lights {candleText}
                           </span>
                         )
@@ -1332,11 +1334,11 @@ export default function Home() {
                   
                   {/* Service Rows - Different layout for Christmas Eve */}
                   {service.displayDate?.includes('Christmas Eve') ? (
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 text-base md:text-sm">
                       {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Liturgist:</span>
+                          <span className="font-medium text-gray-700 whitespace-nowrap text-base">Liturgist:</span>
                           {service.liturgist ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-green-900 truncate" title={service.liturgist.name}>
@@ -1352,7 +1354,7 @@ export default function Home() {
                             <button
                               onClick={() => handleSignup(service.id, 'liturgist')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1365,7 +1367,7 @@ export default function Home() {
                             <button
                               onClick={() => handleCancelSignup(service.liturgist!.id, service.liturgist!.name, service.displayDate, 'Liturgist')}
                               disabled={isLockedQuarter}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
+                              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
                             </button>
@@ -1399,7 +1401,7 @@ export default function Home() {
                             <button
                               onClick={() => handleCancelSignup(service.backup!.id, service.backup!.name, service.displayDate, 'Backup')}
                               disabled={isLockedQuarter}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
+                              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
                             </button>
@@ -1426,7 +1428,7 @@ export default function Home() {
                             <button
                               onClick={() => handleSignup(service.id, 'liturgist2')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1439,7 +1441,7 @@ export default function Home() {
                             <button
                               onClick={() => handleCancelSignup(service.liturgist2!.id, service.liturgist2!.name, service.displayDate, 'Second Liturgist')}
                               disabled={isLockedQuarter}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
+                              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
                             </button>
@@ -1466,7 +1468,7 @@ export default function Home() {
                             <button
                               onClick={() => handleSignup(service.id, 'backup2')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1479,7 +1481,7 @@ export default function Home() {
                             <button
                               onClick={() => handleCancelSignup(service.backup2!.id, service.backup2!.name, service.displayDate, 'Second Backup')}
                               disabled={isLockedQuarter}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
+                              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
                             </button>
@@ -1489,11 +1491,11 @@ export default function Home() {
                     </div>
                   ) : (
                     /* Regular Service Layout */
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 text-base md:text-sm">
                       {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Liturgist:</span>
+                          <span className="font-medium text-gray-700 whitespace-nowrap text-base">Liturgist:</span>
                           {service.liturgist ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-green-900 truncate" title={service.liturgist.name}>
@@ -1509,7 +1511,7 @@ export default function Home() {
                             <button
                               onClick={() => handleSignup(service.id, 'liturgist')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1522,7 +1524,7 @@ export default function Home() {
                             <button
                               onClick={() => handleCancelSignup(service.liturgist!.id, service.liturgist!.name, service.displayDate, 'Liturgist')}
                               disabled={isLockedQuarter}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
+                              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
                             </button>
@@ -1549,7 +1551,7 @@ export default function Home() {
                             <button
                               onClick={() => handleSignup(service.id, 'backup')}
                               disabled={isLockedQuarter}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
                             </button>
@@ -1562,7 +1564,7 @@ export default function Home() {
                             <button
                               onClick={() => handleCancelSignup(service.backup!.id, service.backup!.name, service.displayDate, 'Backup')}
                               disabled={isLockedQuarter}
-                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
+                              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
                             </button>
