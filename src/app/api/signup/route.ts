@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
       })
       if (keysToInvalidate.length === 0) {
         console.log(`⚠️ [CACHE] No cache entries found for ${tablePrefix}`)
+      }
       
       // Send email notifications
       try {
@@ -194,7 +195,8 @@ export async function POST(request: NextRequest) {
         message: 'Signup submitted successfully!',
         recordId: result.record?.id
       })
-    } else {
+    } // Close if (result.success) block
+    else {
       console.error('Airtable submission failed:', result.error)
       
       // Send error notification email
