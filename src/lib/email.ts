@@ -58,9 +58,15 @@ export function generateSignupEmail(data: {
   // Check if this is food distribution or liturgist
   const isFoodDistribution = systemName.includes('Food Distribution')
   
-  // Check if this is a backup role
+  // Determine role label based on service type
+  let roleLabel = 'Liturgist'
+  if (isFoodDistribution) {
+    roleLabel = 'Food Distribution Volunteer'
+  } else {
+    const isBackup = role.toLowerCase() === 'backup'
+    roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
+  }
   const isBackup = role.toLowerCase() === 'backup'
-  const roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
   const headerColor = isBackup ? '#805ad5' : (isFoodDistribution ? '#ea580c' : '#2c5282')  // Purple for backup, orange for food, blue for liturgist
   
   // Format the display date if it looks like an ISO timestamp
