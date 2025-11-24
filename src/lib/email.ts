@@ -51,13 +51,17 @@ export function generateSignupEmail(data: {
   displayDate: string
   notes?: string
   recordId: string
+  systemName?: string
 }) {
-  const { name, email, phone, role, displayDate, notes, recordId } = data
+  const { name, email, phone, role, displayDate, notes, recordId, systemName = 'UUMC Liturgist Scheduling' } = data
+  
+  // Check if this is food distribution or liturgist
+  const isFoodDistribution = systemName.includes('Food Distribution')
   
   // Check if this is a backup role
   const isBackup = role.toLowerCase() === 'backup'
   const roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
-  const headerColor = isBackup ? '#805ad5' : '#2c5282'  // Purple for backup, blue for main
+  const headerColor = isBackup ? '#805ad5' : (isFoodDistribution ? '#ea580c' : '#2c5282')  // Purple for backup, orange for food, blue for liturgist
   
   // Format the display date if it looks like an ISO timestamp
   let formattedDate = displayDate
@@ -211,7 +215,7 @@ export function generateSignupEmail(data: {
           <h1>${isBackup ? 'Backup ' : ''}Signup Confirmed</h1>
         </div>
         <div class="content">
-          <p class="message-text">${isBackup ? 'You signed up as backup liturgist!' : 'You signed up for liturgist service!'}</p>
+          <p class="message-text">${isFoodDistribution ? 'You signed up for food distribution volunteer service!' : (isBackup ? 'You signed up as backup liturgist!' : 'You signed up for liturgist service!')}</p>
           
           <div class="info-box">
             <div class="info-row">
@@ -266,8 +270,12 @@ export function generateCancellationEmail(data: {
   name: string
   role: string
   displayDate: string
+  systemName?: string
 }) {
-  const { name, role, displayDate } = data
+  const { name, role, displayDate, systemName = 'UUMC Liturgist Scheduling' } = data
+  
+  // Check if this is food distribution or liturgist
+  const isFoodDistribution = systemName.includes('Food Distribution')
   
   // Check if this is a backup role
   const isBackup = role.toLowerCase() === 'backup'
@@ -312,7 +320,7 @@ export function generateCancellationEmail(data: {
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .header { 
-          background: #744210; 
+          background: ${isFoodDistribution ? '#9a3412' : '#744210'}; 
           color: white; 
           padding: 40px 30px; 
           text-align: center;
@@ -336,7 +344,7 @@ export function generateCancellationEmail(data: {
           padding: 24px; 
           border-radius: 6px; 
           margin: 24px 0; 
-          border-left: 4px solid #744210;
+          border-left: 4px solid ${isFoodDistribution ? '#9a3412' : '#744210'};
         }
         .info-row { 
           display: flex; 
@@ -418,7 +426,7 @@ export function generateCancellationEmail(data: {
           <h1>${isBackup ? 'Backup ' : ''}Signup Cancelled</h1>
         </div>
         <div class="content">
-          <p class="message-text">${isBackup ? 'You cancelled your backup liturgist signup.' : 'You cancelled your liturgist signup.'}</p>
+          <p class="message-text">${isFoodDistribution ? 'You cancelled your food distribution volunteer signup.' : (isBackup ? 'You cancelled your backup liturgist signup.' : 'You cancelled your liturgist signup.')}</p>
           
           <div class="info-box">
             <div class="info-row">
@@ -446,7 +454,7 @@ export function generateCancellationEmail(data: {
         </div>
         <div class="footer-text">
           <strong>Ukiah United Methodist Church</strong><br/>
-          Liturgist Signup System
+          ${systemName}
         </div>
       </div>
     </body>

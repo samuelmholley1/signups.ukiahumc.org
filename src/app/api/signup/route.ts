@@ -105,6 +105,9 @@ export async function POST(request: NextRequest) {
       
       // Send email notifications
       try {
+        const isFoodDistribution = tableName === 'Food Distribution'
+        const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        
         const emailHtml = generateSignupEmail({
           name: body.name,
           email: body.email,
@@ -112,14 +115,14 @@ export async function POST(request: NextRequest) {
           role: body.role,
           displayDate: body.displayDate,
           notes: body.notes,
-          recordId: result.record?.id || ''
+          recordId: result.record?.id || '',
+          systemName
         })
         
         // Send email confirmation
         // If Sam signs up: TO sam@ only (no CC)
         // If others sign up: TO their email, CC sam@
         const isSamSigningUp = body.email.toLowerCase() === 'sam@samuelholley.com'
-        const isFoodDistribution = tableName === 'Food Distribution'
         const role = body.role.toLowerCase().trim()
         
         // Determine role label based on table type
@@ -270,12 +273,6 @@ export async function GET(request: NextRequest) {
           }
         }
         
-        const emailHtml = generateCancellationEmail({
-          name: recordData.record.name as string,
-          role: recordData.record.role as string,
-          displayDate: recordData.record.displayDate as string
-        })
-        
         const userEmail = recordData.record.email as string
           const userRole = recordData.record.role as string
           const userName = recordData.record.name as string
@@ -284,6 +281,14 @@ export async function GET(request: NextRequest) {
           // Detect if this is food distribution based on role
           const role = userRole.toLowerCase().trim()
           const isFoodDistribution = role.startsWith('volunteer')
+          const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        
+        const emailHtml = generateCancellationEmail({
+          name: recordData.record.name as string,
+          role: recordData.record.role as string,
+          displayDate: recordData.record.displayDate as string,
+          systemName
+        })
           
           // Determine role label based on table type
           let roleLabel = ''
@@ -523,17 +528,19 @@ export async function DELETE(request: NextRequest) {
             }
           }
           
-          const emailHtml = generateCancellationEmail({
-            name: recordData.record.name as string,
-            role: recordData.record.role as string,
-            displayDate: recordData.record.displayDate as string
-          })
-          
           const userEmail = recordData.record.email as string
           const userRole = recordData.record.role as string
           const userName = recordData.record.name as string
           const isSamCancelling = userEmail.toLowerCase() === 'sam@samuelholley.com'
           const isFoodDistribution = tableName === 'Food Distribution'
+          const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+          
+          const emailHtml = generateCancellationEmail({
+            name: recordData.record.name as string,
+            role: recordData.record.role as string,
+            displayDate: recordData.record.displayDate as string,
+            systemName
+          })
           
           // Determine role label based on table type
           let roleLabel = ''
