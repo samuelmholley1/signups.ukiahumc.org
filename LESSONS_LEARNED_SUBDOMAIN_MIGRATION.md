@@ -813,3 +813,140 @@ fetch('/api/report-error', { ... }); // Developer notification (fire-and-forget)
 
 **Total Time Investment:** ~22 hours for fully production-ready multi-service platform with comprehensive error handling and branding.
 
+---
+
+### Issue 14: Email Template URL Hardcoding (Nov 23, 2025)
+**Problem:** Cancellation emails still used hardcoded `liturgists.ukiahumc.org` URLs for logo images and links, causing broken images and wrong navigation.
+
+**Root Cause:** Email templates in `generateSignupEmail()` and `generateCancellationEmail()` had hardcoded subdomain URLs that weren't updated during migration.
+
+**Solution:** Updated all email template URLs:
+```typescript
+// Before
+<img src="https://liturgists.ukiahumc.org/logo-for-church-larger.jpg" />
+<a href="https://liturgists.ukiahumc.org">Return to Schedule</a>
+
+// After
+<img src="https://signups.ukiahumc.org/logo-for-church-larger.jpg" />
+<a href="https://signups.ukiahumc.org">Return to Schedule</a>
+```
+
+**Key Learning:** When migrating domains, grep ALL hardcoded URLs in email templates, not just application code. Email templates are often overlooked.
+
+---
+
+### Issue 15: Email Footer Information Overload (Nov 23, 2025)
+**Problem:** Email footers showed both church name AND system name, creating redundant/confusing messaging.
+
+**Example:**
+```html
+<!-- Before -->
+<footer>
+  <strong>Ukiah United Methodist Church</strong><br/>
+  UUMC Food Distribution
+</footer>
+```
+
+**Solution:** Simplified to show only church name in footer (system context already clear from subject/body):
+```html
+<!-- After -->
+<footer>
+  <strong>Ukiah United Methodist Church</strong>
+</footer>
+```
+
+**Key Learning:** In branded emails, context comes from sender name + subject + body. Footer should be minimal - just org name or legal info.
+
+---
+
+### Issue 16: Confirmation Modal UX (Nov 23, 2025)
+**Problem:** Cancellation used native `confirm()` dialog - ugly, no branding, inconsistent with styled modals elsewhere.
+
+**Solution:** Created styled cancellation confirmation modal:
+- Church logo (150x100 for visibility)
+- Question mark emoji (❓)
+- Clear messaging: "Are you sure you want to cancel [Name]'s signup?"
+- Two-button choice: "No, Keep It" (gray) vs "Yes, Cancel" (red)
+- Consistent with other modal styling
+
+**Key Learning:** Replace ALL native browser dialogs (`alert()`, `confirm()`, `prompt()`) with branded modals. Consistency matters for professional UX.
+
+---
+
+### Issue 17: Modal Logo Sizing (Nov 23, 2025)
+**Problem:** Church logo in success/error modals was too small (80x53px) - hard to see, looked like an icon.
+
+**Solution:** Increased all modal logos to 150x100px for better visibility and brand presence.
+
+**Key Learning:** Modal logos should be prominent enough to establish brand identity but not dominate the message. 150-200px width is ideal for 600px modal width.
+
+---
+
+### Updated Common Pitfalls Table (Revised Nov 23, 2025)
+
+| Pitfall | Solution | Reference |
+|---------|----------|-----------|
+| **Airtable field mismatch** | Use conditional field inclusion based on table type | Issue 10 |
+| **Variable scope in error handlers** | Declare variables BEFORE try blocks if needed in catch | Issue 12 |
+| **Email branding inconsistency** | Update sender name, subject, AND body content | Issue 11 |
+| **Role detection ambiguity** | Use unique prefixes per signup type | Issue 13 |
+| **Button width inconsistency** | Avoid `w-full` in grid layouts | Issue 7 |
+| **Alert/Confirm fatigue** | Replace ALL native dialogs with branded modals | Issues 8, 16 |
+| **Silent errors** | Implement auto-reporting pipeline early | Issue 9 |
+| **Field type restrictions** | Prefer Long Text over Single Select | Issue 6 |
+| **Overwhelming UX** | Use progressive disclosure | Issue 7 |
+| **Hardcoded URLs in emails** | Grep email templates during domain migrations | Issue 14 |
+| **Email footer overload** | Keep footers minimal - org name only | Issue 15 |
+| **Tiny modal logos** | Use 150-200px width for brand presence | Issue 17 |
+
+---
+
+### Updated Key Learnings (Final - Nov 23, 2025)
+
+11. **Field Type Flexibility:** Long Text > Single Select for evolving multi-purpose systems
+12. **Progressive Disclosure:** Show 2-3 fields initially, reveal more on demand
+13. **Visual Consistency:** Match button widths, colors, spacing across similar components
+14. **Modal > Alert/Confirm:** Replace ALL native browser dialogs with branded modals
+15. **Error Reporting:** Build email notification pipeline BEFORE things break
+16. **Conditional Fields:** Multi-table systems need if/else logic for field inclusion
+17. **Email Branding:** Update sender name, subject, AND body for complete adaptation
+18. **Variable Scoping:** Declare variables before try blocks if needed in catch
+19. **Test Data Management:** Use email aliases (`+test`) for test accounts
+20. **Documentation First:** Create migration plans and post-mortems before AND after changes
+21. **Email Template URLs:** Grep all hardcoded URLs in email templates during domain migrations
+22. **Email Footer Minimalism:** Keep footers simple - org name only, context comes from content
+23. **Modal Logo Sizing:** 150-200px width logos for professional brand presence in modals
+24. **Native Dialog Replacement:** Confirm dialogs need same branded treatment as alerts
+
+---
+
+### Final Production Stats (As of Nov 23, 2025)
+
+**Initial Migration:** November 20-22, 2025
+- Subdomain → path-based routing complete
+- Both services live in production
+
+**Post-Migration Enhancements:** November 23, 2025
+- Progressive disclosure UI (4 hours)
+- Styled modal system (2 hours)
+- Error reporting pipeline (3 hours)
+- Complete email branding overhaul (5 hours)
+- Conditional Airtable fields (1 hour)
+- Email template URL migration (1 hour)
+- Cancellation modal improvements (1 hour)
+- Modal logo sizing fixes (0.5 hours)
+- Bug fixes and testing (3 hours)
+
+**Total Time Investment:** ~22.5 hours for fully production-ready multi-service platform with comprehensive error handling, branding, and polished UX.
+
+**Files Modified:** 
+- `src/lib/email.ts` - Email templates and branding
+- `src/app/food-distribution/page.tsx` - Progressive UI, modals
+- `src/app/api/signup/route.ts` - Multi-table routing, error handling
+- `src/lib/airtable.ts` - Conditional field mapping
+- Documentation files (6 markdown files)
+
+**Commits:** 15+ individual commits with detailed descriptions
+
+**Build Status:** ✅ All builds passing, TypeScript strict mode, no errors
+
