@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { submitSignup, getSignups, deleteSignup, getSignupById } from '@/lib/airtable'
 import { sendEmail, generateSignupEmail, generateCancellationEmail, generateErrorEmail } from '@/lib/email'
+import { serviceCache } from '@/lib/cache'
 
 // Disable all caching for this API route
 export const dynamic = 'force-dynamic'
@@ -84,6 +85,11 @@ export async function POST(request: NextRequest) {
 
     if (result.success) {
       console.log('Signup successful:', result.record?.id)
+      
+      // CRITICAL: Invalidate cache so fresh data is returned
+      const cacheKey = tableName === 'Food Distribution' ? 'food-Q4-2025' : 'liturgists-Q4-2025'
+      serviceCache.delete(cacheKey)
+      console.log(`✅ [CACHE] Invalidated cache key: ${cacheKey}`)
       
       // Send email notifications
       try {
@@ -530,6 +536,11 @@ export async function DELETE(request: NextRequest) {
 
     if (result.success) {
       console.log('Signup cancelled successfully:', recordId)
+      
+      // CRITICAL: Invalidate cache so fresh data is returned
+      const cacheKey = tableName === 'Food Distribution' ? 'food-Q4-2025' : 'liturgists-Q4-2025'
+      serviceCache.delete(cacheKey)
+      console.log(`✅ [CACHE] Invalidated cache key: ${cacheKey}`)
       
       // BACKFILL LOGIC: If volunteer 1 or 2 cancelled, promote volunteer 3 & 4
       if (tableName === 'Food Distribution' && (cancelledRole === 'volunteer1' || cancelledRole === 'volunteer2')) {
