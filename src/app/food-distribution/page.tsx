@@ -346,7 +346,7 @@ export default function FoodDistribution() {
           ) : (
             <div className="bg-white rounded-lg shadow-xl overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full table-auto min-w-[800px]" key={lastUpdate}>
+                <table className="w-full table-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
@@ -381,23 +381,27 @@ export default function FoodDistribution() {
                                   {signup.volunteer1.phone || '111-111-1111'}
                                 </p>
                               </div>
-                              <button
-                                onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                                className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                              >
-                                Cancel
-                              </button>
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
+                                  className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => {
-                                setSelectedDate(signup.date)
-                                setFormData({ ...formData, role: 'volunteer1' })
-                              }}
-                              className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
-                            >
-                              Sign Up
-                            </button>
+                            <div className="flex justify-center">
+                              <button
+                                onClick={() => {
+                                  setSelectedDate(signup.date)
+                                  setFormData({ ...formData, role: 'volunteer1' })
+                                }}
+                                className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                              >
+                                Sign Up
+                              </button>
+                            </div>
                           )}
                         </td>
                         <td className="px-4 py-4 align-top">
@@ -410,23 +414,27 @@ export default function FoodDistribution() {
                                   {signup.volunteer2.phone || '111-111-1111'}
                                 </p>
                               </div>
-                              <button
-                                onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                              >
-                                Cancel
-                              </button>
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
+                                  className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => {
-                                setSelectedDate(signup.date)
-                                setFormData({ ...formData, role: 'volunteer2' })
-                              }}
-                              className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
-                            >
-                              Sign Up
-                            </button>
+                            <div className="flex justify-center">
+                              <button
+                                onClick={() => {
+                                  setSelectedDate(signup.date)
+                                  setFormData({ ...formData, role: 'volunteer2' })
+                                }}
+                                className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                              >
+                                Sign Up
+                              </button>
+                            </div>
                           )}
                         </td>
                         {signups.some(s => s.volunteer1 && s.volunteer2) && (
@@ -441,23 +449,27 @@ export default function FoodDistribution() {
                                         {signup.volunteer3.phone || '111-111-1111'}
                                       </p>
                                     </div>
-                                    <button
-                                      onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                                      className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                                    >
-                                      Cancel
-                                    </button>
+                                    <div className="flex justify-center">
+                                      <button
+                                        onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                                        className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
                                   </div>
                                 ) : bothFilled ? (
-                                  <button
-                                    onClick={() => {
-                                      setSelectedDate(signup.date)
-                                      setFormData({ ...formData, role: 'volunteer3' })
-                                    }}
-                                    className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
-                                  >
-                                    Sign Up
-                                  </button>
+                                  <div className="flex justify-center">
+                                    <button
+                                      onClick={() => {
+                                        setSelectedDate(signup.date)
+                                        setFormData({ ...formData, role: 'volunteer3' })
+                                      }}
+                                      className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                    >
+                                      Sign Up
+                                    </button>
+                                  </div>
                                 ) : null}
                             </td>
                             <td className="px-4 py-4 align-top">
@@ -470,23 +482,27 @@ export default function FoodDistribution() {
                                         {signup.volunteer4.phone || '111-111-1111'}
                                       </p>
                                     </div>
-                                    <button
-                                      onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                                      className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                                    >
-                                      Cancel
-                                    </button>
+                                    <div className="flex justify-center">
+                                      <button
+                                        onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                        className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
                                   </div>
                                 ) : hasThirdVolunteer ? (
-                                  <button
-                                    onClick={() => {
-                                      setSelectedDate(signup.date)
-                                      setFormData({ ...formData, role: 'volunteer4' })
-                                    }}
-                                    className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
-                                  >
-                                    Sign Up
-                                  </button>
+                                  <div className="flex justify-center">
+                                    <button
+                                      onClick={() => {
+                                        setSelectedDate(signup.date)
+                                        setFormData({ ...formData, role: 'volunteer4' })
+                                      }}
+                                      className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                    >
+                                      Sign Up
+                                    </button>
+                                  </div>
                                 ) : null}
                             </td>
                           </>
