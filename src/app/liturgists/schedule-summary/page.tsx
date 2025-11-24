@@ -336,7 +336,7 @@ export default function ScheduleSummary() {
           <div ref={tableRef}>
             {/* Title - Only appears in PNG */}
             <div className="bg-white px-4 py-3 text-center border border-gray-400 border-b-0">
-              <h2 className="text-lg font-bold text-gray-900">Liturgist Signups | {displayedServices.length > 0 ? Array.from(new Set(displayedServices.map(s => s.displayDate.split(' ')[0]))).join(' ') + ' ' + (displayedServices[0].displayDate.split(', ')[1]?.split(' ')[0] || new Date().getFullYear()) : currentQuarter}</h2>
+              <h2 className="text-lg font-bold text-gray-900">Liturgist Signups | {filteredServices.length > 0 ? Array.from(new Set(filteredServices.map(s => s.displayDate.split(' ')[0]))).join(' ') + ' ' + (filteredServices[0].displayDate.split(', ')[1]?.split(' ')[0] || new Date().getFullYear()) : currentQuarter}</h2>
               <p className="text-sm text-gray-700">Ukiah United Methodist Church</p>
             </div>
           <table className="w-auto border-collapse border border-gray-400 table-auto">

@@ -356,12 +356,12 @@ export default function FoodDistribution() {
           ) : (
             <div className="bg-white rounded-lg shadow-xl overflow-hidden">
               <div>
-                <table className="w-full table-fixed" key={lastUpdate}>
+                <table className="w-full" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm w-32 md:w-40">Date</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-48">Volunteer #1</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-48">Volunteer #2</th>
                       {signups.some(s => s.volunteer3) && (
                         <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #3</th>
                       )}
