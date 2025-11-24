@@ -328,11 +328,14 @@ export default function FoodDistribution() {
               <table className="w-full">
                 <thead className="bg-green-600 text-white">
                   <tr>
-                    <th className="px-4 py-4 text-left font-semibold">Date</th>
+                    <th className="px-4 py-4 text-left font-semibold w-32">Date</th>
                     <th className="px-4 py-4 text-left font-semibold">Volunteer #1</th>
                     <th className="px-4 py-4 text-left font-semibold">Volunteer #2</th>
                     {Object.values(showExtraColumns).some(v => v) && (
-                      <th className="px-4 py-4 text-left font-semibold">Additional Volunteers</th>
+                      <>
+                        <th className="px-4 py-4 text-left font-semibold">Volunteer #3</th>
+                        <th className="px-4 py-4 text-left font-semibold">Volunteer #4</th>
+                      </>
                     )}
                   </tr>
                 </thead>
@@ -345,50 +348,25 @@ export default function FoodDistribution() {
                     
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-6 py-4 font-medium text-gray-900">
+                        <td className="px-6 py-4 font-medium text-gray-900 align-top">
                           {signup.displayDate}
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4 align-top">
                           {signup.volunteer1 ? (
-                            <div className="flex items-start gap-2">
-                              <div className="flex-1">
+                            <div>
+                              <div className="mb-2">
                                 <p className="font-medium text-gray-900">{signup.volunteer1.name}</p>
                                 <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
+                                {signup.volunteer1.phone && (
+                                  <p className="text-sm text-gray-600">{signup.volunteer1.phone}</p>
+                                )}
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                                className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
+                                className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                               >
                                 Cancel
                               </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                setSelectedDate(signup.date)
-                                setFormData({ ...formData, role: 'volunteer1' })
-                              }}
-                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
-                            >
-                              Sign Up
-                            </button>
-                          )}
-                        </td>
-                        <td className="px-4 py-4">
-                          {signup.volunteer2 ? (
-                            <div>
-                              <div className="flex items-start gap-2">
-                                <div className="flex-1">
-                                  <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
-                                  <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
-                                </div>
-                                <button
-                                  onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                  className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
                               {bothFilled && !showExtra && !hasThirdVolunteer && (
                                 <button
                                   onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
@@ -402,28 +380,59 @@ export default function FoodDistribution() {
                             <button
                               onClick={() => {
                                 setSelectedDate(signup.date)
+                                setFormData({ ...formData, role: 'volunteer1' })
+                              }}
+                              className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                            >
+                              Sign Up
+                            </button>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 align-top">
+                          {signup.volunteer2 ? (
+                            <div>
+                              <div className="mb-2">
+                                <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
+                                <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
+                                {signup.volunteer2.phone && (
+                                  <p className="text-sm text-gray-600">{signup.volunteer2.phone}</p>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
+                                className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer2' })
                               }}
-                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                              className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
                           )}
                         </td>
                         {Object.values(showExtraColumns).some(v => v) && (
-                          <td className="px-4 py-4">
-                            {showExtra || hasThirdVolunteer || hasFourthVolunteer ? (
-                              <div className="space-y-2">
-                                {/* Volunteer 3 */}
-                                {signup.volunteer3 ? (
-                                  <div className="flex items-start gap-2 mb-2">
-                                    <div className="flex-1">
+                          <>
+                            <td className="px-4 py-4 align-top">
+                              {showExtra || hasThirdVolunteer || hasFourthVolunteer ? (
+                                signup.volunteer3 ? (
+                                  <div>
+                                    <div className="mb-2">
                                       <p className="font-medium text-gray-900">{signup.volunteer3.name}</p>
                                       <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
+                                      {signup.volunteer3.phone && (
+                                        <p className="text-sm text-gray-600">{signup.volunteer3.phone}</p>
+                                      )}
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                                      className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
+                                      className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                                     >
                                       Cancel
                                     </button>
@@ -436,57 +445,54 @@ export default function FoodDistribution() {
                                     }}
                                     className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                                   >
-                                    Sign Up (#3)
+                                    Sign Up
                                   </button>
-                                )}
-                                
-                                {/* Volunteer 4 */}
-                                {hasThirdVolunteer && (
-                                  <>
-                                    {signup.volunteer4 ? (
-                                      <div className="flex items-start gap-2">
-                                        <div className="flex-1">
-                                          <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
-                                          <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
-                                        </div>
-                                        <button
-                                          onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                                          className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
-                                        >
-                                          Cancel
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <div className="space-y-2">
+                                )
+                              ) : null}
+                            </td>
+                            <td className="px-4 py-4 align-top">
+                              {showExtra || hasThirdVolunteer || hasFourthVolunteer ? (
+                                signup.volunteer4 ? (
+                                  <div>
+                                    <div className="mb-2">
+                                      <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
+                                      <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
+                                      {signup.volunteer4.phone && (
+                                        <p className="text-sm text-gray-600">{signup.volunteer4.phone}</p>
+                                      )}
+                                    </div>
+                                    <button
+                                      onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                      className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                    {hasThirdVolunteer && !hasFourthVolunteer && (
                                       <button
                                         onClick={() => {
                                           setSelectedDate(signup.date)
                                           setFormData({ ...formData, role: 'volunteer4' })
                                         }}
-                                        className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
-                                        >
-                                          Sign Up (#4)
-                                        </button>
-                                      </div>
+                                        className="mt-2 w-full px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-full transition-colors font-medium"
+                                      >
+                                        Add a fourth volunteer?
+                                      </button>
                                     )}
-                                  </>
-                                )}
-                                
-                                {/* Add fourth volunteer button */}
-                                {hasThirdVolunteer && !hasFourthVolunteer && (
+                                  </div>
+                                ) : hasThirdVolunteer ? (
                                   <button
                                     onClick={() => {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer4' })
                                     }}
-                                    className="w-full px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-full transition-colors font-medium"
+                                    className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                                   >
-                                    Add a fourth volunteer?
+                                    Sign Up
                                   </button>
-                                )}
-                              </div>
-                            ) : null}
-                          </td>
+                                ) : null
+                              ) : null}
+                            </td>
+                          </>
                         )}
                       </tr>
                     )
