@@ -33,6 +33,7 @@ export default function FoodDistribution() {
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState(Date.now()) // Force re-render trigger
+  const [isCancelling, setIsCancelling] = useState(false)
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -138,8 +139,20 @@ export default function FoodDistribution() {
   }
 
   const handleCancelConfirm = async () => {
+    if (isCancelling) return // Prevent double-clicks
+    
     const { recordId, name, displayDate } = cancelConfirmModal
     setCancelConfirmModal({ show: false, recordId: '', name: '', displayDate: '' })
+    setIsCancelling(true)
+    
+    // Immediately optimistically remove the signup from UI to prevent double-clicks
+    setSignups(prev => prev.map(signup => {
+      if (signup.volunteer1?.id === recordId) return { ...signup, volunteer1: null }
+      if (signup.volunteer2?.id === recordId) return { ...signup, volunteer2: null }
+      if (signup.volunteer3?.id === recordId) return { ...signup, volunteer3: null }
+      if (signup.volunteer4?.id === recordId) return { ...signup, volunteer4: null }
+      return signup
+    }))
     
     try {
       const response = await fetch(`/api/signup?recordId=${recordId}&table=food`, {
@@ -155,7 +168,18 @@ export default function FoodDistribution() {
         
         setSuccessModal({ show: true, message: 'Signup cancelled successfully.' })
       } else {
-        setErrorModal({ show: true, title: 'Cancellation Failed', message: data.error || 'Unable to cancel signup. Please try again.' })
+        // Check if it's a "not found" error (already deleted)
+        const isNotFound = data.error?.includes('NOT_FOUND') || data.error?.includes('not found') || data.error?.includes('404')
+        if (isNotFound) {
+          // Record already deleted, just refresh to sync state
+          console.log('📋 [CANCEL] Record already deleted, syncing UI...')
+          await fetchSignups()
+          setSuccessModal({ show: true, message: 'Signup was already cancelled.' })
+        } else {
+          // Real error, revert optimistic update by refetching
+          await fetchSignups()
+          setErrorModal({ show: true, title: 'Cancellation Failed', message: data.error || 'Unable to cancel signup. Please try again.' })
+        }
       }
     } catch (error) {
       console.error('Error cancelling signup:', error)
@@ -183,6 +207,8 @@ export default function FoodDistribution() {
       } catch (reportError) {
         console.error('Failed to report error:', reportError)
       }
+    } finally {
+      setIsCancelling(false)
     }
   }
 

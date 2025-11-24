@@ -147,8 +147,23 @@ export default function ScheduleSummary() {
         }
       })
       
+      // Generate filename with service type, months, and year
+      const displayedServices = selectedMonths.includes('all') 
+        ? services 
+        : services.filter(service => {
+            const monthName = service.displayDate.split(' ')[0]
+            return selectedMonths.includes(monthName)
+          })
+      
+      const months = displayedServices.length > 0
+        ? Array.from(new Set(displayedServices.map(s => s.displayDate.split(' ')[0]))).join('-')
+        : 'Schedule'
+      const year = displayedServices.length > 0
+        ? displayedServices[0].displayDate.split(', ')[1]?.split(' ')[0] || new Date().getFullYear()
+        : new Date().getFullYear()
+      
       const link = document.createElement('a')
-      link.download = `liturgist-schedule-${currentQuarter}.png`
+      link.download = `Liturgist-Signups-${months}-${year}.png`
       link.href = dataUrl
       link.click()
     } catch (error) {

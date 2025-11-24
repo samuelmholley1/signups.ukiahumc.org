@@ -89,11 +89,19 @@ export default function ScheduleSummary() {
       const response = await fetch(dataUrl)
       const blob = await response.blob()
 
+      // Generate filename with service type, months, and year
+      const months = services.length > 0 
+        ? Array.from(new Set(services.map(s => s.displayDate.split(' ')[0]))).join('-')
+        : 'Schedule'
+      const year = services.length > 0 
+        ? services[0].displayDate.split(', ')[1] || new Date().getFullYear()
+        : new Date().getFullYear()
+      
       // Download
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `food-distribution-schedule-${new Date().toISOString().split('T')[0]}.png`
+      a.download = `Food-Distribution-${months}-${year}.png`
       a.click()
       URL.revokeObjectURL(url)
     } catch (error) {
