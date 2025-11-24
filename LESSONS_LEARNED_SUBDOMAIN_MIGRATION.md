@@ -642,65 +642,22 @@ This migration successfully transformed a single-purpose subdomain into a multi-
 **End of Guide**  
 Last Updated: November 23, 2025
 
-## 📝 POST-MIGRATION UPDATES (November 23, 2025)
+## 📝 POST-MIGRATION ISSUES (November 23, 2025)
 
-Since the initial migration was completed, several critical enhancements and bug fixes have been implemented. This section documents real-world issues encountered and solutions applied.
+Issues discovered and fixed that are **directly related to the subdomain-to-path migration**.
 
-### Issue 6: Airtable Field Type Restrictions
-**Problem:** Original Role field was Single Select (liturgist/backup) - couldn't accommodate food distribution's 4 volunteer slots.
-
-**Solution:** Changed Role field to **Long Text** in Airtable.
-- Allows flexible values: `volunteer1`, `volunteer2`, `volunteer3`, `volunteer4`, `liturgist`, `backup`, `liturgist2`
-- No dropdown limitations
-- Different services use different role conventions
-
-**Key Learning:** When designing multi-service systems, prefer flexible field types (Long Text, JSON) over constrained types (Single Select) unless strict validation is required.
-
----
-
-### Issue 7: Progressive Disclosure UX Pattern
-**Problem:** Food distribution needs 2-4 volunteer signups, but showing 4 columns initially was overwhelming.
-
-**Solution:** Implemented **progressive disclosure pattern**:
-- Show 2 volunteer columns by default
-- "Add a third volunteer?" button (amber) reveals volunteer 3
-- "Add a fourth volunteer?" button (orange) reveals volunteer 4
-- Users opt-in to complexity
-
-**Key Learning:** Don't show all fields upfront. Progressive disclosure reduces cognitive load and improves conversion for simple cases while supporting complex needs.
-
----
-
-### Issue 8: Branded Modal System vs Alert()
-**Problem:** Error messages displayed via `alert()` - ugly, no branding, poor UX, can't auto-report errors.
-
-**Solution:** Built React-based modal system with church branding, logo, emoji indicators, consistent Tailwind styling, and automatic error reporting.
-
-**Key Learning:** Never use `alert()` in production. Build branded, stateful modals with proper accessibility and error reporting integration.
-
----
-
-### Issue 9: Silent Errors in Production
-**Problem:** Errors happened silently - no visibility into production issues until users complained.
-
-**Solution:** Created automatic error reporting pipeline - `/api/report-error` endpoint that sends styled HTML error emails with stack traces and plain-English explanations.
-
-**Key Learning:** Build error reporting EARLY. Email notifications provide faster incident response than log diving.
-
----
-
-### Issue 10: Conditional Airtable Fields Across Tables
+### Issue 6: Conditional Airtable Fields Across Tables
 **Problem:** 500 error on food distribution signups - `UNKNOWN_FIELD_NAME` for "Attendance Status".
 
 **Root Cause:** "Attendance Status" field exists ONLY in Liturgists table, not Food Distribution table.
 
 **Solution:** Conditional field inclusion based on table type in `submitSignup()`.
 
-**Key Learning:** Multi-table systems need defensive field mapping. Never assume all tables share the same schema.
+**Key Learning:** Multi-table systems need defensive field mapping. Never assume all tables share the same schema. When migrating multiple services, preserve original table structures.
 
 ---
 
-### Issue 11: Email Branding Confusion
+### Issue 7: Email Branding Confusion
 **Problem:** All emails said "Liturgist Signup System" even for food distribution users - confusing and unprofessional.
 
 **Solution:** Implemented **complete table-aware email system** with three adaptation layers:
@@ -709,22 +666,11 @@ Since the initial migration was completed, several critical enhancements and bug
 2. **Dynamic Subjects:** "Food Distribution Volunteer" vs "Liturgist" in all email subjects
 3. **Dynamic Body Content:** Added `systemName` parameter to email generation functions, header colors (orange vs blue), body messages, footer text
 
-**Key Learning:** Multi-tenant email systems need comprehensive branding. Update sender name, subjects, AND body content for complete context adaptation.
+**Key Learning:** Multi-tenant email systems need comprehensive branding adaptation. Update sender name, subjects, AND body content for complete context adaptation.
 
 ---
 
-### Issue 12: Variable Scoping in Error Handlers
-**Problem:** Build failed with "Cannot find name 'tableName'" in catch block.
-
-**Root Cause:** `tableName` declared inside try block, inaccessible in catch block for error emails.
-
-**Solution:** Declare `tableName` and `body` BEFORE try blocks in POST and DELETE handlers.
-
-**Key Learning:** When variables are needed in both try and catch blocks, declare them BEFORE the try block. Watch for scope issues when implementing error handling.
-
----
-
-### Issue 13: Role Detection in Email Link Cancellations
+### Issue 8: Role Detection in Email Link Cancellations
 **Challenge:** GET handler for email link cancellations doesn't have explicit table parameter.
 
 **Solution:** Detect table type from role prefix - `volunteer*` roles = food distribution.
@@ -750,72 +696,11 @@ sendEmail({ ...emailParams, fromName: systemName });
 <footer>${systemName}</footer>
 ```
 
-#### Pattern 5: Progressive Disclosure State Management
-```typescript
-const [showExtraColumns, setShowExtraColumns] = useState(false);
-{!showExtraColumns && <RevealButton />}
-{showExtraColumns && <AdditionalContent />}
-```
-
-#### Pattern 6: Error Reporting Pipeline
-```typescript
-// Frontend: Dual responsibility
-setErrorModal({ show: true }); // User experience
-fetch('/api/report-error', { ... }); // Developer notification (fire-and-forget)
-```
+---
 
 ---
 
-### Updated Common Pitfalls Table
-
-| Pitfall | Solution | Reference |
-|---------|----------|-----------|
-| **Airtable field mismatch** | Use conditional field inclusion based on table type | Issue 10 |
-| **Variable scope in error handlers** | Declare variables BEFORE try blocks if needed in catch | Issue 12 |
-| **Email branding inconsistency** | Update sender name, subject, AND body content | Issue 11 |
-| **Role detection ambiguity** | Use unique prefixes per signup type | Issue 13 |
-| **Button width inconsistency** | Avoid `w-full` in grid layouts | Issue 7 |
-| **Alert fatigue** | Replace all `alert()` calls with branded modal system | Issue 8 |
-| **Silent errors** | Implement auto-reporting pipeline early | Issue 9 |
-| **Field type restrictions** | Prefer Long Text over Single Select | Issue 6 |
-| **Overwhelming UX** | Use progressive disclosure | Issue 7 |
-
----
-
-### Updated Key Learnings
-
-11. **Field Type Flexibility:** Long Text > Single Select for evolving multi-purpose systems
-12. **Progressive Disclosure:** Show 2-3 fields initially, reveal more on demand
-13. **Visual Consistency:** Match button widths, colors, spacing across similar components
-14. **Modal > Alert:** Always use branded, stateful modals in production apps
-15. **Error Reporting:** Build email notification pipeline BEFORE things break
-16. **Conditional Fields:** Multi-table systems need if/else logic for field inclusion
-17. **Email Branding:** Update sender name, subject, AND body for complete adaptation
-18. **Variable Scoping:** Declare variables before try blocks if needed in catch
-19. **Test Data Management:** Use email aliases (`+test`) for test accounts
-20. **Documentation First:** Create migration plans and post-mortems before AND after changes
-
----
-
-### Production Deployment Timeline
-
-**Initial Migration:** November 20-22, 2025
-- Subdomain → path-based routing complete
-- Both services live in production
-
-**Post-Migration Enhancements:** November 23, 2025
-- Progressive disclosure UI (4 hours)
-- Styled modal system (2 hours)
-- Error reporting pipeline (3 hours)
-- Complete email branding overhaul (5 hours)
-- Conditional Airtable fields (1 hour)
-- Bug fixes and testing (3 hours)
-
-**Total Time Investment:** ~22 hours for fully production-ready multi-service platform with comprehensive error handling and branding.
-
----
-
-### Issue 14: Email Template URL Hardcoding (Nov 23, 2025)
+### Issue 9: Email Template URL Hardcoding (Nov 23, 2025)
 **Problem:** Cancellation emails still used hardcoded `liturgists.ukiahumc.org` URLs for logo images and links, causing broken images and wrong navigation.
 
 **Root Cause:** Email templates in `generateSignupEmail()` and `generateCancellationEmail()` had hardcoded subdomain URLs that weren't updated during migration.
@@ -835,118 +720,118 @@ fetch('/api/report-error', { ... }); // Developer notification (fire-and-forget)
 
 ---
 
-### Issue 15: Email Footer Information Overload (Nov 23, 2025)
-**Problem:** Email footers showed both church name AND system name, creating redundant/confusing messaging.
+### Issue 10: Email Footer Service Duplication (Nov 23, 2025)
+**Problem:** Email footers showed both church name AND system name, creating redundant messaging (e.g., "Ukiah United Methodist Church" + "UUMC Food Distribution").
 
-**Example:**
-```html
-<!-- Before -->
-<footer>
-  <strong>Ukiah United Methodist Church</strong><br/>
-  UUMC Food Distribution
-</footer>
+**Solution:** Simplified footer to show only church name - system context already clear from sender name and subject line.
+
+**Key Learning:** In multi-service emails, context comes from sender name + subject. Keep footers minimal - organization name only.
+
+---
+
+### Issue 11: Email Role Label Detection (Nov 23, 2025)
+**Problem:** Food distribution confirmation emails showed "Your Role: Liturgist" instead of "Food Distribution Volunteer".
+
+**Root Cause:** `generateSignupEmail()` only checked for backup vs regular liturgist, didn't check service type first.
+
+**Solution:** Added service type check BEFORE role logic:
+```typescript
+if (isFoodDistribution) {
+  roleLabel = 'Food Distribution Volunteer'
+} else {
+  const isBackup = role.toLowerCase() === 'backup'
+  roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
+}
 ```
 
-**Solution:** Simplified to show only church name in footer (system context already clear from subject/body):
-```html
-<!-- After -->
-<footer>
-  <strong>Ukiah United Methodist Church</strong>
-</footer>
+**Key Learning:** When adapting shared code for multiple services, always check service type FIRST, then apply service-specific logic.
+
+---
+
+### Issue 12: Client-Side Cache Preventing UI Updates (Nov 23, 2025)
+**Problem:** Food distribution page didn't show newly filled slots after signups - users saw stale data until manual refresh.
+
+**Root Cause:** Browser caching API responses. Even though `fetchSignups()` was called after mutations, cached responses were returned.
+
+**Solution:** Added cache-busting to API fetch:
+```typescript
+// Before
+const response = await fetch('/api/services?table=food&quarter=Q4-2025')
+
+// After
+const response = await fetch(`/api/services?table=food&quarter=Q4-2025&t=${Date.now()}`, {
+  cache: 'no-store'
+})
 ```
 
-**Key Learning:** In branded emails, context comes from sender name + subject + body. Footer should be minimal - just org name or legal info.
+**Key Learning:** After mutations (POST/DELETE), re-fetch operations need cache-busting. Add timestamp parameter + `cache: 'no-store'` directive.
 
 ---
 
-### Issue 16: Confirmation Modal UX (Nov 23, 2025)
-**Problem:** Cancellation used native `confirm()` dialog - ugly, no branding, inconsistent with styled modals elsewhere.
-
-**Solution:** Created styled cancellation confirmation modal:
-- Church logo (150x100 for visibility)
-- Question mark emoji (❓)
-- Clear messaging: "Are you sure you want to cancel [Name]'s signup?"
-- Two-button choice: "No, Keep It" (gray) vs "Yes, Cancel" (red)
-- Consistent with other modal styling
-
-**Key Learning:** Replace ALL native browser dialogs (`alert()`, `confirm()`, `prompt()`) with branded modals. Consistency matters for professional UX.
-
----
-
-### Issue 17: Modal Logo Sizing (Nov 23, 2025)
-**Problem:** Church logo in success/error modals was too small (80x53px) - hard to see, looked like an icon.
-
-**Solution:** Increased all modal logos to 150x100px for better visibility and brand presence.
-
-**Key Learning:** Modal logos should be prominent enough to establish brand identity but not dominate the message. 150-200px width is ideal for 600px modal width.
-
----
-
-### Updated Common Pitfalls Table (Revised Nov 23, 2025)
+## Migration-Specific Common Pitfalls
 
 | Pitfall | Solution | Reference |
 |---------|----------|-----------|
-| **Airtable field mismatch** | Use conditional field inclusion based on table type | Issue 10 |
-| **Variable scope in error handlers** | Declare variables BEFORE try blocks if needed in catch | Issue 12 |
-| **Email branding inconsistency** | Update sender name, subject, AND body content | Issue 11 |
-| **Role detection ambiguity** | Use unique prefixes per signup type | Issue 13 |
-| **Button width inconsistency** | Avoid `w-full` in grid layouts | Issue 7 |
-| **Alert/Confirm fatigue** | Replace ALL native dialogs with branded modals | Issues 8, 16 |
-| **Silent errors** | Implement auto-reporting pipeline early | Issue 9 |
-| **Field type restrictions** | Prefer Long Text over Single Select | Issue 6 |
-| **Overwhelming UX** | Use progressive disclosure | Issue 7 |
-| **Hardcoded URLs in emails** | Grep email templates during domain migrations | Issue 14 |
-| **Email footer overload** | Keep footers minimal - org name only | Issue 15 |
-| **Tiny modal logos** | Use 150-200px width for brand presence | Issue 17 |
+| **Using rewrites instead of redirects** | Use 301 redirects for cross-subdomain routing | Issue 1 |
+| **Wildcard route ordering** | Put specific routes before wildcards in vercel.json | Issue 2 |
+| **Airtable field schema differences** | Use conditional field inclusion based on table type | Issue 6 |
+| **Email branding inconsistency** | Update sender name, subject, AND body content | Issue 7 |
+| **Role terminology collision** | Use unique prefixes per service type (volunteer* vs liturgist*) | Issue 8 |
+| **Hardcoded subdomain URLs in emails** | Grep ALL email templates for old domain references | Issue 9 |
+| **Email footer redundancy** | Keep footers minimal - org name only | Issue 10 |
+| **Service type detection order** | Check service type BEFORE checking role variations | Issue 11 |
+| **Stale cache after mutations** | Add timestamp + no-store directive to re-fetches | Issue 12 |
 
 ---
 
-### Updated Key Learnings (Final - Nov 23, 2025)
+## Migration-Specific Key Learnings
 
-11. **Field Type Flexibility:** Long Text > Single Select for evolving multi-purpose systems
-12. **Progressive Disclosure:** Show 2-3 fields initially, reveal more on demand
-13. **Visual Consistency:** Match button widths, colors, spacing across similar components
-14. **Modal > Alert/Confirm:** Replace ALL native browser dialogs with branded modals
-15. **Error Reporting:** Build email notification pipeline BEFORE things break
-16. **Conditional Fields:** Multi-table systems need if/else logic for field inclusion
-17. **Email Branding:** Update sender name, subject, AND body for complete adaptation
-18. **Variable Scoping:** Declare variables before try blocks if needed in catch
-19. **Test Data Management:** Use email aliases (`+test`) for test accounts
-20. **Documentation First:** Create migration plans and post-mortems before AND after changes
-21. **Email Template URLs:** Grep all hardcoded URLs in email templates during domain migrations
-22. **Email Footer Minimalism:** Keep footers simple - org name only, context comes from content
-23. **Modal Logo Sizing:** 150-200px width logos for professional brand presence in modals
-24. **Native Dialog Replacement:** Confirm dialogs need same branded treatment as alerts
+### Core Migration Principles
+1. **Vercel treats subdomains as separate deployments** - Use 301 redirects, not rewrites
+2. **Redirect order matters** - Specific routes must come before wildcards in vercel.json
+3. **Test redirects thoroughly** - Verify all path combinations preserve query params
+4. **Keep old subdomains active** - Maintain redirects for 6-12 months minimum
+
+### Multi-Service Architecture
+5. **Preserve original table structures** - Minimally edit existing Airtable schemas to reduce errors
+6. **Conditional field mapping** - Multi-table systems need defensive field inclusion based on service type
+7. **Parameter-based routing** - Use `?table=food` pattern instead of separate endpoints
+8. **Unique role prefixes** - Service-specific role conventions enable implicit detection (volunteer* vs liturgist*)
+
+### Email System Adaptation
+9. **Complete branding adaptation** - Update sender name, subject line, AND body content for each service
+10. **Domain migration in templates** - Grep ALL hardcoded URLs in email HTML, not just app code
+11. **Service type detection order** - Always check service type FIRST, then role-specific logic
+12. **Minimal email footers** - Org name only - context comes from sender/subject
+
+### Client-Side Updates
+13. **Cache-busting after mutations** - Add timestamp params + `cache: 'no-store'` to re-fetch calls
+14. **Context-aware components** - Use Next.js `usePathname()` for dynamic section detection
 
 ---
 
-### Final Production Stats (As of Nov 23, 2025)
+## Final Production Stats (As of Nov 23, 2025)
 
 **Initial Migration:** November 20-22, 2025
-- Subdomain → path-based routing complete
-- Both services live in production
+- Subdomain → path-based routing: 4-6 hours
+- Vercel configuration and testing: 2 hours
 
-**Post-Migration Enhancements:** November 23, 2025
-- Progressive disclosure UI (4 hours)
-- Styled modal system (2 hours)
-- Error reporting pipeline (3 hours)
-- Complete email branding overhaul (5 hours)
-- Conditional Airtable fields (1 hour)
-- Email template URL migration (1 hour)
-- Cancellation modal improvements (1 hour)
-- Modal logo sizing fixes (0.5 hours)
-- Bug fixes and testing (3 hours)
+**Post-Migration Fixes:** November 23, 2025
+- Conditional Airtable fields: 1 hour
+- Email branding overhaul: 3 hours
+- Email template URL migration: 1 hour
+- Role label detection fixes: 1 hour
+- Cache-busting implementation: 0.5 hours
+- Testing and validation: 1.5 hours
 
-**Total Time Investment:** ~22.5 hours for fully production-ready multi-service platform with comprehensive error handling, branding, and polished UX.
+**Total Migration Time:** ~8 hours for complete subdomain-to-path migration with all edge cases resolved
 
-**Files Modified:** 
-- `src/lib/email.ts` - Email templates and branding
-- `src/app/food-distribution/page.tsx` - Progressive UI, modals
-- `src/app/api/signup/route.ts` - Multi-table routing, error handling
+**Files Modified:**
+- `vercel.json` - Redirect configuration
+- `src/lib/email.ts` - Email templates with new domain URLs and service detection
 - `src/lib/airtable.ts` - Conditional field mapping
-- Documentation files (6 markdown files)
+- `src/app/api/signup/route.ts` - Multi-table routing
+- `src/app/food-distribution/page.tsx` - Cache-busting implementation
 
-**Commits:** 15+ individual commits with detailed descriptions
-
-**Build Status:** ✅ All builds passing, TypeScript strict mode, no errors
+**Key Insight:** Most migration time was redirect configuration (1 hour) + fixing domain references in email templates (1 hour) + conditional field logic (1 hour). The actual routing changes were straightforward.
 
