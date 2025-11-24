@@ -264,7 +264,7 @@ export function generateSignupEmail(data: {
         </div>
         <div class="footer-text">
           <strong>Ukiah United Methodist Church</strong><br/>
-          Liturgist Signup System
+          ${isFoodDistribution ? 'Food Distribution Volunteer System' : 'Liturgist Signup System'}
         </div>
       </div>
     </body>
@@ -466,7 +466,8 @@ export function generateCancellationEmail(data: {
           </p>
         </div>
         <div class="footer-text">
-          <strong>Ukiah United Methodist Church</strong>
+          <strong>Ukiah United Methodist Church</strong><br/>
+          ${isFoodDistribution ? 'Food Distribution Volunteer System' : 'Liturgist Signup System'}
         </div>
       </div>
     </body>
@@ -664,7 +665,7 @@ export function generateErrorEmail(data: {
         </div>
         <div class="footer-text">
           <strong>Automated Error Notification</strong><br/>
-          Liturgist Signup System - Ukiah UMC
+          ${serviceType ? (serviceType === 'food' ? 'Food Distribution System' : 'Liturgist Signup System') : 'Signup System'} - Ukiah UMC
         </div>
       </div>
     </body>
