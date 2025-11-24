@@ -141,7 +141,24 @@ export default function FoodDistribution() {
       const data = await response.json()
       
       if (data.success) {
+        console.log('🔄 [DEBUG] Before fetchSignups (cancel) - Current signups:', signups.length, 'records')
+        const beforeState = JSON.parse(JSON.stringify(signups))
         await fetchSignups()
+        console.log('✅ [DEBUG] After fetchSignups (cancel) - Updated signups:', signups.length, 'records')
+        
+        // Verify data actually changed
+        setTimeout(() => {
+          const afterState = JSON.parse(JSON.stringify(signups))
+          const changed = JSON.stringify(beforeState) !== JSON.stringify(afterState)
+          if (!changed) {
+            console.error('⚠️ [DEBUG ERROR] Data did NOT update after cancellation! Cache issue detected.')
+            console.error('Before:', beforeState)
+            console.error('After:', afterState)
+          } else {
+            console.log('✅ [DEBUG] Data successfully updated after cancellation')
+          }
+        }, 500)
+        
         setSuccessModal({ show: true, message: 'Signup cancelled successfully.' })
       } else {
         setErrorModal({ show: true, title: 'Cancellation Failed', message: data.error || 'Unable to cancel signup. Please try again.' })
@@ -221,7 +238,24 @@ export default function FoodDistribution() {
       
       if (data.success) {
         // Refresh signups from server
+        console.log('🔄 [DEBUG] Before fetchSignups - Current signups:', signups.length, 'records')
+        const beforeState = JSON.parse(JSON.stringify(signups))
         await fetchSignups()
+        console.log('✅ [DEBUG] After fetchSignups - Updated signups:', signups.length, 'records')
+        
+        // Verify data actually changed
+        setTimeout(() => {
+          const afterState = JSON.parse(JSON.stringify(signups))
+          const changed = JSON.stringify(beforeState) !== JSON.stringify(afterState)
+          if (!changed) {
+            console.error('⚠️ [DEBUG ERROR] Data did NOT update after signup! Cache issue detected.')
+            console.error('Before:', beforeState)
+            console.error('After:', afterState)
+          } else {
+            console.log('✅ [DEBUG] Data successfully updated after signup')
+          }
+        }, 500)
+        
         // Reset form
         setFormData({ 
           selectedPerson: '',
@@ -316,14 +350,14 @@ export default function FoodDistribution() {
                         </td>
                         <td className="px-4 py-4">
                           {signup.volunteer1 ? (
-                            <div className="flex items-center justify-between">
-                              <div>
+                            <div className="flex items-start gap-2">
+                              <div className="flex-1">
                                 <p className="font-medium text-gray-900">{signup.volunteer1.name}</p>
                                 <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                                className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
                               >
                                 Cancel
                               </button>
@@ -334,7 +368,7 @@ export default function FoodDistribution() {
                                 setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer1' })
                               }}
-                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
@@ -343,14 +377,14 @@ export default function FoodDistribution() {
                         <td className="px-4 py-4">
                           {signup.volunteer2 ? (
                             <div>
-                              <div className="flex items-center justify-between">
-                                <div>
+                              <div className="flex items-start gap-2">
+                                <div className="flex-1">
                                   <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
                                   <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
                                 </div>
                                 <button
                                   onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                  className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                  className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
                                 >
                                   Cancel
                                 </button>
@@ -358,7 +392,7 @@ export default function FoodDistribution() {
                               {bothFilled && !showExtra && !hasThirdVolunteer && (
                                 <button
                                   onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
-                                  className="mt-2 w-full px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-lg transition-colors font-medium"
+                                  className="mt-2 w-full px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-full transition-colors font-medium"
                                 >
                                   Add a third volunteer?
                                 </button>
@@ -370,7 +404,7 @@ export default function FoodDistribution() {
                                 setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer2' })
                               }}
-                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
@@ -382,14 +416,14 @@ export default function FoodDistribution() {
                               <div className="space-y-2">
                                 {/* Volunteer 3 */}
                                 {signup.volunteer3 ? (
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div>
+                                  <div className="flex items-start gap-2 mb-2">
+                                    <div className="flex-1">
                                       <p className="font-medium text-gray-900">{signup.volunteer3.name}</p>
                                       <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                                      className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                      className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
                                     >
                                       Cancel
                                     </button>
@@ -400,7 +434,7 @@ export default function FoodDistribution() {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer3' })
                                     }}
-                                    className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                                    className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                                   >
                                     Sign Up (#3)
                                   </button>
@@ -410,26 +444,26 @@ export default function FoodDistribution() {
                                 {hasThirdVolunteer && (
                                   <>
                                     {signup.volunteer4 ? (
-                                      <div className="flex items-center justify-between">
-                                        <div>
+                                      <div className="flex items-start gap-2">
+                                        <div className="flex-1">
                                           <p className="font-medium text-gray-900">{signup.volunteer4.name}</p>
                                           <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
                                         </div>
                                         <button
                                           onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                                          className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                          className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors whitespace-nowrap"
                                         >
                                           Cancel
                                         </button>
                                       </div>
                                     ) : (
                                       <div className="space-y-2">
-                                        <button
-                                          onClick={() => {
-                                            setSelectedDate(signup.date)
-                                            setFormData({ ...formData, role: 'volunteer4' })
-                                          }}
-                                          className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                                      <button
+                                        onClick={() => {
+                                          setSelectedDate(signup.date)
+                                          setFormData({ ...formData, role: 'volunteer4' })
+                                        }}
+                                        className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                                         >
                                           Sign Up (#4)
                                         </button>
@@ -445,7 +479,7 @@ export default function FoodDistribution() {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer4' })
                                     }}
-                                    className="w-full px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-lg transition-colors font-medium"
+                                    className="w-full px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-full transition-colors font-medium"
                                   >
                                     Add a fourth volunteer?
                                   </button>
@@ -562,13 +596,13 @@ export default function FoodDistribution() {
                     <button
                       type="button"
                       onClick={() => setSelectedDate(null)}
-                      className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                      className="flex-1 px-4 py-2 border rounded-full hover:bg-gray-50"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700"
                     >
                       Submit
                     </button>
@@ -598,7 +632,7 @@ export default function FoodDistribution() {
                 </div>
                 <button
                   onClick={() => setErrorModal({ show: false, title: '', message: '' })}
-                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium"
                 >
                   Close
                 </button>
@@ -626,7 +660,7 @@ export default function FoodDistribution() {
                 </div>
                 <button
                   onClick={() => setSuccessModal({ show: false, message: '' })}
-                  className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors font-medium"
                 >
                   Close
                 </button>
@@ -660,13 +694,13 @@ export default function FoodDistribution() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setCancelConfirmModal({ show: false, recordId: '', name: '', displayDate: '' })}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors font-medium"
                   >
                     No, Keep It
                   </button>
                   <button
                     onClick={handleCancelConfirm}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium"
                   >
                     Yes, Cancel
                   </button>
