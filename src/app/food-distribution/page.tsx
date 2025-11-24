@@ -362,10 +362,10 @@ export default function FoodDistribution() {
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
-                      {signups.some(s => s.volunteer3) && (
+                      {signups.some(s => s.volunteer1 && s.volunteer2) && (
                         <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #3</th>
                       )}
-                      {signups.some(s => s.volunteer4) && (
+                      {signups.some(s => s.volunteer3) && (
                         <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #4</th>
                       )}
                     </tr>
@@ -375,7 +375,7 @@ export default function FoodDistribution() {
                     const bothFilled = signup.volunteer1 && signup.volunteer2
                     const hasThirdVolunteer = signup.volunteer3
                     const hasFourthVolunteer = signup.volunteer4
-                    const showExtraVolunteers = hasThirdVolunteer || hasFourthVolunteer
+                    const showExtraVolunteers = bothFilled || hasThirdVolunteer || hasFourthVolunteer
                     
                     return (
                       <React.Fragment key={signup.date}>
