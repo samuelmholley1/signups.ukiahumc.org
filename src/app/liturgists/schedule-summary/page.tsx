@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PasswordGate from '@/components/PasswordGate'
+import { toPng } from 'html-to-image'
 
 interface Service {
   id: string
@@ -19,6 +20,7 @@ export default function ScheduleSummary() {
   const [currentQuarter, setCurrentQuarter] = useState('Q4-2025')
   const [selectedMonths, setSelectedMonths] = useState<string[]>(['all'])
   const [showBackupColumn, setShowBackupColumn] = useState(true)
+  const tableRef = useRef<HTMLDivElement>(null)
 
   console.log('🔍 SCHEDULE SUMMARY DEBUG: Component initialized with quarter:', currentQuarter)
 
@@ -131,6 +133,30 @@ export default function ScheduleSummary() {
     }
   }
 
+  const downloadAsPNG = async () => {
+    if (!tableRef.current) return
+    
+    try {
+      const dataUrl = await toPng(tableRef.current, {
+        quality: 0.98,
+        backgroundColor: '#ffffff',
+        pixelRatio: 2,
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left'
+        }
+      })
+      
+      const link = document.createElement('a')
+      link.download = `liturgist-schedule-${currentQuarter}.png`
+      link.href = dataUrl
+      link.click()
+    } catch (error) {
+      console.error('Error generating PNG:', error)
+      alert('Failed to generate PNG. Please try again.')
+    }
+  }
+
   if (loading) {
     console.log('🔍 SCHEDULE SUMMARY DEBUG: Rendering loading state')
     return (
@@ -171,6 +197,13 @@ export default function ScheduleSummary() {
               <p className="text-sm text-gray-600 mt-1">Version 1.1.0 - Last updated: {new Date().toLocaleString()}</p>
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={downloadAsPNG}
+                className="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
+                title="Download schedule as PNG"
+              >
+                📥 Download PNG
+              </button>
               <button
                 onClick={clearCacheAndReload}
                 className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700"
@@ -285,6 +318,7 @@ export default function ScheduleSummary() {
           </div>
 
           {/* Simple Spreadsheet Table */}
+          <div ref={tableRef}>
           <table className="w-auto border-collapse border border-gray-400 table-auto">
             <thead>
               <tr className="bg-gray-300 border-b-2 border-gray-600">
@@ -361,6 +395,7 @@ export default function ScheduleSummary() {
               })()}
             </tbody>
           </table>
+          </div>
         </div>
       </main>
     </PasswordGate>

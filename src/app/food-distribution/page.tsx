@@ -68,8 +68,14 @@ export default function FoodDistribution() {
           volunteer4: service.volunteer4 || null
         }))
         setSignups(transformed)
-        setLastUpdate(Date.now()) // Force component re-render
-        console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
+        
+        // CRITICAL: Use setTimeout to ensure state updates are processed first
+        // This forces the key update to happen AFTER React processes the new signups
+        setTimeout(() => {
+          setLastUpdate(Date.now())
+          console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
+          console.log('📊 [FORCE UPDATE] New signups data:', transformed.length, 'records')
+        }, 0)
       }
     } catch (error) {
       console.error('Error fetching signups:', error)
@@ -144,28 +150,9 @@ export default function FoodDistribution() {
       const data = await response.json()
       
       if (data.success) {
-        console.log('🔄 [DEBUG] Before fetchSignups (cancel) - Current signups:', signups.length, 'records')
-        const beforeState = JSON.parse(JSON.stringify(signups))
+        console.log('🔄 [CANCEL] Fetching fresh data from server after cancellation...')
         await fetchSignups()
-        console.log('✅ [DEBUG] After fetchSignups (cancel) - Updated signups:', signups.length, 'records')
-        
-        // Verify data actually changed
-        setTimeout(() => {
-          const afterState = JSON.parse(JSON.stringify(signups))
-          const changed = JSON.stringify(beforeState) !== JSON.stringify(afterState)
-          if (!changed) {
-            console.error('⚠️ [DEBUG ERROR] Data did NOT update after cancellation! Cache issue detected.')
-            console.error('Before:', beforeState)
-            console.error('After:', afterState)
-            console.error('🔄 [DEBUG] Forcing page reload to clear cache...')
-            // Nuclear option: force full page reload
-            setTimeout(() => {
-              window.location.reload()
-            }, 2000)
-          } else {
-            console.log('✅ [DEBUG] Data successfully updated after cancellation')
-          }
-        }, 500)
+        console.log('✅ [CANCEL] Fetch complete, UI should update momentarily')
         
         setSuccessModal({ show: true, message: 'Signup cancelled successfully.' })
       } else {
@@ -246,28 +233,9 @@ export default function FoodDistribution() {
       
       if (data.success) {
         // Refresh signups from server
-        console.log('🔄 [DEBUG] Before fetchSignups - Current signups:', signups.length, 'records')
-        const beforeState = JSON.parse(JSON.stringify(signups))
+        console.log('🔄 [SIGNUP] Fetching fresh data from server after signup...')
         await fetchSignups()
-        console.log('✅ [DEBUG] After fetchSignups - Updated signups:', signups.length, 'records')
-        
-        // Verify data actually changed
-        setTimeout(() => {
-          const afterState = JSON.parse(JSON.stringify(signups))
-          const changed = JSON.stringify(beforeState) !== JSON.stringify(afterState)
-          if (!changed) {
-            console.error('⚠️ [DEBUG ERROR] Data did NOT update after signup! Cache issue detected.')
-            console.error('Before:', beforeState)
-            console.error('After:', afterState)
-            console.error('🔄 [DEBUG] Forcing page reload to clear cache...')
-            // Nuclear option: force full page reload
-            setTimeout(() => {
-              window.location.reload()
-            }, 2000)
-          } else {
-            console.log('✅ [DEBUG] Data successfully updated after signup')
-          }
-        }, 500)
+        console.log('✅ [SIGNUP] Fetch complete, UI should update momentarily')
         
         // Reset form
         setFormData({ 

@@ -835,3 +835,332 @@ const response = await fetch(`/api/services?table=food&quarter=Q4-2025&t=${Date.
 
 **Key Insight:** Most migration time was redirect configuration (1 hour) + fixing domain references in email templates (1 hour) + conditional field logic (1 hour). The actual routing changes were straightforward.
 
+---
+
+## Issue 13: Git Merge Strategy and Conflict Resolution
+
+**Problem**: When merging subdomain branches back to main, encountered complex conflicts in shared files (layout.tsx, middleware.ts, API routes).
+
+**Root Cause**: 
+- Two parallel development branches (liturgists-subdomain and food-distribution-subdomain)
+- Both modified same core files with different service-specific logic
+- No shared abstraction layer initially
+
+**Failed Approaches**:
+1. Direct merge - Created conflicts in 15+ files
+2. Cherry-picking - Lost context and introduced bugs
+3. Manual file-by-file merge - Error-prone and time-consuming
+
+**Solution**:
+```bash
+# Merge strategy used:
+# 1. Create clean comparison branch
+git checkout main
+git checkout -b merge-prep
+
+# 2. Merge liturgists first (safer, more stable)
+git merge liturgists-subdomain
+# Resolve conflicts carefully, test thoroughly
+
+# 3. Merge food distribution with full context
+git merge food-distribution-subdomain
+# Use three-way diff to understand both changes
+
+# 4. Refactor to service-aware patterns
+# Extract common logic to shared utilities
+# Add service detection throughout
+```
+
+**Key Merge Conflicts**:
+- **middleware.ts**: Password gate logic vs service routing
+- **layout.tsx**: Navigation components for different services  
+- **API routes**: Airtable table selection logic
+- **globals.css**: Service-specific styling overrides
+- **Types**: Interface mismatches between services
+
+**Best Practices Learned**:
+1. **Merge smaller, more frequently** - Don't let branches diverge too far
+2. **Create service-agnostic abstractions early** - Makes merging easier
+3. **Test both services after each merge commit** - Catch integration bugs immediately
+4. **Use feature flags** - Allow gradual rollout of merged features
+5. **Document merge decisions** - Future maintainers need context
+
+**Preventive Measures for Next Time**:
+```typescript
+// From the start, design for multiple services:
+// lib/service-config.ts
+export const SERVICE_CONFIG = {
+  liturgists: {
+    table: 'Liturgists',
+    fields: ['liturgist', 'backup'],
+    branding: 'Liturgist Signup'
+  },
+  'food-distribution': {
+    table: 'FoodDistribution', 
+    fields: ['volunteer1', 'volunteer2', 'volunteer3', 'volunteer4'],
+    branding: 'Food Distribution Volunteer'
+  }
+}
+
+// Then reference config instead of hardcoding
+const config = SERVICE_CONFIG[service]
+```
+
+---
+
+## Issue 14: Vercel Domain Configuration and DNS Management
+
+**Problem**: Subdomain approach required complex DNS configuration and Vercel project management that caused deployment confusion.
+
+**Initial Setup Issues**:
+- Main domain: signups.ukiahumc.org (pointed to main Vercel project)
+- Attempted subdomain: food.signups.ukiahumc.org (required separate Vercel project OR complex rewrite rules)
+- DNS CNAME records conflicting with Vercel's automatic SSL
+
+**Why Subdomains Were Problematic**:
+1. **Vercel Limitations**: Subdomains either need separate projects OR rewrites (which break relative paths)
+2. **SSL Certificate Management**: Each subdomain needs its own cert verification
+3. **Preview Deployments**: Subdomain previews created confusing URLs
+4. **CORS Issues**: Cross-subdomain requests triggered CORS policies
+5. **Cookie Isolation**: Auth cookies couldn't be shared across subdomains
+
+**Path-Based Solution Benefits**:
+```
+Before (subdomain approach):
+- signups.ukiahumc.org → Main project
+- food.signups.ukiahumc.org → ??? (separate project OR rewrite)
+- liturgists.signups.ukiahumc.org → ??? (more complexity)
+
+After (path-based approach):
+- signups.ukiahumc.org/liturgists → All in one project
+- signups.ukiahumc.org/food-distribution → Same project
+- signups.ukiahumc.org/admin → Same project
+- Single DNS record, single SSL cert, single deployment
+```
+
+**DNS Configuration**:
+```dns
+# Simple, single record needed:
+A record: signups.ukiahumc.org → 76.76.21.21 (Vercel)
+# No CNAME subdomains needed!
+```
+
+**Vercel Configuration**:
+```json
+// vercel.json (simplified)
+{
+  "rewrites": [
+    {
+      "source": "/liturgists/:path*",
+      "destination": "/liturgists/:path*"
+    },
+    {
+      "source": "/food-distribution/:path*", 
+      "destination": "/food-distribution/:path*"
+    }
+  ]
+}
+```
+
+**Lessons Learned**:
+1. **Favor path-based routing** for multi-service Next.js apps
+2. **Subdomains add complexity** without significant benefits for our use case
+3. **Single Vercel project** = simpler DNS, SSL, deployments, previews
+4. **Vercel rewrites work best with paths**, not subdomains
+
+---
+
+## Issue 15: Testing Strategy for Multi-Service Applications
+
+**Problem**: E2E tests written for single-service app broke when merged into multi-service system.
+
+**Test Failures After Merge**:
+- Tests navigated to `/` (root) but services now at `/liturgists` and `/food-distribution`
+- Password gate appeared on all pages, tests didn't account for it
+- Selectors assumed single service structure
+- Real-time updates tested only for liturgists
+
+**Original Test Structure**:
+```typescript
+// playwright/liturgist-signup.spec.ts
+test('should signup for liturgist slot', async ({ page }) => {
+  await page.goto('http://localhost:3000/')
+  // This broke - now need /liturgists
+  await page.click('[data-testid="signup-button"]')
+  // ...
+})
+```
+
+**Fixed Multi-Service Test Structure**:
+```typescript
+// e2e/liturgist-signup.spec.ts
+test.describe('Liturgist Signup Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to correct service path
+    await page.goto('http://localhost:3000/liturgists')
+    
+    // Handle password gate (all services require auth)
+    const passwordInput = page.locator('input[type="password"]')
+    if (await passwordInput.isVisible()) {
+      await passwordInput.fill(process.env.TEST_PASSWORD!)
+      await page.click('button:has-text("Submit")')
+    }
+  })
+  
+  test('should signup for liturgist slot', async ({ page }) => {
+    // Test-specific logic
+    await page.waitForSelector('[data-testid="liturgist-signup-button"]')
+    // ...
+  })
+})
+
+// e2e/food-distribution-signup.spec.ts
+test.describe('Food Distribution Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('http://localhost:3000/food-distribution')
+    // Handle password gate
+    // ...
+  })
+  
+  test('should signup for volunteer slot', async ({ page }) => {
+    await page.waitForSelector('[data-testid="volunteer-signup-button"]')
+    // ...
+  })
+})
+```
+
+**Key Testing Patterns**:
+1. **Service-specific test files** - Separate concerns, easier maintenance
+2. **Shared test utilities** - Password gate handler, common selectors
+3. **Data-testid attributes** - Service-aware selectors (`data-testid="liturgist-signup"` vs `data-testid="volunteer-signup"`)
+4. **Environment variables** - Test against correct service paths
+5. **Parallel execution** - Run both service tests simultaneously
+
+**Test Utility Pattern**:
+```typescript
+// e2e/utils/auth.ts
+export async function handlePasswordGate(page: Page) {
+  const passwordInput = page.locator('input[type="password"]')
+  if (await passwordInput.isVisible({ timeout: 1000 })) {
+    await passwordInput.fill(process.env.TEST_PASSWORD!)
+    await page.click('button:has-text("Submit")')
+    await passwordInput.waitFor({ state: 'hidden' })
+  }
+}
+
+// e2e/utils/navigation.ts
+export const ROUTES = {
+  liturgists: '/liturgists',
+  foodDistribution: '/food-distribution',
+  liturgistsSummary: '/liturgists/schedule-summary',
+  foodSummary: '/food-distribution/schedule-summary'
+}
+```
+
+**Lessons Learned**:
+1. **Test service boundaries** - Each service needs comprehensive test coverage
+2. **Don't assume single service** - Tests should work in multi-service context
+3. **Use test utilities** - Reduce duplication, easier updates
+4. **Service-aware selectors** - Namespace test IDs by service
+5. **Test cross-service scenarios** - Navigation between services, shared components
+
+---
+
+## Issue 16: Environment Variable Management Across Services
+
+**Problem**: Environment variables needed for multiple services but structured for single service.
+
+**Initial Structure** (Single Service):
+```env
+# .env.local
+AIRTABLE_API_KEY=keyXXXXX
+AIRTABLE_BASE_ID=appYYYYY
+AIRTABLE_TABLE_NAME=Liturgists  # Hardcoded!
+AUTH_PASSWORD=mypassword
+```
+
+**Problem After Merge**:
+- Which table should `AIRTABLE_TABLE_NAME` point to?
+- Both services need different table names
+- Can't have two variables with same name
+- Environment variables needed to be service-aware
+
+**Solution** (Multi-Service):
+```env
+# .env.local
+AIRTABLE_API_KEY=keyXXXXX
+AIRTABLE_BASE_ID=appYYYYY
+# No AIRTABLE_TABLE_NAME - determined by service parameter
+
+# Service-specific settings
+LITURGISTS_TABLE_NAME=Liturgists
+FOOD_DISTRIBUTION_TABLE_NAME=FoodDistribution
+
+# Shared settings
+AUTH_PASSWORD=mypassword
+SMTP_HOST=smtp.sendgrid.net
+SMTP_USER=apikey
+SMTP_PASS=SG.xxxxx
+EMAIL_FROM=noreply@ukiahumc.org
+```
+
+**Code Pattern**:
+```typescript
+// lib/airtable.ts
+export function getTableName(service: 'liturgists' | 'food-distribution'): string {
+  const tableMap = {
+    liturgists: process.env.LITURGISTS_TABLE_NAME || 'Liturgists',
+    'food-distribution': process.env.FOOD_DISTRIBUTION_TABLE_NAME || 'FoodDistribution'
+  }
+  return tableMap[service]
+}
+
+// API route usage:
+const service = searchParams.get('table') === 'food' ? 'food-distribution' : 'liturgists'
+const tableName = getTableName(service)
+```
+
+**Vercel Environment Variables**:
+```
+Production Environment:
+✓ AIRTABLE_API_KEY (secret)
+✓ AIRTABLE_BASE_ID
+✓ AUTH_PASSWORD (secret)
+✓ SMTP_HOST
+✓ SMTP_PASS (secret)
+✓ LITURGISTS_TABLE_NAME
+✓ FOOD_DISTRIBUTION_TABLE_NAME
+
+Preview/Development:
+(Same variables, different values for testing)
+```
+
+**Lessons Learned**:
+1. **Avoid hardcoded service names in env vars** - Use dynamic lookups
+2. **Namespace service-specific vars** - `SERVICE_SETTING` pattern
+3. **Document required env vars** - README should list all needed
+4. **Validate env vars at startup** - Fail fast if missing
+5. **Use separate env files per environment** - `.env.local`, `.env.production`
+
+**Validation Pattern**:
+```typescript
+// lib/env-validation.ts
+const requiredEnvVars = [
+  'AIRTABLE_API_KEY',
+  'AIRTABLE_BASE_ID',
+  'AUTH_PASSWORD',
+  'LITURGISTS_TABLE_NAME',
+  'FOOD_DISTRIBUTION_TABLE_NAME'
+]
+
+export function validateEnv() {
+  const missing = requiredEnvVars.filter(key => !process.env[key])
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`)
+  }
+}
+
+// Call in middleware or API routes:
+validateEnv()
+```
+
