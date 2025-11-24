@@ -33,21 +33,25 @@ export interface SignupData {
 export async function submitSignup(data: SignupData, tableName: string = TABLES.LITURGISTS) {
   try {
     const table = getTable(tableName)
-    const record = await table.create([
-      {
-        fields: {
-          'Service Date': data.serviceDate,
-          'Display Date': data.displayDate,
-          'Name': data.name,
-          'Email': data.email,
-          'Phone': data.phone || '',
-          'Role': data.role,
-          'Attendance Status': data.attendanceStatus || '',
-          'Notes': data.notes || '',
-          'Submitted At': new Date().toISOString(),
-        },
-      },
-    ])
+    
+    // Build fields object - only include Attendance Status for Liturgists table
+    const fields: Record<string, any> = {
+      'Service Date': data.serviceDate,
+      'Display Date': data.displayDate,
+      'Name': data.name,
+      'Email': data.email,
+      'Phone': data.phone || '',
+      'Role': data.role,
+      'Notes': data.notes || '',
+      'Submitted At': new Date().toISOString(),
+    }
+    
+    // Only add Attendance Status for Liturgists table (not Food Distribution)
+    if (tableName === TABLES.LITURGISTS && data.attendanceStatus) {
+      fields['Attendance Status'] = data.attendanceStatus
+    }
+    
+    const record = await table.create([{ fields }])
 
     return { success: true, record: record[0] }
   } catch (error) {
