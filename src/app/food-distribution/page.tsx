@@ -359,7 +359,7 @@ export default function FoodDistribution() {
                 <table className="w-full table-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
-                      <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
+                      <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm w-48">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
                       {signups.some(s => s.volunteer1 && s.volunteer2) && (
@@ -378,7 +378,7 @@ export default function FoodDistribution() {
                     
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
+                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base w-48">
                           {signup.displayDate}
                         </td>
                         <td className="px-4 py-4 align-top">
