@@ -158,9 +158,70 @@ Added to checklist: "For any width/layout changes, verify both headers AND cells
 
 ---
 
+### Failure #5: Vercel Deployment Protection Blocked API and Image Requests (November 24, 2025)
+
+**Severity**: 🔴 CRITICAL
+
+**What Happened**:
+- User tested signup on Vercel preview deployment URL
+- Got "Network Error - Unable to connect to the server" modal
+- Logo images showed placeholder (broken image icon)
+- Console showed 401 Unauthorized errors:
+  - `POST /api/signup` → 401
+  - `GET /_next/image?url=/logo-for-church-larger.jpg` → 401
+  - `POST /api/report-error` → 401
+- Error: `SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON`
+
+**Root Cause**:
+- Vercel preview deployments have **Deployment Protection** enabled
+- This requires authentication to access ANY resource on the preview URL
+- Next.js `<Image>` component uses Vercel's Image Optimization API (`/_next/image`)
+- Image Optimization API endpoint treated as separate request without auth cookies
+- API routes also blocked by same protection
+- System returned HTML error page instead of JSON, causing parse errors
+
+**Impact**:
+- Complete signup system failure on preview deployments
+- User could not test volunteer 3 signup after backfill worked correctly
+- Misleading error message ("Network Error") instead of auth issue
+- Broke all user-facing functionality on preview URLs
+
+**What Should Have Been Done**:
+1. ✅ Use regular `<img>` tags instead of Next.js `<Image>` for simple logos
+2. ✅ Test on actual production domain, not preview URLs with protection
+3. ✅ Document that preview URLs require Vercel auth for ALL requests
+4. ✅ Add deployment protection bypass for specific routes if needed
+5. ✅ Check for 401 responses and show appropriate error messages
+
+**Fix Applied**:
+- Replaced all `<Image>` components with `<img>` tags in food-distribution page
+- Removed Next.js Image import
+- Images now served directly from `/public` without optimization
+- Bypasses Vercel Image Optimization API entirely
+
+**Why This Happened**:
+- Used Next.js best practice (`<Image>` component) without considering deployment constraints
+- Didn't realize Image Optimization is a separate API endpoint that needs auth
+- Preview URL testing assumed all resources would work if page loaded
+
+**Protocol Update**:
+Added to checklist: "When using Vercel preview deployments, test with regular `<img>` tags or disable deployment protection for testing"
+
+---
+
 ## Red Team Testing Protocol v2.0
 
 ### Pre-Deployment Checklist
+
+#### Deployment Environment
+- [ ] **Test on actual production domain**, not preview URLs
+- [ ] **Check Vercel Deployment Protection** settings
+  - If enabled, verify API routes bypass protection OR use production URL
+  - If enabled, consider using `<img>` instead of `<Image>` for static assets
+- [ ] **Test 401/403 responses** display appropriate error messages
+- [ ] **Verify image loading** in deployed environment
+  - Check browser console for 401 errors on image requests
+  - Test both Next.js `<Image>` and regular `<img>` tags
 
 #### Data Flow & Caching
 - [ ] **Trace full data flow** for any data freshness question
