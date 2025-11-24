@@ -32,7 +32,6 @@ export default function FoodDistribution() {
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [showExtraColumns, setShowExtraColumns] = useState<{ [key: string]: boolean }>({})
   const [lastUpdate, setLastUpdate] = useState(Date.now()) // Force re-render trigger
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
@@ -313,7 +312,7 @@ export default function FoodDistribution() {
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
-                      {Object.values(showExtraColumns).some(v => v) && (
+                      {signups.some(s => s.volunteer1 && s.volunteer2) && (
                         <>
                           <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #3</th>
                           <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #4</th>
@@ -326,7 +325,6 @@ export default function FoodDistribution() {
                     const bothFilled = signup.volunteer1 && signup.volunteer2
                     const hasThirdVolunteer = signup.volunteer3
                     const hasFourthVolunteer = signup.volunteer4
-                    const showExtra = showExtraColumns[signup.date]
                     
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
@@ -339,9 +337,9 @@ export default function FoodDistribution() {
                               <div className="mb-2">
                                 <p className="font-medium text-gray-900 text-base">{signup.volunteer1.name}</p>
                                 <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.email}</p>
-                                {signup.volunteer1.phone && (
-                                  <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.phone}</p>
-                                )}
+                                <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer1.phone ? 'visible' : 'hidden' }}>
+                                  {signup.volunteer1.phone || '111-111-1111'}
+                                </p>
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
@@ -349,14 +347,6 @@ export default function FoodDistribution() {
                               >
                                 Cancel
                               </button>
-                              {bothFilled && !showExtra && !hasThirdVolunteer && (
-                                <button
-                                  onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
-                                  className="mt-2 px-4 py-2.5 md:px-3 md:py-1.5 text-base md:text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 min-h-[44px] rounded-full transition-colors font-medium"
-                                >
-                                  Add a third volunteer?
-                                </button>
-                              )}
                             </div>
                           ) : (
                             <button
@@ -376,9 +366,9 @@ export default function FoodDistribution() {
                               <div className="mb-2">
                                 <p className="font-medium text-gray-900 text-base">{signup.volunteer2.name}</p>
                                 <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.email}</p>
-                                {signup.volunteer2.phone && (
-                                  <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.phone}</p>
-                                )}
+                                <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
+                                  {signup.volunteer2.phone || '111-111-1111'}
+                                </p>
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
@@ -399,18 +389,17 @@ export default function FoodDistribution() {
                             </button>
                           )}
                         </td>
-                        {Object.values(showExtraColumns).some(v => v) && (
+                        {signups.some(s => s.volunteer1 && s.volunteer2) && (
                           <>
                             <td className="px-4 py-4 align-top">
-                              {showExtra || hasThirdVolunteer || hasFourthVolunteer ? (
-                                signup.volunteer3 ? (
+                              {signup.volunteer3 ? (
                                   <div>
                                     <div className="mb-2">
                                       <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
                                       <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
-                                      {signup.volunteer3.phone && (
-                                        <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.phone}</p>
-                                      )}
+                                      <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
+                                        {signup.volunteer3.phone || '111-111-1111'}
+                                      </p>
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
@@ -419,7 +408,7 @@ export default function FoodDistribution() {
                                       Cancel
                                     </button>
                                   </div>
-                                ) : (
+                                ) : bothFilled ? (
                                   <button
                                     onClick={() => {
                                       setSelectedDate(signup.date)
@@ -429,19 +418,17 @@ export default function FoodDistribution() {
                                   >
                                     Sign Up
                                   </button>
-                                )
-                              ) : null}
+                                ) : null}
                             </td>
                             <td className="px-4 py-4 align-top">
-                              {showExtra || hasThirdVolunteer || hasFourthVolunteer ? (
-                                signup.volunteer4 ? (
+                              {signup.volunteer4 ? (
                                   <div>
                                     <div className="mb-2">
                                       <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
                                       <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
-                                      {signup.volunteer4.phone && (
-                                        <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.phone}</p>
-                                      )}
+                                      <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
+                                        {signup.volunteer4.phone || '111-111-1111'}
+                                      </p>
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
@@ -449,17 +436,6 @@ export default function FoodDistribution() {
                                     >
                                       Cancel
                                     </button>
-                                    {hasThirdVolunteer && !hasFourthVolunteer && (
-                                      <button
-                                        onClick={() => {
-                                          setSelectedDate(signup.date)
-                                          setFormData({ ...formData, role: 'volunteer4' })
-                                        }}
-                                        className="mt-2 px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-full transition-colors font-medium"
-                                      >
-                                        Add a fourth volunteer?
-                                      </button>
-                                    )}
                                   </div>
                                 ) : hasThirdVolunteer ? (
                                   <button
@@ -471,8 +447,7 @@ export default function FoodDistribution() {
                                   >
                                     Sign Up
                                   </button>
-                                ) : null
-                              ) : null}
+                                ) : null}
                             </td>
                           </>
                         )}
