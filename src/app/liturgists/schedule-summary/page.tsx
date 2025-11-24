@@ -336,7 +336,14 @@ export default function ScheduleSummary() {
           <div ref={tableRef} className="w-fit">
             {/* Title - Only appears in PNG */}
             <div className="bg-white px-4 py-3 text-center border border-gray-400 border-b-0">
-              <h2 className="text-lg font-bold text-gray-900">Liturgist Signups | {filteredServices.length > 0 ? Array.from(new Set(filteredServices.map(s => s.displayDate.split(' ')[0]))).join(' ') + ' ' + (filteredServices[0].displayDate.split(', ')[1]?.split(' ')[0] || new Date().getFullYear()) : currentQuarter}</h2>
+              <h2 className="text-lg font-bold text-gray-900">Liturgist Signups | {(() => {
+                if (filteredServices.length === 0) return currentQuarter;
+                const months = Array.from(new Set(filteredServices.map(s => s.displayDate.split(' ')[0])));
+                const year = filteredServices[0].displayDate.split(', ')[1]?.split(' ')[0] || new Date().getFullYear();
+                if (months.length === 1) return `${months[0]} ${year}`;
+                if (months.length === 2) return `${months[0]} & ${months[1]} ${year}`;
+                return `${months[0]} - ${months[months.length - 1]} ${year}`;
+              })()}</h2>
               <p className="text-sm text-gray-700">Ukiah United Methodist Church</p>
             </div>
           <table className="w-full border-collapse border border-gray-400 table-auto">

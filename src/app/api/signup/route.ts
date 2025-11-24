@@ -624,6 +624,44 @@ export async function DELETE(request: NextRequest) {
           }
           console.log('✅ [BACKFILL] Promotion complete after volunteer2 cancellation')
         }
+        
+        // VALIDATION: Verify backfill worked correctly
+        try {
+          const verifySignups = await getSignups(tableName)
+          const verifyDateSignups = verifySignups.filter((s: any) => s.serviceDate === serviceDate)
+          const stillHasGap = verifyDateSignups.some((s: any) => {
+            // Check if volunteer3 exists but volunteer2 doesn't (gap after backfill)
+            const hasVol3 = verifyDateSignups.some((v: any) => v.role === 'volunteer3')
+            const hasVol2 = verifyDateSignups.some((v: any) => v.role === 'volunteer2')
+            const hasVol1 = verifyDateSignups.some((v: any) => v.role === 'volunteer1')
+            return (hasVol3 && !hasVol2) || (hasVol2 && !hasVol1)
+          })
+          
+          if (stillHasGap) {
+            // CRITICAL: Backfill failed - send alert email
+            const errorEmailHtml = generateErrorEmail({
+              errorType: 'CRITICAL: Backfill Validation Failed',
+              errorMessage: `After cancelling ${cancelledRole} on ${serviceDate}, volunteers were not properly promoted. Gap detected in volunteer sequence.`,
+              userName: recordData.record?.name as string || 'Unknown',
+              userEmail: recordData.record?.email as string || 'Unknown',
+              serviceDate,
+              stackTrace: `Cancelled Role: ${cancelledRole}\nDate: ${serviceDate}\nTable: ${tableName}\nVerification found gap in volunteer sequence after backfill`,
+              serviceType: tableName
+            })
+            
+            await sendEmail({
+              to: 'sam@samuelholley.com',
+              subject: '🚨 CRITICAL: Food Distribution Backfill Failed',
+              html: errorEmailHtml,
+              fromName: 'UUMC Food Distribution'
+            })
+            console.error('❌ [BACKFILL VALIDATION] Failed - gap still exists after promotion')
+          } else {
+            console.log('✅ [BACKFILL VALIDATION] Success - no gaps detected')
+          }
+        } catch (validationError) {
+          console.error('❌ [BACKFILL VALIDATION] Error during verification:', validationError)
+        }
       }
       
       // Send cancellation email notifications
