@@ -122,9 +122,27 @@ export async function POST(request: NextRequest) {
         const firstName = body.name.split(' ')[0] || body.name || 'Unknown'
         const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
         
+        // Email CC/BCC logic
+        let ccRecipients: string | undefined
+        let bccRecipients: string | undefined
+        
+        if (isFoodDistribution) {
+          // Food Distribution: Trudy is CC'd, Sam is BCC'd
+          // Exception: If Trudy is signing up, no CC (she's already TO), Sam still BCC'd
+          const isTrudySigningUp = body.email.toLowerCase() === 'trudy@valleyvillagelife.com'
+          
+          ccRecipients = isTrudySigningUp ? undefined : 'trudy@valleyvillagelife.com'
+          bccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
+        } else {
+          // Liturgist: Sam is CC'd (not BCC'd), no Trudy
+          ccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
+          bccRecipients = undefined
+        }
+        
         await sendEmail({
           to: body.email,
-          cc: isSamSigningUp ? undefined : 'sam@samuelholley.com',
+          cc: ccRecipients,
+          bcc: bccRecipients,
           replyTo: 'sam@samuelholley.com',
           subject: `✅ ${roleLabel} Sign-up Confirmed: ${firstName} | ${body.displayDate}`,
           html: emailHtml,
@@ -287,15 +305,29 @@ export async function GET(request: NextRequest) {
           const firstName = userName.split(' ' )[0] || userName || 'Unknown'
           const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
           
-          // CC logic: always CC sam@ except when sam@ is TO recipient
-          const shouldCCSam = !isSamCancelling
+          // Email CC/BCC logic for email-link cancellations
+          let ccRecipients: string | undefined
+          let bccRecipients: string | undefined
+          
+          if (isFoodDistribution) {
+            // Food Distribution: Trudy is CC'd, Sam is BCC'd
+            // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
+            const isTrudyCancelling = userEmail.toLowerCase() === 'trudy@valleyvillagelife.com'
+            
+            ccRecipients = isTrudyCancelling ? undefined : 'trudy@valleyvillagelife.com'
+            bccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
+          } else {
+            // Liturgist: Sam is CC'd (not BCC'd), no Trudy
+            ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
+            bccRecipients = undefined
+          }
           
           const finalSubject = `❌ ${roleLabel} Sign-up Cancelled: ${firstName} | ${formattedDateForSubject}`
-          const finalCC = shouldCCSam ? 'sam@samuelholley.com' : undefined
           
           await sendEmail({
             to: userEmail,
-            cc: finalCC,
+            cc: ccRecipients,
+            bcc: bccRecipients,
             replyTo: 'sam@samuelholley.com',
             subject: finalSubject,
             html: emailHtml,
@@ -571,16 +603,30 @@ export async function DELETE(request: NextRequest) {
           
           const firstName = userName.split(' ' )[0] || userName || 'Unknown'
           
-          // CC logic: always CC sam@ except when sam@ is TO recipient
-          const shouldCCSam = !isSamCancelling
+          // Email CC/BCC logic for cancellations
+          let ccRecipients: string | undefined
+          let bccRecipients: string | undefined
+          
+          if (isFoodDistribution) {
+            // Food Distribution: Trudy is CC'd, Sam is BCC'd
+            // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
+            const isTrudyCancelling = userEmail.toLowerCase() === 'trudy@valleyvillagelife.com'
+            
+            ccRecipients = isTrudyCancelling ? undefined : 'trudy@valleyvillagelife.com'
+            bccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
+          } else {
+            // Liturgist: Sam is CC'd (not BCC'd), no Trudy
+            ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
+            bccRecipients = undefined
+          }
           
           const finalSubject = `❌ ${roleLabel} Sign-up Cancelled: ${firstName} | ${formattedDateForSubject}`
-          const finalCC = shouldCCSam ? 'sam@samuelholley.com' : undefined
           const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
           
           await sendEmail({
             to: userEmail,
-            cc: finalCC,
+            cc: ccRecipients,
+            bcc: bccRecipients,
             replyTo: 'sam@samuelholley.com',
             subject: finalSubject,
             html: emailHtml,

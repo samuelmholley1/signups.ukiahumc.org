@@ -5,13 +5,14 @@ import nodemailer from 'nodemailer'
 interface EmailParams {
   to: string
   cc?: string
+  bcc?: string
   replyTo?: string
   subject: string
   html: string
   fromName?: string
 }
 
-export async function sendEmail({ to, cc, replyTo, subject, html, fromName }: EmailParams) {
+export async function sendEmail({ to, cc, bcc, replyTo, subject, html, fromName }: EmailParams) {
   // Create transporter using Zoho SMTP
   const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.com',
@@ -28,6 +29,7 @@ export async function sendEmail({ to, cc, replyTo, subject, html, fromName }: Em
     from: `"${senderName}" <alerts@samuelholley.com>`,
     to,
     cc,
+    bcc,
     replyTo: replyTo || 'sam@samuelholley.com',
     subject: subject,
     html: html
