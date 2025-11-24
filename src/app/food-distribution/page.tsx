@@ -67,14 +67,22 @@ export default function FoodDistribution() {
           volunteer3: service.volunteer3 || null,
           volunteer4: service.volunteer4 || null
         }))
+        
+        console.log('🔍 [FETCH] Raw API response:', JSON.stringify(data.services, null, 2))
+        console.log('🔍 [FETCH] Transformed data:', JSON.stringify(transformed, null, 2))
+        console.log('🔍 [FETCH] Current signups state BEFORE update:', JSON.stringify(signups, null, 2))
+        
         setSignups(transformed)
         
         // CRITICAL: Use setTimeout to ensure state updates are processed first
         // This forces the key update to happen AFTER React processes the new signups
         setTimeout(() => {
-          setLastUpdate(Date.now())
+          const newTimestamp = Date.now()
+          setLastUpdate(newTimestamp)
           console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
           console.log('📊 [FORCE UPDATE] New signups data:', transformed.length, 'records')
+          console.log('🔑 [FORCE UPDATE] New key timestamp:', newTimestamp)
+          console.log('🔍 [FORCE UPDATE] Signups state AFTER update:', JSON.stringify(signups, null, 2))
         }, 0)
       }
     } catch (error) {
@@ -163,6 +171,7 @@ export default function FoodDistribution() {
       
       if (data.success) {
         console.log('🔄 [CANCEL] Fetching fresh data from server after cancellation...')
+        console.log('🔍 [CANCEL] API response:', JSON.stringify(data, null, 2))
         await fetchSignups()
         console.log('✅ [CANCEL] Fetch complete, UI should update momentarily')
         
@@ -259,6 +268,7 @@ export default function FoodDistribution() {
       if (data.success) {
         // Refresh signups from server
         console.log('🔄 [SIGNUP] Fetching fresh data from server after signup...')
+        console.log('🔍 [SIGNUP] API response:', JSON.stringify(data, null, 2))
         await fetchSignups()
         console.log('✅ [SIGNUP] Fetch complete, UI should update momentarily')
         
