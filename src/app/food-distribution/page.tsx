@@ -33,6 +33,7 @@ export default function FoodDistribution() {
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [showExtraColumns, setShowExtraColumns] = useState<{ [key: string]: boolean }>({})
+  const [lastUpdate, setLastUpdate] = useState(Date.now()) // Force re-render trigger
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -67,6 +68,8 @@ export default function FoodDistribution() {
           volunteer4: service.volunteer4 || null
         }))
         setSignups(transformed)
+        setLastUpdate(Date.now()) // Force component re-render
+        console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
       }
     } catch (error) {
       console.error('Error fetching signups:', error)
@@ -154,6 +157,11 @@ export default function FoodDistribution() {
             console.error('⚠️ [DEBUG ERROR] Data did NOT update after cancellation! Cache issue detected.')
             console.error('Before:', beforeState)
             console.error('After:', afterState)
+            console.error('🔄 [DEBUG] Forcing page reload to clear cache...')
+            // Nuclear option: force full page reload
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
           } else {
             console.log('✅ [DEBUG] Data successfully updated after cancellation')
           }
@@ -251,6 +259,11 @@ export default function FoodDistribution() {
             console.error('⚠️ [DEBUG ERROR] Data did NOT update after signup! Cache issue detected.')
             console.error('Before:', beforeState)
             console.error('After:', afterState)
+            console.error('🔄 [DEBUG] Forcing page reload to clear cache...')
+            // Nuclear option: force full page reload
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
           } else {
             console.log('✅ [DEBUG] Data successfully updated after signup')
           }
@@ -325,16 +338,16 @@ export default function FoodDistribution() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-xl overflow-hidden overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full table-auto" key={lastUpdate}>
                 <thead className="bg-green-600 text-white">
                   <tr>
-                    <th className="px-4 py-4 text-left font-semibold w-32">Date</th>
-                    <th className="px-4 py-4 text-left font-semibold">Volunteer #1</th>
-                    <th className="px-4 py-4 text-left font-semibold">Volunteer #2</th>
+                    <th className="px-4 py-4 text-center font-semibold whitespace-nowrap">Date</th>
+                    <th className="px-4 py-4 text-center font-semibold">Volunteer #1</th>
+                    <th className="px-4 py-4 text-center font-semibold">Volunteer #2</th>
                     {Object.values(showExtraColumns).some(v => v) && (
                       <>
-                        <th className="px-4 py-4 text-left font-semibold">Volunteer #3</th>
-                        <th className="px-4 py-4 text-left font-semibold">Volunteer #4</th>
+                        <th className="px-4 py-4 text-center font-semibold">Volunteer #3</th>
+                        <th className="px-4 py-4 text-center font-semibold">Volunteer #4</th>
                       </>
                     )}
                   </tr>
@@ -348,7 +361,7 @@ export default function FoodDistribution() {
                     
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-6 py-4 font-medium text-gray-900 align-top">
+                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap">
                           {signup.displayDate}
                         </td>
                         <td className="px-4 py-4 align-top">
@@ -363,14 +376,14 @@ export default function FoodDistribution() {
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                                className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                               >
                                 Cancel
                               </button>
                               {bothFilled && !showExtra && !hasThirdVolunteer && (
                                 <button
                                   onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
-                                  className="mt-2 w-full px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-full transition-colors font-medium"
+                                  className="mt-2 px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-full transition-colors font-medium"
                                 >
                                   Add a third volunteer?
                                 </button>
@@ -382,7 +395,7 @@ export default function FoodDistribution() {
                                 setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer1' })
                               }}
-                              className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
@@ -400,7 +413,7 @@ export default function FoodDistribution() {
                               </div>
                               <button
                                 onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                               >
                                 Cancel
                               </button>
@@ -411,7 +424,7 @@ export default function FoodDistribution() {
                                 setSelectedDate(signup.date)
                                 setFormData({ ...formData, role: 'volunteer2' })
                               }}
-                              className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                             >
                               Sign Up
                             </button>
@@ -432,7 +445,7 @@ export default function FoodDistribution() {
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                                      className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                      className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                                     >
                                       Cancel
                                     </button>
@@ -443,7 +456,7 @@ export default function FoodDistribution() {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer3' })
                                     }}
-                                    className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                                   >
                                     Sign Up
                                   </button>
@@ -463,7 +476,7 @@ export default function FoodDistribution() {
                                     </div>
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                                      className="w-full px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                      className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                                     >
                                       Cancel
                                     </button>
@@ -473,7 +486,7 @@ export default function FoodDistribution() {
                                           setSelectedDate(signup.date)
                                           setFormData({ ...formData, role: 'volunteer4' })
                                         }}
-                                        className="mt-2 w-full px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-full transition-colors font-medium"
+                                        className="mt-2 px-3 py-1.5 text-sm bg-orange-100 text-orange-800 hover:bg-orange-200 rounded-full transition-colors font-medium"
                                       >
                                         Add a fourth volunteer?
                                       </button>
@@ -485,7 +498,7 @@ export default function FoodDistribution() {
                                       setSelectedDate(signup.date)
                                       setFormData({ ...formData, role: 'volunteer4' })
                                     }}
-                                    className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
+                                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full transition-colors font-medium"
                                   >
                                     Sign Up
                                   </button>

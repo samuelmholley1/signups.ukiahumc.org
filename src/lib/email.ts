@@ -221,7 +221,7 @@ export function generateSignupEmail(data: {
           <h1>${isBackup ? 'Backup ' : ''}Signup Confirmed</h1>
         </div>
         <div class="content">
-          <p class="message-text">${isFoodDistribution ? 'You signed up for food distribution volunteer service!' : (isBackup ? 'You signed up as backup liturgist!' : 'You signed up for liturgist service!')}</p>
+          <p class="message-text">${isFoodDistribution ? 'You signed up to volunteer at Saturday Food Distribution!' : (isBackup ? 'You signed up as backup liturgist!' : 'You signed up for liturgist service!')}</p>
           
           <div class="info-box">
             <div class="info-row">
@@ -241,7 +241,7 @@ export function generateSignupEmail(data: {
               <span class="info-value" style="${isBackup ? 'font-weight: 700; color: #805ad5; font-size: 16px;' : ''}">${roleLabel}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Service Date:</span>
+              <span class="info-label">Date:</span>
               <span class="info-value">${formattedDate}</span>
             </div>
             ${notes ? `
@@ -439,7 +439,7 @@ export function generateCancellationEmail(data: {
           <h1>${isBackup ? 'Backup ' : ''}Signup Cancelled</h1>
         </div>
         <div class="content">
-          <p class="message-text">${isFoodDistribution ? 'You cancelled your food distribution volunteer signup.' : (isBackup ? 'You cancelled your backup liturgist signup.' : 'You cancelled your liturgist signup.')}</p>
+          <p class="message-text">${isFoodDistribution ? 'You cancelled your Saturday Food Distribution volunteer signup.' : (isBackup ? 'You cancelled your backup liturgist signup.' : 'You cancelled your liturgist signup.')}</p>
           
           <div class="info-box">
             <div class="info-row">
@@ -451,7 +451,7 @@ export function generateCancellationEmail(data: {
               <span class="info-value" style="${isBackup ? 'font-weight: 700; color: #805ad5; font-size: 16px;' : ''}">${roleLabel}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Service Date:</span>
+              <span class="info-label">Date:</span>
               <span class="info-value">${formattedDate}</span>
             </div>
           </div>
