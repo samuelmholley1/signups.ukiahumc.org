@@ -482,8 +482,9 @@ export function generateErrorEmail(data: {
   serviceDate?: string
   stackTrace?: string
   explanation?: string
+  serviceType?: string
 }) {
-  const { errorType, errorMessage, userEmail, userName, serviceDate, stackTrace, explanation } = data
+  const { errorType, errorMessage, userEmail, userName, serviceDate, stackTrace, explanation, serviceType } = data
   
   return `
     <!DOCTYPE html>
@@ -591,7 +592,7 @@ export function generateErrorEmail(data: {
         <div class="header">
           <div class="error-icon">🚨</div>
           <h1>System Error Alert</h1>
-          <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 15px;">Liturgist Signup System</p>
+          <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 15px;">UUMC Signup System</p>
         </div>
         <div class="content">
           <div style="text-align: center;">
@@ -609,7 +610,7 @@ export function generateErrorEmail(data: {
           </div>
           ` : ''}
           
-          <p class="message-text">An error occurred in the liturgist signup system.</p>
+          <p class="message-text">An error occurred in the UUMC signup system.</p>
           
           <div class="error-box">
             <div class="info-row">
@@ -620,6 +621,12 @@ export function generateErrorEmail(data: {
               <span class="info-label">Error Message:</span>
               <span class="info-value">${errorMessage}</span>
             </div>
+            ${serviceType ? `
+            <div class="info-row">
+              <span class="info-label">Service Type:</span>
+              <span class="info-value">${serviceType}</span>
+            </div>
+            ` : ''}
             ${userName ? `
             <div class="info-row">
               <span class="info-label">User Name:</span>

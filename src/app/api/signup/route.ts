@@ -171,7 +171,8 @@ export async function POST(request: NextRequest) {
           userName: body.name,
           userEmail: body.email,
           serviceDate: body.displayDate,
-          stackTrace: result.error instanceof Error ? result.error.stack : undefined
+          stackTrace: result.error instanceof Error ? result.error.stack : undefined,
+          serviceType: tableName
         })
         
         const errorSubject = tableName === 'Food Distribution' 
@@ -202,7 +203,8 @@ export async function POST(request: NextRequest) {
       const errorEmailHtml = generateErrorEmail({
         errorType: 'API Internal Server Error',
         errorMessage: String(error),
-        stackTrace: error instanceof Error ? error.stack : undefined
+        stackTrace: error instanceof Error ? error.stack : undefined,
+        serviceType: tableName
       })
       
       const systemErrorSubject = tableName === 'Food Distribution'
@@ -370,7 +372,8 @@ export async function GET(request: NextRequest) {
           userName: recordData.record.name as string,
           userEmail: recordData.record.email as string,
           serviceDate: recordData.record.displayDate as string,
-          stackTrace: result.error instanceof Error ? result.error.stack : undefined
+          stackTrace: result.error instanceof Error ? result.error.stack : undefined,
+          serviceType: isFoodDistribution ? 'Food Distribution' : 'Liturgists'
         })
         
         // Detect table type from role for error email
@@ -589,7 +592,8 @@ export async function DELETE(request: NextRequest) {
         const errorEmailHtml = generateErrorEmail({
           errorType: 'Cancellation Failed',
           errorMessage: String(result.error),
-          stackTrace: result.error instanceof Error ? result.error.stack : undefined
+          stackTrace: result.error instanceof Error ? result.error.stack : undefined,
+          serviceType: tableName
         })
         
         const cancelErrorSubject = tableName === 'Food Distribution'
@@ -618,7 +622,8 @@ export async function DELETE(request: NextRequest) {
       const errorEmailHtml = generateErrorEmail({
         errorType: 'Cancellation API Error',
         errorMessage: String(error),
-        stackTrace: error instanceof Error ? error.stack : undefined
+        stackTrace: error instanceof Error ? error.stack : undefined,
+        serviceType: tableName
       })
       
       const cancelSystemErrorSubject = tableName === 'Food Distribution'

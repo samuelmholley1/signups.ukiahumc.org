@@ -342,29 +342,19 @@ export default function FoodDistribution() {
                         </td>
                         <td className="px-4 py-4">
                           {signup.volunteer2 ? (
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
-                                <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
-                              </div>
-                              <button
-                                onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
                             <div>
-                              <button
-                                onClick={() => {
-                                  setSelectedDate(signup.date)
-                                  setFormData({ ...formData, role: 'volunteer2' })
-                                }}
-                                className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
-                              >
-                                Sign Up
-                              </button>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium text-gray-900">{signup.volunteer2.name}</p>
+                                  <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
+                                </div>
+                                <button
+                                  onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
+                                  className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                               {bothFilled && !showExtra && !hasThirdVolunteer && (
                                 <button
                                   onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
@@ -374,6 +364,16 @@ export default function FoodDistribution() {
                                 </button>
                               )}
                             </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setSelectedDate(signup.date)
+                                setFormData({ ...formData, role: 'volunteer2' })
+                              }}
+                              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                            >
+                              Sign Up
+                            </button>
                           )}
                         </td>
                         {Object.values(showExtraColumns).some(v => v) && (
@@ -653,8 +653,8 @@ export default function FoodDistribution() {
                   <p className="text-gray-700 mb-2">
                     Are you sure you want to cancel <span className="font-semibold">{cancelConfirmModal.name}</span>&apos;s signup?
                   </p>
-                  <p className="text-gray-600 text-sm">
-                    Date: {cancelConfirmModal.displayDate}
+                  <p className="text-gray-600 text-sm font-medium">
+                    {cancelConfirmModal.displayDate} - Food Distribution
                   </p>
                 </div>
                 <div className="flex gap-3">
