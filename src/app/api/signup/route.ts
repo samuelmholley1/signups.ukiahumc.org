@@ -577,6 +577,7 @@ export async function DELETE(request: NextRequest) {
       })
       if (keysToInvalidate.length === 0) {
         console.log(`⚠️ [CACHE] No cache entries found for ${tablePrefix}`)
+      }
       
       // BACKFILL LOGIC: If volunteer 1 or 2 cancelled, promote volunteer 3 & 4
       if (tableName === 'Food Distribution' && (cancelledRole === 'volunteer1' || cancelledRole === 'volunteer2')) {
