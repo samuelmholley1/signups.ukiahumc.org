@@ -354,9 +354,9 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden w-fit mx-auto">
               <div>
-                <table className="w-auto mx-auto" key={lastUpdate}>
+                <table className="w-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
