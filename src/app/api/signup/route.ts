@@ -129,9 +129,9 @@ export async function POST(request: NextRequest) {
         if (isFoodDistribution) {
           // Food Distribution: Trudy is CC'd, Sam is BCC'd
           // Exception: If Trudy is signing up, no CC (she's already TO), Sam still BCC'd
-          const isTrudySigningUp = body.email.toLowerCase() === 'trudy@valleyvillagelife.com'
+          const isTrudySigningUp = body.email.toLowerCase() === 'morganmiller@pacific.net'
           
-          ccRecipients = isTrudySigningUp ? undefined : 'trudy@valleyvillagelife.com'
+          ccRecipients = isTrudySigningUp ? undefined : 'morganmiller@pacific.net'
           bccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
         } else {
           // Liturgist: Sam is CC'd (not BCC'd), no Trudy
@@ -312,9 +312,9 @@ export async function GET(request: NextRequest) {
           if (isFoodDistribution) {
             // Food Distribution: Trudy is CC'd, Sam is BCC'd
             // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
-            const isTrudyCancelling = userEmail.toLowerCase() === 'trudy@valleyvillagelife.com'
+            const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller@pacific.net'
             
-            ccRecipients = isTrudyCancelling ? undefined : 'trudy@valleyvillagelife.com'
+            ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
             bccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
           } else {
             // Liturgist: Sam is CC'd (not BCC'd), no Trudy
@@ -610,9 +610,9 @@ export async function DELETE(request: NextRequest) {
           if (isFoodDistribution) {
             // Food Distribution: Trudy is CC'd, Sam is BCC'd
             // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
-            const isTrudyCancelling = userEmail.toLowerCase() === 'trudy@valleyvillagelife.com'
+            const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller@pacific.net'
             
-            ccRecipients = isTrudyCancelling ? undefined : 'trudy@valleyvillagelife.com'
+            ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
             bccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
           } else {
             // Liturgist: Sam is CC'd (not BCC'd), no Trudy
