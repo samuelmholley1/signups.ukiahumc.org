@@ -173,8 +173,6 @@ export default function FoodDistribution() {
       if (data.success) {
         console.log('🔄 [CANCEL] Fetching fresh data from server after cancellation...')
         console.log('🔍 [CANCEL] API response:', JSON.stringify(data, null, 2))
-        console.log('⏳ [CANCEL] Waiting 500ms for Airtable propagation...')
-        await new Promise(resolve => setTimeout(resolve, 500))
         await fetchSignups()
         console.log('✅ [CANCEL] Fetch complete, UI should update momentarily')
         
@@ -276,8 +274,6 @@ export default function FoodDistribution() {
         // Refresh signups from server
         console.log('🔄 [SIGNUP] Fetching fresh data from server after signup...')
         console.log('🔍 [SIGNUP] API response:', JSON.stringify(data, null, 2))
-        console.log('⏳ [SIGNUP] Waiting 500ms for Airtable propagation...')
-        await new Promise(resolve => setTimeout(resolve, 500))
         await fetchSignups()
         console.log('✅ [SIGNUP] Fetch complete, UI should update momentarily')
         
