@@ -207,8 +207,8 @@ export function generateSignupEmail(data: {
       <div class="container">
         <div class="header">
           <div class="logo">
-            <a href="https://liturgists.ukiahumc.org" style="display: block;">
-              <img src="https://liturgists.ukiahumc.org/logo-for-church-larger.jpg" alt="Ukiah United Methodist Church" />
+            <a href="https://signups.ukiahumc.org" style="display: block;">
+              <img src="https://signups.ukiahumc.org/logo-for-church-larger.jpg" alt="Ukiah United Methodist Church" />
             </a>
           </div>
           <div class="success-icon">✅</div>
@@ -247,8 +247,8 @@ export function generateSignupEmail(data: {
           </div>
           
           <div class="button-container">
-            <a href="https://liturgists.ukiahumc.org" class="button">View Full Schedule</a>
-            <!-- <a href="https://liturgists.ukiahumc.org/api/signup?recordId=${recordId}&action=cancel" class="button cancel-button">Cancel This Signup</a> -->
+            <a href="https://signups.ukiahumc.org" class="button">View Full Schedule</a>
+            <!-- <a href="https://signups.ukiahumc.org/api/signup?recordId=${recordId}&action=cancel" class="button cancel-button">Cancel This Signup</a> -->
           </div>
           
           <p class="timestamp">
@@ -277,9 +277,16 @@ export function generateCancellationEmail(data: {
   // Check if this is food distribution or liturgist
   const isFoodDistribution = systemName.includes('Food Distribution')
   
-  // Check if this is a backup role
+  // Determine role label based on service type
+  let roleLabel = 'Liturgist'
+  if (isFoodDistribution) {
+    roleLabel = 'Food Distribution Volunteer'
+  } else {
+    const isBackup = role.toLowerCase() === 'backup'
+    const isSecondLiturgist = role.toLowerCase() === 'liturgist2'
+    roleLabel = isBackup ? 'Backup Liturgist' : (isSecondLiturgist ? 'Second Liturgist' : 'Liturgist')
+  }
   const isBackup = role.toLowerCase() === 'backup'
-  const roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
   
   // Format the display date if it looks like an ISO timestamp
   let formattedDate = displayDate
@@ -418,8 +425,8 @@ export function generateCancellationEmail(data: {
       <div class="container">
         <div class="header">
           <div class="logo">
-            <a href="https://liturgists.ukiahumc.org" style="display: block;">
-              <img src="https://liturgists.ukiahumc.org/logo-for-church-larger.jpg" alt="Ukiah United Methodist Church" />
+            <a href="https://signups.ukiahumc.org" style="display: block;">
+              <img src="https://signups.ukiahumc.org/logo-for-church-larger.jpg" alt="Ukiah United Methodist Church" />
             </a>
           </div>
           <div class="cancel-icon">❌</div>
@@ -444,7 +451,7 @@ export function generateCancellationEmail(data: {
           </div>
           
           <div class="button-container">
-            <a href="https://liturgists.ukiahumc.org" class="button">Return to Schedule</a>
+            <a href="https://signups.ukiahumc.org" class="button">Return to Schedule</a>
           </div>
           
           <p class="timestamp">
@@ -453,8 +460,7 @@ export function generateCancellationEmail(data: {
           </p>
         </div>
         <div class="footer-text">
-          <strong>Ukiah United Methodist Church</strong><br/>
-          ${systemName}
+          <strong>Ukiah United Methodist Church</strong>
         </div>
       </div>
     </body>

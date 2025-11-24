@@ -35,6 +35,7 @@ export default function FoodDistribution() {
   const [showExtraColumns, setShowExtraColumns] = useState<{ [key: string]: boolean }>({})
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
+  const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
   const [formData, setFormData] = useState({
     selectedPerson: '',
     firstName: '',
@@ -122,8 +123,13 @@ export default function FoodDistribution() {
     }
   }
 
-  const handleCancel = async (recordId: string, name: string, displayDate: string) => {
-    if (!confirm(`Cancel ${name}'s signup for ${displayDate}?`)) return
+  const handleCancelClick = (recordId: string, name: string, displayDate: string) => {
+    setCancelConfirmModal({ show: true, recordId, name, displayDate })
+  }
+
+  const handleCancelConfirm = async () => {
+    const { recordId, name, displayDate } = cancelConfirmModal
+    setCancelConfirmModal({ show: false, recordId: '', name: '', displayDate: '' })
     
     try {
       const response = await fetch(`/api/signup?recordId=${recordId}&table=food`, {
@@ -314,7 +320,7 @@ export default function FoodDistribution() {
                                 <p className="text-sm text-gray-600">{signup.volunteer1.email}</p>
                               </div>
                               <button
-                                onClick={() => handleCancel(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
+                                onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
                                 className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                               >
                                 Cancel
@@ -340,7 +346,7 @@ export default function FoodDistribution() {
                                 <p className="text-sm text-gray-600">{signup.volunteer2.email}</p>
                               </div>
                               <button
-                                onClick={() => handleCancel(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
+                                onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
                                 className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                               >
                                 Cancel
@@ -380,7 +386,7 @@ export default function FoodDistribution() {
                                       <p className="text-sm text-gray-600">{signup.volunteer3.email}</p>
                                     </div>
                                     <button
-                                      onClick={() => handleCancel(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                                      onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
                                       className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                                     >
                                       Cancel
@@ -408,7 +414,7 @@ export default function FoodDistribution() {
                                           <p className="text-sm text-gray-600">{signup.volunteer4.email}</p>
                                         </div>
                                         <button
-                                          onClick={() => handleCancel(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                          onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
                                           className="ml-2 px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded-full transition-colors"
                                         >
                                           Cancel
@@ -578,8 +584,8 @@ export default function FoodDistribution() {
                   <Image
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
-                    width={80}
-                    height={53}
+                    width={150}
+                    height={100}
                     className="rounded-lg"
                   />
                 </div>
@@ -606,8 +612,8 @@ export default function FoodDistribution() {
                   <Image
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
-                    width={80}
-                    height={53}
+                    width={150}
+                    height={100}
                     className="rounded-lg"
                   />
                 </div>
@@ -622,6 +628,47 @@ export default function FoodDistribution() {
                 >
                   Close
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cancel Confirmation Modal */}
+          {cancelConfirmModal.show && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src="/logo-for-church-larger.jpg"
+                    alt="UUMC"
+                    width={150}
+                    height={100}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="text-center mb-6">
+                  <div className="text-5xl mb-3">❓</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Confirm Cancellation</h3>
+                  <p className="text-gray-700 mb-2">
+                    Are you sure you want to cancel <span className="font-semibold">{cancelConfirmModal.name}</span>&apos;s signup?
+                  </p>
+                  <p className="text-gray-600 text-sm">
+                    Date: {cancelConfirmModal.displayDate}
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setCancelConfirmModal({ show: false, recordId: '', name: '', displayDate: '' })}
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                  >
+                    No, Keep It
+                  </button>
+                  <button
+                    onClick={handleCancelConfirm}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  >
+                    Yes, Cancel
+                  </button>
+                </div>
               </div>
             </div>
           )}

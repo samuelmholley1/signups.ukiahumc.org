@@ -572,3 +572,162 @@ Migration is complete when:
 ---
 
 **Ready to execute? Let's begin! 🚀**
+
+---
+
+## 📝 POST-MIGRATION LESSONS LEARNED
+
+**Updated:** November 23, 2025
+
+### ✅ COMPLETED ENHANCEMENTS
+
+#### 1. **Airtable Field Type Correction** (Nov 23, 2025)
+**Problem:** Role field was Single Select (liturgist/backup) - too restrictive for multi-volunteer food distribution.
+
+**Solution:** Changed Role field to **Long Text** type in Airtable.
+- Allows flexible role values: `volunteer1`, `volunteer2`, `volunteer3`, `volunteer4`, `liturgist`, `backup`, `liturgist2`
+- No dropdown constraints
+- Food distribution uses `volunteer1-4`, liturgists use `liturgist/backup/liturgist2`
+
+**Lesson:** When planning multi-table systems, consider field flexibility early. Long Text > Single Select for evolving use cases.
+
+---
+
+#### 2. **Progressive Disclosure UI for Food Distribution** (Nov 23, 2025)
+**Problem:** Users wanted option to sign up 3-4 volunteers but initial UI showed all 4 columns (overwhelming).
+
+**Solution:** Implemented **progressive disclosure pattern**:
+- Initially show 2 volunteer columns
+- "Add a third volunteer?" button (amber/yellow styling) reveals volunteer 3
+- "Add a fourth volunteer?" button (orange styling) reveals volunteer 4
+- Users opt-in to complexity only when needed
+
+**Files Modified:**
+- `/src/app/food-distribution/page.tsx` - Added `showExtraColumns` state, conditional rendering, progressive buttons
+
+**Lesson:** Don't show all fields upfront. Progressive disclosure reduces cognitive load and improves UX for simple vs. complex signups.
+
+---
+
+#### 3. **Styled Modal System with Church Branding** (Nov 23, 2025)
+**Problem:** Errors displayed via ugly `alert()` calls, no branding, poor UX.
+
+**Solution:** Implemented **React-based modal system**:
+- `errorModal` state: `{ show: boolean, title: string, message: string }`
+- `successModal` state: `{ show: boolean, message: string }`
+- Church logo in all modals (signup, error, success)
+- Emoji indicators (✅ success, ❌ error)
+
+**Lesson:** Never use `alert()` in production apps. Build branded, accessible modals with proper state management.
+
+---
+
+#### 4. **Automatic Error Logging to Vercel** (Nov 23, 2025)
+**Problem:** Errors happened silently, no visibility into production issues.
+
+**Solution:** Created `/api/report-error` endpoint that sends styled HTML error emails to `sam@samuelholley.com`.
+
+**Lesson:** Build error reporting EARLY in development. Email notifications beat log diving for fast incident response.
+
+---
+
+#### 5. **Conditional Airtable Field Handling** (Nov 23, 2025)
+**Problem:** 500 error on food distribution - `UNKNOWN_FIELD_NAME` for "Attendance Status".
+
+**Solution:** "Attendance Status" field exists ONLY in Liturgists table. Added conditional field inclusion in `submitSignup()`.
+
+**Lesson:** Multi-table systems need conditional field mapping. Validate table schemas differ and code accordingly.
+
+---
+
+#### 6. **Complete Email System Nomenclature Overhaul** (Nov 23, 2025)
+**Problem:** All emails said "Liturgist Signup System" even for food distribution users.
+
+**Solution:** Implemented **complete table-aware email system**:
+- **Dynamic Sender Name:** `fromName` parameter - "UUMC Food Distribution" vs "UUMC Liturgist Scheduling"
+- **Dynamic Subjects:** "Food Distribution Volunteer" vs "Liturgist" in all email subjects
+- **Dynamic Body Content:** Added `systemName` parameter to email generation functions
+- **Header Colors:** Orange (#ea580c) for food, Blue (#2c5282) for liturgist
+- **Role Label Detection:** `volunteer1-4` → "Food Distribution Volunteer", `liturgist/backup` → "Liturgist/Backup Liturgist"
+
+**Critical Bug Fixed:** Variable scope issue - `tableName` was declared inside try blocks, inaccessible in catch blocks for error emails. Moved declarations BEFORE try blocks.
+
+**Lesson:** Multi-tenant email systems need comprehensive branding strategy. Update sender name, subjects, AND body content. Watch for variable scoping in error handlers.
+
+---
+
+### 🎯 ARCHITECTURAL PATTERNS ESTABLISHED
+
+#### Pattern 1: **Multi-Table Routing Strategy**
+```typescript
+// URL Structure: /liturgists → table=liturgists, /food-distribution → table=food
+const tableName = body.table === 'food' ? 'Food Distribution' : 'Liturgists'
+```
+
+#### Pattern 2: **Context-Aware Email System**
+```typescript
+const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+generateEmail({ ...data, systemName })
+sendEmail({ ...params, fromName: systemName })
+```
+
+#### Pattern 3: **Error Reporting Pipeline**
+```typescript
+// Frontend: Show modal + auto-report to /api/report-error
+// Backend: Generate HTML email with stack trace → SMTP send
+```
+
+---
+
+### 📚 KNOWLEDGE BASE FOR FUTURE MIGRATIONS
+
+#### When Adding New Signup Type (e.g., Event Registration):
+
+**Checklist:**
+1. ✅ Create new Airtable table with appropriate schema
+2. ✅ Add new env var: `AIRTABLE_EVENTS_TABLE`
+3. ✅ Create route: `/src/app/events/page.tsx`
+4. ✅ Update `TABLES` constant in `/src/lib/airtable.ts`
+5. ✅ Add table detection to `/src/app/api/signup/route.ts`
+6. ✅ Update email system with new systemName: `'UUMC Event Registration'`
+7. ✅ Choose unique role prefix (e.g., `attendee1`, `speaker`) for GET handler detection
+8. ✅ Add card to landing page (`/src/app/page.tsx`)
+9. ✅ Update `SectionHeader.tsx` with new color scheme
+10. ✅ Create E2E tests
+
+**Estimated Time:** 2-3 hours for complete implementation
+
+---
+
+#### Common Pitfalls & Solutions:
+
+| Pitfall | Solution |
+|---------|----------|
+| **Airtable field mismatch** | Use conditional field inclusion based on table type |
+| **Variable scope in error handlers** | Declare variables BEFORE try blocks if needed in catch |
+| **Email branding inconsistency** | Update sender name, subject, AND body content |
+| **Role detection ambiguity** | Use unique prefixes per signup type (`volunteer*`, `liturgist*`, `attendee*`) |
+| **Button width inconsistency** | Avoid `w-full` in grid layouts unless all buttons are full-width |
+| **Alert fatigue** | Replace all `alert()` calls with branded modal system |
+| **Silent errors** | Implement auto-reporting pipeline early in development |
+
+---
+
+### 🎓 KEY LEARNINGS SUMMARY
+
+1. **Field Type Flexibility:** Long Text > Single Select for evolving multi-purpose systems
+2. **Progressive Disclosure:** Show 2-3 fields initially, reveal more on demand
+3. **Visual Consistency:** Match button widths, colors, spacing across similar components
+4. **Modal > Alert:** Always use branded, stateful modals in production apps
+5. **Error Reporting:** Build email notification pipeline BEFORE things break
+6. **Conditional Fields:** Multi-table systems need if/else logic for field inclusion
+7. **Email Branding:** Update sender, subject, AND body for complete context adaptation
+8. **Variable Scoping:** Declare variables before try blocks if needed in catch blocks
+9. **Test Data Management:** Use email aliases (`+test`) for test accounts
+10. **Documentation First:** Create migration plans before executing large changes
+
+---
+
+**Migration Status: ✅ COMPLETE & PRODUCTION-READY**
+
+Next steps: Scale pattern to additional signup types (events, classes, volunteer shifts, etc.)
