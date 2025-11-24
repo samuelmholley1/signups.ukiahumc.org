@@ -51,7 +51,9 @@ export default function FoodDistribution() {
   
   const fetchSignups = async () => {
     try {
-      const response = await fetch('/api/services?table=food&quarter=Q4-2025')
+      const response = await fetch(`/api/services?table=food&quarter=Q4-2025&t=${Date.now()}`, {
+        cache: 'no-store'
+      })
       const data = await response.json()
       
       if (data.success && data.services) {

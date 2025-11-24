@@ -67,7 +67,7 @@ export function generateSignupEmail(data: {
     roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
   }
   const isBackup = role.toLowerCase() === 'backup'
-  const headerColor = isBackup ? '#805ad5' : (isFoodDistribution ? '#ea580c' : '#2c5282')  // Purple for backup, orange for food, blue for liturgist
+  const headerColor = '#2c5282'  // Consistent blue for all services
   
   // Format the display date if it looks like an ISO timestamp
   let formattedDate = displayDate
@@ -333,7 +333,7 @@ export function generateCancellationEmail(data: {
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .header { 
-          background: ${isFoodDistribution ? '#9a3412' : '#744210'}; 
+          background: #744210; 
           color: white; 
           padding: 40px 30px; 
           text-align: center;
@@ -357,7 +357,7 @@ export function generateCancellationEmail(data: {
           padding: 24px; 
           border-radius: 6px; 
           margin: 24px 0; 
-          border-left: 4px solid ${isFoodDistribution ? '#9a3412' : '#744210'};
+          border-left: 4px solid #744210;
         }
         .info-row { 
           display: flex; 
