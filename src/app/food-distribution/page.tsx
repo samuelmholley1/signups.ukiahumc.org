@@ -34,6 +34,7 @@ export default function FoodDistribution() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState(Date.now()) // Force re-render trigger
   const [isCancelling, setIsCancelling] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -226,6 +227,8 @@ export default function FoodDistribution() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (isSubmitting) return // Prevent double-submission
+    
     const signup = signups.find(s => s.date === selectedDate)
     if (!signup) return
     
@@ -249,6 +252,8 @@ export default function FoodDistribution() {
       setErrorModal({ show: true, title: 'Invalid Email', message: 'Please enter a valid email address.' })
       return
     }
+    
+    setIsSubmitting(true)
     
     try {
       const response = await fetch('/api/signup', {
@@ -288,7 +293,14 @@ export default function FoodDistribution() {
         setSelectedDate(null)
         setSuccessModal({ show: true, message: 'Signup successful! You will receive a confirmation email shortly.' })
       } else {
-        setErrorModal({ show: true, title: 'Signup Failed', message: data.error || 'Unable to complete signup. Please try again.' })
+        // Check if it's a duplicate slot error
+        if (data.code === 'SLOT_TAKEN') {
+          setErrorModal({ show: true, title: 'Slot Already Filled', message: data.error })
+          // Refresh to show current state
+          await fetchSignups()
+        } else {
+          setErrorModal({ show: true, title: 'Signup Failed', message: data.error || 'Unable to complete signup. Please try again.' })
+        }
       }
     } catch (error) {
       console.error('Error submitting signup:', error)
@@ -318,6 +330,8 @@ export default function FoodDistribution() {
       } catch (reportError) {
         console.error('Failed to report error:', reportError)
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 

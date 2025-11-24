@@ -67,9 +67,29 @@ export async function POST(request: NextRequest) {
       return errorResponse2;
     }
 
-    // NOTE: Duplicate prevention disabled for testing
-    // Allow same user to sign up for multiple slots on same day
-    // TODO: Re-enable after testing is complete
+    // CRITICAL: Check if slot is already taken BEFORE submitting
+    // This prevents race conditions where multiple signups happen before UI updates
+    console.log(`🔍 [DUPLICATE CHECK] Checking if ${body.role} is already taken for ${body.serviceDate}`)
+    
+    const allSignups = await getSignups(tableName)
+    const existingSignup = allSignups.find((s: any) => 
+      s.serviceDate === body.serviceDate && s.role === body.role
+    )
+    
+    if (existingSignup) {
+      console.log(`❌ [DUPLICATE CHECK] Slot already taken: ${body.role} on ${body.serviceDate} by ${existingSignup.name}`)
+      const errorResponse = NextResponse.json(
+        { 
+          error: 'This volunteer slot is already filled. Please refresh the page to see the latest signups.',
+          code: 'SLOT_TAKEN'
+        },
+        { status: 409 } // 409 Conflict
+      )
+      errorResponse.headers.set('X-Handler', JSON.stringify(handlerStamp))
+      return errorResponse
+    }
+    
+    console.log(`✅ [DUPLICATE CHECK] Slot is available: ${body.role} on ${body.serviceDate}`)
     
     // Submit to Airtable
     const result = await submitSignup({
@@ -88,7 +108,7 @@ export async function POST(request: NextRequest) {
       
       // CRITICAL: Invalidate cache so fresh data is returned
       const cacheKey = tableName === 'Food Distribution' ? 'food-Q4-2025' : 'liturgists-Q4-2025'
-      serviceCache.delete(cacheKey)
+      serviceCache.invalidate(cacheKey)
       console.log(`✅ [CACHE] Invalidated cache key: ${cacheKey}`)
       
       // Send email notifications
@@ -539,18 +559,21 @@ export async function DELETE(request: NextRequest) {
       
       // CRITICAL: Invalidate cache so fresh data is returned
       const cacheKey = tableName === 'Food Distribution' ? 'food-Q4-2025' : 'liturgists-Q4-2025'
-      serviceCache.delete(cacheKey)
+      serviceCache.invalidate(cacheKey)
       console.log(`✅ [CACHE] Invalidated cache key: ${cacheKey}`)
       
       // BACKFILL LOGIC: If volunteer 1 or 2 cancelled, promote volunteer 3 & 4
       if (tableName === 'Food Distribution' && (cancelledRole === 'volunteer1' || cancelledRole === 'volunteer2')) {
-        console.log('🔄 [BACKFILL] Checking for volunteers to promote...')
+        console.log(`🔄 [BACKFILL] ${cancelledRole} cancelled on ${serviceDate}, checking for volunteers to promote...`)
         
         // Get all signups for this date
         const { getSignups } = await import('@/lib/airtable')
         const { updateSignupRole } = await import('@/lib/airtable')
         const allSignups = await getSignups(tableName)
         const dateSignups = allSignups.filter((s: any) => s.serviceDate === serviceDate)
+        
+        console.log(`🔍 [BACKFILL] Found ${dateSignups.length} remaining volunteers for ${serviceDate}:`, 
+          dateSignups.map((s: any) => `${s.role}: ${s.name}`))
         
         // Find volunteer3 and volunteer4
         const vol3 = dateSignups.find((s: any) => s.role === 'volunteer3')
@@ -559,15 +582,30 @@ export async function DELETE(request: NextRequest) {
         if (cancelledRole === 'volunteer1') {
           // volunteer2 -> volunteer1, volunteer3 -> volunteer2, volunteer4 -> volunteer3
           const vol2 = dateSignups.find((s: any) => s.role === 'volunteer2')
-          if (vol2) await updateSignupRole(vol2.id, 'volunteer1', tableName)
-          if (vol3) await updateSignupRole(vol3.id, 'volunteer2', tableName)
-          if (vol4) await updateSignupRole(vol4.id, 'volunteer3', tableName)
-          console.log('✅ [BACKFILL] Promoted volunteers after volunteer1 cancellation')
+          if (vol2) {
+            await updateSignupRole(vol2.id, 'volunteer1', tableName)
+            console.log(`✅ [BACKFILL] ${vol2.name}: volunteer2 → volunteer1`)
+          }
+          if (vol3) {
+            await updateSignupRole(vol3.id, 'volunteer2', tableName)
+            console.log(`✅ [BACKFILL] ${vol3.name}: volunteer3 → volunteer2`)
+          }
+          if (vol4) {
+            await updateSignupRole(vol4.id, 'volunteer3', tableName)
+            console.log(`✅ [BACKFILL] ${vol4.name}: volunteer4 → volunteer3`)
+          }
+          console.log('✅ [BACKFILL] Promotion complete after volunteer1 cancellation')
         } else if (cancelledRole === 'volunteer2') {
           // volunteer3 -> volunteer2, volunteer4 -> volunteer3
-          if (vol3) await updateSignupRole(vol3.id, 'volunteer2', tableName)
-          if (vol4) await updateSignupRole(vol4.id, 'volunteer3', tableName)
-          console.log('✅ [BACKFILL] Promoted volunteers after volunteer2 cancellation')
+          if (vol3) {
+            await updateSignupRole(vol3.id, 'volunteer2', tableName)
+            console.log(`✅ [BACKFILL] ${vol3.name}: volunteer3 → volunteer2`)
+          }
+          if (vol4) {
+            await updateSignupRole(vol4.id, 'volunteer3', tableName)
+            console.log(`✅ [BACKFILL] ${vol4.name}: volunteer4 → volunteer3`)
+          }
+          console.log('✅ [BACKFILL] Promotion complete after volunteer2 cancellation')
         }
       }
       
