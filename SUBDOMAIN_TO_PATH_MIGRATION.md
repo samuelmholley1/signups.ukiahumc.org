@@ -641,3 +641,175 @@ This migration successfully transformed a single-purpose subdomain into a multi-
 
 **End of Guide**  
 Last Updated: November 23, 2025
+
+## 📝 POST-MIGRATION UPDATES (November 23, 2025)
+
+Since the initial migration was completed, several critical enhancements and bug fixes have been implemented. This section documents real-world issues encountered and solutions applied.
+
+### Issue 6: Airtable Field Type Restrictions
+**Problem:** Original Role field was Single Select (liturgist/backup) - couldn't accommodate food distribution's 4 volunteer slots.
+
+**Solution:** Changed Role field to **Long Text** in Airtable.
+- Allows flexible values: `volunteer1`, `volunteer2`, `volunteer3`, `volunteer4`, `liturgist`, `backup`, `liturgist2`
+- No dropdown limitations
+- Different services use different role conventions
+
+**Key Learning:** When designing multi-service systems, prefer flexible field types (Long Text, JSON) over constrained types (Single Select) unless strict validation is required.
+
+---
+
+### Issue 7: Progressive Disclosure UX Pattern
+**Problem:** Food distribution needs 2-4 volunteer signups, but showing 4 columns initially was overwhelming.
+
+**Solution:** Implemented **progressive disclosure pattern**:
+- Show 2 volunteer columns by default
+- "Add a third volunteer?" button (amber) reveals volunteer 3
+- "Add a fourth volunteer?" button (orange) reveals volunteer 4
+- Users opt-in to complexity
+
+**Key Learning:** Don't show all fields upfront. Progressive disclosure reduces cognitive load and improves conversion for simple cases while supporting complex needs.
+
+---
+
+### Issue 8: Branded Modal System vs Alert()
+**Problem:** Error messages displayed via `alert()` - ugly, no branding, poor UX, can't auto-report errors.
+
+**Solution:** Built React-based modal system with church branding, logo, emoji indicators, consistent Tailwind styling, and automatic error reporting.
+
+**Key Learning:** Never use `alert()` in production. Build branded, stateful modals with proper accessibility and error reporting integration.
+
+---
+
+### Issue 9: Silent Errors in Production
+**Problem:** Errors happened silently - no visibility into production issues until users complained.
+
+**Solution:** Created automatic error reporting pipeline - `/api/report-error` endpoint that sends styled HTML error emails with stack traces and plain-English explanations.
+
+**Key Learning:** Build error reporting EARLY. Email notifications provide faster incident response than log diving.
+
+---
+
+### Issue 10: Conditional Airtable Fields Across Tables
+**Problem:** 500 error on food distribution signups - `UNKNOWN_FIELD_NAME` for "Attendance Status".
+
+**Root Cause:** "Attendance Status" field exists ONLY in Liturgists table, not Food Distribution table.
+
+**Solution:** Conditional field inclusion based on table type in `submitSignup()`.
+
+**Key Learning:** Multi-table systems need defensive field mapping. Never assume all tables share the same schema.
+
+---
+
+### Issue 11: Email Branding Confusion
+**Problem:** All emails said "Liturgist Signup System" even for food distribution users - confusing and unprofessional.
+
+**Solution:** Implemented **complete table-aware email system** with three adaptation layers:
+
+1. **Dynamic Sender Name:** `fromName` parameter - "UUMC Food Distribution" vs "UUMC Liturgist Scheduling"
+2. **Dynamic Subjects:** "Food Distribution Volunteer" vs "Liturgist" in all email subjects
+3. **Dynamic Body Content:** Added `systemName` parameter to email generation functions, header colors (orange vs blue), body messages, footer text
+
+**Key Learning:** Multi-tenant email systems need comprehensive branding. Update sender name, subjects, AND body content for complete context adaptation.
+
+---
+
+### Issue 12: Variable Scoping in Error Handlers
+**Problem:** Build failed with "Cannot find name 'tableName'" in catch block.
+
+**Root Cause:** `tableName` declared inside try block, inaccessible in catch block for error emails.
+
+**Solution:** Declare `tableName` and `body` BEFORE try blocks in POST and DELETE handlers.
+
+**Key Learning:** When variables are needed in both try and catch blocks, declare them BEFORE the try block. Watch for scope issues when implementing error handling.
+
+---
+
+### Issue 13: Role Detection in Email Link Cancellations
+**Challenge:** GET handler for email link cancellations doesn't have explicit table parameter.
+
+**Solution:** Detect table type from role prefix - `volunteer*` roles = food distribution.
+
+**Future Enhancement:** Add explicit `table` query parameter to cancellation links for more robust detection.
+
+**Key Learning:** Role prefixes can serve as implicit service identifiers when explicit parameters aren't available. Document these conventions clearly.
+
+---
+
+### Updated Architectural Patterns
+
+#### Pattern 4: Context Propagation in Email System
+```typescript
+// Detection Layer (API route)
+const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling';
+
+// Propagation Layer (function params)
+generateSignupEmail({ ...userData, systemName });
+sendEmail({ ...emailParams, fromName: systemName });
+
+// Rendering Layer (email template)
+<footer>${systemName}</footer>
+```
+
+#### Pattern 5: Progressive Disclosure State Management
+```typescript
+const [showExtraColumns, setShowExtraColumns] = useState(false);
+{!showExtraColumns && <RevealButton />}
+{showExtraColumns && <AdditionalContent />}
+```
+
+#### Pattern 6: Error Reporting Pipeline
+```typescript
+// Frontend: Dual responsibility
+setErrorModal({ show: true }); // User experience
+fetch('/api/report-error', { ... }); // Developer notification (fire-and-forget)
+```
+
+---
+
+### Updated Common Pitfalls Table
+
+| Pitfall | Solution | Reference |
+|---------|----------|-----------|
+| **Airtable field mismatch** | Use conditional field inclusion based on table type | Issue 10 |
+| **Variable scope in error handlers** | Declare variables BEFORE try blocks if needed in catch | Issue 12 |
+| **Email branding inconsistency** | Update sender name, subject, AND body content | Issue 11 |
+| **Role detection ambiguity** | Use unique prefixes per signup type | Issue 13 |
+| **Button width inconsistency** | Avoid `w-full` in grid layouts | Issue 7 |
+| **Alert fatigue** | Replace all `alert()` calls with branded modal system | Issue 8 |
+| **Silent errors** | Implement auto-reporting pipeline early | Issue 9 |
+| **Field type restrictions** | Prefer Long Text over Single Select | Issue 6 |
+| **Overwhelming UX** | Use progressive disclosure | Issue 7 |
+
+---
+
+### Updated Key Learnings
+
+11. **Field Type Flexibility:** Long Text > Single Select for evolving multi-purpose systems
+12. **Progressive Disclosure:** Show 2-3 fields initially, reveal more on demand
+13. **Visual Consistency:** Match button widths, colors, spacing across similar components
+14. **Modal > Alert:** Always use branded, stateful modals in production apps
+15. **Error Reporting:** Build email notification pipeline BEFORE things break
+16. **Conditional Fields:** Multi-table systems need if/else logic for field inclusion
+17. **Email Branding:** Update sender name, subject, AND body for complete adaptation
+18. **Variable Scoping:** Declare variables before try blocks if needed in catch
+19. **Test Data Management:** Use email aliases (`+test`) for test accounts
+20. **Documentation First:** Create migration plans and post-mortems before AND after changes
+
+---
+
+### Production Deployment Timeline
+
+**Initial Migration:** November 20-22, 2025
+- Subdomain → path-based routing complete
+- Both services live in production
+
+**Post-Migration Enhancements:** November 23, 2025
+- Progressive disclosure UI (4 hours)
+- Styled modal system (2 hours)
+- Error reporting pipeline (3 hours)
+- Complete email branding overhaul (5 hours)
+- Conditional Airtable fields (1 hour)
+- Bug fixes and testing (3 hours)
+
+**Total Time Investment:** ~22 hours for fully production-ready multi-service platform with comprehensive error handling and branding.
+
