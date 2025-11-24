@@ -360,8 +360,8 @@ export default function FoodDistribution() {
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Volunteer #1</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Volunteer #2</th>
                       {(() => {
                         const shouldShowVol3 = signups.some(s => s.volunteer1 && s.volunteer2)
                         console.log('🔍 [VOL3 COLUMN CHECK]', {
@@ -374,7 +374,7 @@ export default function FoodDistribution() {
                           }))
                         })
                         return shouldShowVol3 ? (
-                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #3</th>
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64 hidden lg:table-cell">Volunteer #3</th>
                         ) : null
                       })()}
                       {(() => {
@@ -387,7 +387,7 @@ export default function FoodDistribution() {
                           }))
                         })
                         return shouldShowVol4 ? (
-                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #4</th>
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64 hidden lg:table-cell">Volunteer #4</th>
                         ) : null
                       })()}
                     </tr>
@@ -472,11 +472,11 @@ export default function FoodDistribution() {
                           )}
                         </td>
                         {/* Volunteer 3 & 4 - Desktop only */}
-                        {signups.some(s => s.volunteer3) && (
+                        {signups.some(s => s.volunteer1 && s.volunteer2) && (
                           <td className="px-4 py-4 align-top hidden lg:table-cell">
                             {signup.volunteer3 ? (
                                 <div>
-                                  <div className="mb-2">
+                                  <div className="mb-2 text-center">
                                     <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
                                     <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
                                     <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
@@ -507,11 +507,11 @@ export default function FoodDistribution() {
                               ) : null}
                           </td>
                         )}
-                        {signups.some(s => s.volunteer4) && (
+                        {signups.some(s => s.volunteer3) && (
                           <td className="px-4 py-4 align-top hidden lg:table-cell">
                             {signup.volunteer4 ? (
                                 <div>
-                                  <div className="mb-2">
+                                  <div className="mb-2 text-center">
                                     <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
                                     <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
                                     <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
