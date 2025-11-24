@@ -37,11 +37,11 @@ We now have an easy online system for signing up to volunteer for our Saturday f
 **How it works:**
 1. Visit the website and enter the password.
 2. Browse available Saturdays (currently showing December 2025).
-3. Click "Sign Up" for either Volunteer #1 or Volunteer #2.
+3. Click "Sign Up" for Volunteer #1, #2, #3, or #4 (we need 4 volunteers per Saturday).
 4. Select your name from the dropdown menu.
 5. You're done! The page updates in real-time and you'll receive an email confirmation.
 
-**My ask:** Please sign up for at least one Saturday between now and the end of December if you're available. We need 2 volunteers for each distribution.
+**My ask:** Please sign up for at least one Saturday between now and the end of December if you're available. We need 4 volunteers for each distribution.
 
 **Special features:**
 • See who's already signed up for each date

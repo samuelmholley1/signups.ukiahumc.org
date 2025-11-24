@@ -48,12 +48,8 @@ Delete any default fields Airtable creates, then add these fields **in this exac
 
 #### Field 6: Role
 - **Field Name:** `Role`
-- **Field Type:** `Single select`
-- **Options (add these 4 choices):**
-  - `volunteer1`
-  - `volunteer2`
-  - `volunteer3`
-  - `volunteer4`
+- **Field Type:** `Long text`
+- **Note:** Plain text field allows app to assign any volunteer slot number (volunteer1, volunteer2, volunteer3, volunteer4)
 
 #### Field 7: Notes
 - **Field Name:** `Notes`
@@ -81,7 +77,7 @@ Your table should now have exactly these 8 fields in this order:
 | 3 | Name | Single line text |
 | 4 | Email | Email |
 | 5 | Phone | Phone number |
-| 6 | Role | Single select (4 options: volunteer1-4) |
+| 6 | Role | Long text (app-controlled values) |
 | 7 | Notes | Long text |
 | 8 | Submitted At | Date with time |
 
@@ -120,7 +116,7 @@ Once created, verify the table:
 
 1. **Table name is exactly:** `Food Distribution` (title case with space)
 2. **All 8 fields exist** with correct names and types
-3. **Role field has 4 choices:** volunteer1, volunteer2, volunteer3, volunteer4
+3. **Role field is Long text type** (not Single select)
 4. **Both date fields use Pacific time zone**
 
 ## 🎯 Next Steps
