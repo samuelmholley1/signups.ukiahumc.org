@@ -130,9 +130,12 @@ export async function POST(request: NextRequest) {
           // Food Distribution: Trudy is CC'd, Sam is BCC'd
           // Exception: If Trudy is signing up, no CC (she's already TO), Sam still BCC'd
           const isTrudySigningUp = body.email.toLowerCase() === 'morganmiller@pacific.net'
+          // Check if TO email goes to Sam (including aliases like sam+test@)
+          const emailGoesToSam = body.email.toLowerCase().includes('@samuelholley.com') || 
+                                  body.email.toLowerCase() === 'sam@samuelholley.com'
           
           ccRecipients = isTrudySigningUp ? undefined : 'morganmiller@pacific.net'
-          bccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
+          bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
         } else {
           // Liturgist: Sam is CC'd (not BCC'd), no Trudy
           ccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
@@ -313,9 +316,12 @@ export async function GET(request: NextRequest) {
             // Food Distribution: Trudy is CC'd, Sam is BCC'd
             // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
             const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller@pacific.net'
+            // Check if TO email goes to Sam (including aliases like sam+test@)
+            const emailGoesToSam = userEmail.toLowerCase().includes('@samuelholley.com') || 
+                                    userEmail.toLowerCase() === 'sam@samuelholley.com'
             
             ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
-            bccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
+            bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else {
             // Liturgist: Sam is CC'd (not BCC'd), no Trudy
             ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
@@ -611,9 +617,12 @@ export async function DELETE(request: NextRequest) {
             // Food Distribution: Trudy is CC'd, Sam is BCC'd
             // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
             const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller@pacific.net'
+            // Check if TO email goes to Sam (including aliases like sam+test@)
+            const emailGoesToSam = userEmail.toLowerCase().includes('@samuelholley.com') || 
+                                    userEmail.toLowerCase() === 'sam@samuelholley.com'
             
             ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
-            bccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
+            bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else {
             // Liturgist: Sam is CC'd (not BCC'd), no Trudy
             ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
