@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
 // December 2025 Saturdays
@@ -34,6 +33,7 @@ export default function FoodDistribution() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState(Date.now()) // Force re-render trigger
   const [isCancelling, setIsCancelling] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -67,14 +67,22 @@ export default function FoodDistribution() {
           volunteer3: service.volunteer3 || null,
           volunteer4: service.volunteer4 || null
         }))
+        
+        console.log('🔍 [FETCH] Raw API response:', JSON.stringify(data.services, null, 2))
+        console.log('🔍 [FETCH] Transformed data:', JSON.stringify(transformed, null, 2))
+        console.log('🔍 [FETCH] Current signups state BEFORE update:', JSON.stringify(signups, null, 2))
+        
         setSignups(transformed)
         
         // CRITICAL: Use setTimeout to ensure state updates are processed first
         // This forces the key update to happen AFTER React processes the new signups
         setTimeout(() => {
-          setLastUpdate(Date.now())
+          const newTimestamp = Date.now()
+          setLastUpdate(newTimestamp)
           console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
           console.log('📊 [FORCE UPDATE] New signups data:', transformed.length, 'records')
+          console.log('🔑 [FORCE UPDATE] New key timestamp:', newTimestamp)
+          console.log('🔍 [FORCE UPDATE] Transformed data that SHOULD be in state:', JSON.stringify(transformed, null, 2))
         }, 0)
       }
     } catch (error) {
@@ -163,6 +171,7 @@ export default function FoodDistribution() {
       
       if (data.success) {
         console.log('🔄 [CANCEL] Fetching fresh data from server after cancellation...')
+        console.log('🔍 [CANCEL] API response:', JSON.stringify(data, null, 2))
         await fetchSignups()
         console.log('✅ [CANCEL] Fetch complete, UI should update momentarily')
         
@@ -215,6 +224,8 @@ export default function FoodDistribution() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (isSubmitting) return // Prevent double-submission
+    
     const signup = signups.find(s => s.date === selectedDate)
     if (!signup) return
     
@@ -239,6 +250,8 @@ export default function FoodDistribution() {
       return
     }
     
+    setIsSubmitting(true)
+    
     try {
       const response = await fetch('/api/signup', {
         method: 'POST',
@@ -259,6 +272,7 @@ export default function FoodDistribution() {
       if (data.success) {
         // Refresh signups from server
         console.log('🔄 [SIGNUP] Fetching fresh data from server after signup...')
+        console.log('🔍 [SIGNUP] API response:', JSON.stringify(data, null, 2))
         await fetchSignups()
         console.log('✅ [SIGNUP] Fetch complete, UI should update momentarily')
         
@@ -274,7 +288,14 @@ export default function FoodDistribution() {
         setSelectedDate(null)
         setSuccessModal({ show: true, message: 'Signup successful! You will receive a confirmation email shortly.' })
       } else {
-        setErrorModal({ show: true, title: 'Signup Failed', message: data.error || 'Unable to complete signup. Please try again.' })
+        // Check if it's a duplicate slot error
+        if (data.code === 'SLOT_TAKEN') {
+          setErrorModal({ show: true, title: 'Slot Already Filled', message: data.error })
+          // Refresh to show current state
+          await fetchSignups()
+        } else {
+          setErrorModal({ show: true, title: 'Signup Failed', message: data.error || 'Unable to complete signup. Please try again.' })
+        }
       }
     } catch (error) {
       console.error('Error submitting signup:', error)
@@ -304,6 +325,8 @@ export default function FoodDistribution() {
       } catch (reportError) {
         console.error('Failed to report error:', reportError)
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -312,7 +335,7 @@ export default function FoodDistribution() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <Image
+            <img
               src="/logo-for-church-larger.jpg"
               alt="Ukiah United Methodist Church"
               width={320}
@@ -330,20 +353,42 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full table-auto min-w-[800px]" key={lastUpdate}>
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden w-fit mx-auto">
+              <div>
+                <table className="w-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
-                      {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                        <>
-                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #3</th>
-                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #4</th>
-                        </>
-                      )}
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Volunteer #1</th>
+                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Volunteer #2</th>
+                      {(() => {
+                        const shouldShowVol3 = signups.some(s => s.volunteer1 && s.volunteer2)
+                        console.log('🔍 [VOL3 COLUMN CHECK]', {
+                          shouldShow: shouldShowVol3,
+                          signups: signups.map(s => ({
+                            date: s.displayDate,
+                            hasVol1: !!s.volunteer1,
+                            hasVol2: !!s.volunteer2,
+                            bothFilled: !!(s.volunteer1 && s.volunteer2)
+                          }))
+                        })
+                        return shouldShowVol3 ? (
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64 hidden lg:table-cell">Volunteer #3</th>
+                        ) : null
+                      })()}
+                      {(() => {
+                        const shouldShowVol4 = signups.some(s => s.volunteer3)
+                        console.log('🔍 [VOL4 COLUMN CHECK]', {
+                          shouldShow: shouldShowVol4,
+                          signups: signups.map(s => ({
+                            date: s.displayDate,
+                            hasVol3: !!s.volunteer3
+                          }))
+                        })
+                        return shouldShowVol4 ? (
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64 hidden lg:table-cell">Volunteer #4</th>
+                        ) : null
+                      })()}
                     </tr>
                   </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -351,82 +396,93 @@ export default function FoodDistribution() {
                     const bothFilled = signup.volunteer1 && signup.volunteer2
                     const hasThirdVolunteer = signup.volunteer3
                     const hasFourthVolunteer = signup.volunteer4
+                    const showExtraVolunteers = bothFilled || hasThirdVolunteer || hasFourthVolunteer
                     
                     return (
-                      <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
+                      <React.Fragment key={signup.date}>
+                      <tr className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                        <td className="px-4 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
                           {signup.displayDate}
                         </td>
-                        <td className="px-4 py-4 align-top">
+                        <td className="px-4 py-4 align-top w-64">
                           {signup.volunteer1 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 text-center">
                                 <p className="font-medium text-gray-900 text-base">{signup.volunteer1.name}</p>
                                 <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.email}</p>
                                 <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer1.phone ? 'visible' : 'hidden' }}>
                                   {signup.volunteer1.phone || '111-111-1111'}
                                 </p>
                               </div>
-                              <button
-                                onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
-                                className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                              >
-                                Cancel
-                              </button>
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => handleCancelClick(signup.volunteer1!.id, signup.volunteer1!.name, signup.displayDate)}
+                                  className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => {
-                                setSelectedDate(signup.date)
-                                setFormData({ ...formData, role: 'volunteer1' })
-                              }}
-                              className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
-                            >
-                              Sign Up
-                            </button>
+                            <div className="flex justify-center">
+                              <button
+                                onClick={() => {
+                                  setSelectedDate(signup.date)
+                                  setFormData({ ...formData, role: 'volunteer1' })
+                                }}
+                                className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                              >
+                                Sign Up
+                              </button>
+                            </div>
                           )}
                         </td>
-                        <td className="px-4 py-4 align-top">
+                        <td className="px-4 py-4 align-top w-64">
                           {signup.volunteer2 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 text-center">
                                 <p className="font-medium text-gray-900 text-base">{signup.volunteer2.name}</p>
                                 <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.email}</p>
                                 <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
                                   {signup.volunteer2.phone || '111-111-1111'}
                                 </p>
                               </div>
-                              <button
-                                onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                              >
-                                Cancel
-                              </button>
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
+                                  className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => {
-                                setSelectedDate(signup.date)
-                                setFormData({ ...formData, role: 'volunteer2' })
-                              }}
-                              className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
-                            >
-                              Sign Up
-                            </button>
+                            <div className="flex justify-center">
+                              <button
+                                onClick={() => {
+                                  setSelectedDate(signup.date)
+                                  setFormData({ ...formData, role: 'volunteer2' })
+                                }}
+                                className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                              >
+                                Sign Up
+                              </button>
+                            </div>
                           )}
                         </td>
+                        {/* Volunteer 3 & 4 - Desktop only */}
                         {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                          <>
-                            <td className="px-4 py-4 align-top">
-                              {signup.volunteer3 ? (
-                                  <div>
-                                    <div className="mb-2">
-                                      <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
-                                      <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
-                                      <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
-                                        {signup.volunteer3.phone || '111-111-1111'}
-                                      </p>
-                                    </div>
+                          <td className="px-4 py-4 align-top w-64 hidden lg:table-cell">
+                            {signup.volunteer3 ? (
+                                <div>
+                                  <div className="mb-2 text-center">
+                                    <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
+                                    <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
+                                    <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
+                                      {signup.volunteer3.phone || '111-111-1111'}
+                                    </p>
+                                  </div>
+                                  <div className="flex justify-center">
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
                                       className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
@@ -434,7 +490,9 @@ export default function FoodDistribution() {
                                       Cancel
                                     </button>
                                   </div>
-                                ) : bothFilled ? (
+                                </div>
+                              ) : bothFilled ? (
+                                <div className="flex justify-center">
                                   <button
                                     onClick={() => {
                                       setSelectedDate(signup.date)
@@ -444,18 +502,22 @@ export default function FoodDistribution() {
                                   >
                                     Sign Up
                                   </button>
-                                ) : null}
-                            </td>
-                            <td className="px-4 py-4 align-top">
-                              {signup.volunteer4 ? (
-                                  <div>
-                                    <div className="mb-2">
-                                      <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
-                                      <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
-                                      <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
-                                        {signup.volunteer4.phone || '111-111-1111'}
-                                      </p>
-                                    </div>
+                                </div>
+                              ) : null}
+                          </td>
+                        )}
+                        {signups.some(s => s.volunteer3) && (
+                          <td className="px-4 py-4 align-top w-64 hidden lg:table-cell">
+                            {signup.volunteer4 ? (
+                                <div>
+                                  <div className="mb-2 text-center">
+                                    <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
+                                    <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
+                                    <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
+                                      {signup.volunteer4.phone || '111-111-1111'}
+                                    </p>
+                                  </div>
+                                  <div className="flex justify-center">
                                     <button
                                       onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
                                       className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
@@ -463,7 +525,9 @@ export default function FoodDistribution() {
                                       Cancel
                                     </button>
                                   </div>
-                                ) : hasThirdVolunteer ? (
+                                </div>
+                              ) : hasThirdVolunteer ? (
+                                <div className="flex justify-center">
                                   <button
                                     onClick={() => {
                                       setSelectedDate(signup.date)
@@ -473,11 +537,98 @@ export default function FoodDistribution() {
                                   >
                                     Sign Up
                                   </button>
-                                ) : null}
-                            </td>
-                          </>
+                                </div>
+                              ) : null}
+                          </td>
                         )}
                       </tr>
+                      
+                      {/* Volunteer 3 & 4 - Mobile row (shown below main row on tablets/phones) */}
+                      {showExtraVolunteers && (
+                        <tr className={`lg:hidden ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-t-0`}>
+                          <td className="px-4 py-2 text-xs text-gray-500 font-medium"></td>
+                          <td colSpan={2} className="px-4 py-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {/* Volunteer 3 Mobile Card */}
+                              {(signup.volunteer3 || bothFilled) && (
+                                <div className="border border-gray-300 rounded-lg p-3 bg-white">
+                                  <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Volunteer #3</div>
+                                  {signup.volunteer3 ? (
+                                    <div>
+                                      <div className="mb-2">
+                                        <p className="font-medium text-gray-900 text-sm">{signup.volunteer3.name}</p>
+                                        <p className="text-xs text-gray-600">{signup.volunteer3.email}</p>
+                                        {signup.volunteer3.phone && (
+                                          <p className="text-xs text-gray-600">{signup.volunteer3.phone}</p>
+                                        )}
+                                      </div>
+                                      <div className="flex justify-center">
+                                        <button
+                                          onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                                          className="px-3 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors w-full"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex justify-center">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedDate(signup.date)
+                                          setFormData({ ...formData, role: 'volunteer3' })
+                                        }}
+                                        className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm min-h-[44px] rounded-full transition-colors font-medium w-full"
+                                      >
+                                        Sign Up
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Volunteer 4 Mobile Card */}
+                              {(signup.volunteer4 || hasThirdVolunteer) && (
+                                <div className="border border-gray-300 rounded-lg p-3 bg-white">
+                                  <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Volunteer #4</div>
+                                  {signup.volunteer4 ? (
+                                    <div>
+                                      <div className="mb-2">
+                                        <p className="font-medium text-gray-900 text-sm">{signup.volunteer4.name}</p>
+                                        <p className="text-xs text-gray-600">{signup.volunteer4.email}</p>
+                                        {signup.volunteer4.phone && (
+                                          <p className="text-xs text-gray-600">{signup.volunteer4.phone}</p>
+                                        )}
+                                      </div>
+                                      <div className="flex justify-center">
+                                        <button
+                                          onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                          className="px-3 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors w-full"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex justify-center">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedDate(signup.date)
+                                          setFormData({ ...formData, role: 'volunteer4' })
+                                        }}
+                                        className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm min-h-[44px] rounded-full transition-colors font-medium w-full"
+                                      >
+                                        Sign Up
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      </React.Fragment>
                     )
                   })}
                   </tbody>
@@ -491,7 +642,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={80}
@@ -607,7 +758,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={150}
@@ -635,7 +786,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={150}
@@ -663,7 +814,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={150}

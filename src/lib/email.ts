@@ -255,12 +255,12 @@ export function generateSignupEmail(data: {
           </div>
           
           <div class="button-container">
-            <a href="https://signups.ukiahumc.org" class="button">View Full Schedule</a>
+            <a href="https://signups.ukiahumc.org${isFoodDistribution ? '/food-distribution' : '/liturgist'}" class="button">View or Change Your Signups</a>
             <!-- <a href="https://signups.ukiahumc.org/api/signup?recordId=${recordId}&action=cancel" class="button cancel-button">Cancel This Signup</a> -->
           </div>
           
           <p class="timestamp">
-            Need to cancel? Click the button above or contact the church office.<br/>
+            Click the button above to view the schedule and manage your signups.<br/>
             Confirmation sent: ${new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })} PT
           </p>
         </div>

@@ -135,7 +135,7 @@ export async function updateSignupRole(recordId: string, newRole: string, tableN
       {
         id: recordId,
         fields: {
-          role: newRole
+          'Role': newRole
         }
       }
     ])
