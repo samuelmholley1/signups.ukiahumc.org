@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 import PasswordGate from '@/components/PasswordGate'
 
 // December 2025 Saturdays
@@ -336,7 +335,7 @@ export default function FoodDistribution() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <Image
+            <img
               src="/logo-for-church-larger.jpg"
               alt="Ukiah United Methodist Church"
               width={320}
@@ -643,7 +642,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={80}
@@ -759,7 +758,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={150}
@@ -787,7 +786,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={150}
@@ -815,7 +814,7 @@ export default function FoodDistribution() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
-                  <Image
+                  <img
                     src="/logo-for-church-larger.jpg"
                     alt="UUMC"
                     width={150}
