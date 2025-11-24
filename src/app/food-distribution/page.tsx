@@ -297,20 +297,20 @@ export default function FoodDistribution() {
                               </button>
                             </div>
                           ) : (
-                            <div className="space-y-2">
+                            <div>
                               <button
                                 onClick={() => {
                                   setSelectedDate(signup.date)
                                   setFormData({ ...formData, role: 'volunteer2' })
                                 }}
-                                className="w-full px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
+                                className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors font-medium"
                               >
                                 Sign Up
                               </button>
                               {bothFilled && !showExtra && !hasThirdVolunteer && (
                                 <button
                                   onClick={() => setShowExtraColumns({ ...showExtraColumns, [signup.date]: true })}
-                                  className="w-full px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-lg transition-colors font-medium"
+                                  className="mt-2 w-full px-3 py-1.5 text-sm bg-amber-100 text-amber-800 hover:bg-amber-200 rounded-lg transition-colors font-medium"
                                 >
                                   Add a third volunteer?
                                 </button>
