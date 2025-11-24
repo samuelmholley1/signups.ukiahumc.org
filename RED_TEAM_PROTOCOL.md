@@ -247,6 +247,52 @@ Added to checklist: "Document branch/environment strategy and email routing diff
 
 ---
 
+### Failure #7: PNG Export White Space from Unconstrained Container (November 24, 2025)
+
+**Severity**: 🟢 MEDIUM
+
+**What Happened**:
+- PNG downloads of schedules had excessive white space to the right
+- Title div and table were not width-constrained
+- Table used `w-auto` allowing it to expand beyond natural content width
+- Title header didn't match table width, creating visual inconsistency
+
+**Root Cause**:
+- Container div (`ref={tableRef}`) had no width constraint
+- Table used `w-auto` instead of `w-full` relative to container
+- No `w-fit` wrapper to constrain the exportable area to actual content
+
+**Impact**:
+- Unprofessional looking PNG exports with wasted space
+- Harder to print/share - extra white space confusing
+- Title and table width mismatch looked broken
+
+**What Should Have Been Done**:
+1. ✅ Wrap exportable content in `w-fit` container
+2. ✅ Use `w-full` on table relative to that container
+3. ✅ Test PNG export visual output, not just functionality
+4. ✅ Check exported image dimensions match content bounds
+
+**Fix Applied**:
+```tsx
+// Before
+<div ref={tableRef}>
+  <div className="...">Title</div>
+  <table className="w-auto">...</table>
+</div>
+
+// After
+<div ref={tableRef} className="w-fit">
+  <div className="...">Title</div>
+  <table className="w-full">...</table>
+</div>
+```
+
+**Protocol Update**:
+Added to checklist: "For image/PDF exports, verify exported dimensions match content bounds with no excess whitespace"
+
+---
+
 ## Red Team Testing Protocol v2.0
 
 ### Pre-Deployment Checklist
@@ -332,6 +378,13 @@ Added to checklist: "Document branch/environment strategy and email routing diff
 - [ ] **Loading indicators** for async operations
 - [ ] **Success/error messages** clear and actionable
 - [ ] **Confirm destructive actions** (delete, cancel)
+
+#### Export/Download Features
+- [ ] **PNG/PDF exports match content bounds** - no excess whitespace
+- [ ] **Exported images have correct dimensions** - verify visually
+- [ ] **Export containers use w-fit wrapper** to constrain to content
+- [ ] **Tables use w-full inside export containers** for consistent width
+- [ ] **Test export on different data sizes** (empty, partial, full)
 
 ### When to Re-Audit
 
