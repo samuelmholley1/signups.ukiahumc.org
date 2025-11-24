@@ -366,6 +366,10 @@ export async function GET(request: NextRequest) {
       
       // Send error notification email
       try {
+        // Detect table type from role for error email
+        const userRole = recordData.record.role as string
+        const isFoodDistribution = userRole && userRole.toLowerCase().startsWith('volunteer')
+        
         const errorEmailHtml = generateErrorEmail({
           errorType: 'Email Link Cancellation Failed',
           errorMessage: String(result.error),
@@ -375,10 +379,6 @@ export async function GET(request: NextRequest) {
           stackTrace: result.error instanceof Error ? result.error.stack : undefined,
           serviceType: isFoodDistribution ? 'Food Distribution' : 'Liturgists'
         })
-        
-        // Detect table type from role for error email
-        const userRole = recordData.record.role as string
-        const isFoodDistribution = userRole && userRole.toLowerCase().startsWith('volunteer')
         const errorFromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
         const errorSubject = isFoodDistribution 
           ? '🚨 ERROR: Food Distribution Email Link Cancellation Failed'
