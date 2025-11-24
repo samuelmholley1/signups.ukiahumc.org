@@ -82,7 +82,7 @@ export default function FoodDistribution() {
           console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
           console.log('📊 [FORCE UPDATE] New signups data:', transformed.length, 'records')
           console.log('🔑 [FORCE UPDATE] New key timestamp:', newTimestamp)
-          console.log('🔍 [FORCE UPDATE] Signups state AFTER update:', JSON.stringify(signups, null, 2))
+          console.log('🔍 [FORCE UPDATE] Transformed data that SHOULD be in state:', JSON.stringify(transformed, null, 2))
         }, 0)
       }
     } catch (error) {
