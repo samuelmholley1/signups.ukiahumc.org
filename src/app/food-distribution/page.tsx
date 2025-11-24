@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import PasswordGate from '@/components/PasswordGate'
 
@@ -355,18 +355,18 @@ export default function FoodDistribution() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full table-auto" key={lastUpdate}>
+              <div>
+                <table className="w-full table-fixed" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
-                      <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm w-48">Date</th>
+                      <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm w-32 md:w-40">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #2</th>
-                      {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                        <>
-                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #3</th>
-                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm">Volunteer #4</th>
-                        </>
+                      {signups.some(s => s.volunteer3) && (
+                        <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #3</th>
+                      )}
+                      {signups.some(s => s.volunteer4) && (
+                        <th className="px-4 py-4 text-center font-semibold text-base md:text-sm hidden lg:table-cell">Volunteer #4</th>
                       )}
                     </tr>
                   </thead>
@@ -375,10 +375,12 @@ export default function FoodDistribution() {
                     const bothFilled = signup.volunteer1 && signup.volunteer2
                     const hasThirdVolunteer = signup.volunteer3
                     const hasFourthVolunteer = signup.volunteer4
+                    const showExtraVolunteers = hasThirdVolunteer || hasFourthVolunteer
                     
                     return (
-                      <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-6 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base w-48">
+                      <React.Fragment key={signup.date}>
+                      <tr className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                        <td className="px-4 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base w-32 md:w-40">
                           {signup.displayDate}
                         </td>
                         <td className="px-4 py-4 align-top">
@@ -447,77 +449,165 @@ export default function FoodDistribution() {
                             </div>
                           )}
                         </td>
-                        {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                          <>
-                            <td className="px-4 py-4 align-top">
-                              {signup.volunteer3 ? (
-                                  <div>
-                                    <div className="mb-2">
-                                      <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
-                                      <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
-                                      <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
-                                        {signup.volunteer3.phone || '111-111-1111'}
-                                      </p>
-                                    </div>
-                                    <div className="flex justify-center">
-                                      <button
-                                        onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
-                                        className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                                      >
-                                        Cancel
-                                      </button>
-                                    </div>
+                        {/* Volunteer 3 & 4 - Desktop only */}
+                        {signups.some(s => s.volunteer3) && (
+                          <td className="px-4 py-4 align-top hidden lg:table-cell">
+                            {signup.volunteer3 ? (
+                                <div>
+                                  <div className="mb-2">
+                                    <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
+                                    <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
+                                    <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
+                                      {signup.volunteer3.phone || '111-111-1111'}
+                                    </p>
                                   </div>
-                                ) : bothFilled ? (
                                   <div className="flex justify-center">
                                     <button
-                                      onClick={() => {
-                                        setSelectedDate(signup.date)
-                                        setFormData({ ...formData, role: 'volunteer3' })
-                                      }}
-                                      className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                      onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                                      className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                                     >
-                                      Sign Up
+                                      Cancel
                                     </button>
                                   </div>
-                                ) : null}
-                            </td>
-                            <td className="px-4 py-4 align-top">
-                              {signup.volunteer4 ? (
-                                  <div>
-                                    <div className="mb-2">
-                                      <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
-                                      <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
-                                      <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
-                                        {signup.volunteer4.phone || '111-111-1111'}
-                                      </p>
-                                    </div>
-                                    <div className="flex justify-center">
-                                      <button
-                                        onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
-                                        className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
-                                      >
-                                        Cancel
-                                      </button>
-                                    </div>
+                                </div>
+                              ) : bothFilled ? (
+                                <div className="flex justify-center">
+                                  <button
+                                    onClick={() => {
+                                      setSelectedDate(signup.date)
+                                      setFormData({ ...formData, role: 'volunteer3' })
+                                    }}
+                                    className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                  >
+                                    Sign Up
+                                  </button>
+                                </div>
+                              ) : null}
+                          </td>
+                        )}
+                        {signups.some(s => s.volunteer4) && (
+                          <td className="px-4 py-4 align-top hidden lg:table-cell">
+                            {signup.volunteer4 ? (
+                                <div>
+                                  <div className="mb-2">
+                                    <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
+                                    <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
+                                    <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
+                                      {signup.volunteer4.phone || '111-111-1111'}
+                                    </p>
                                   </div>
-                                ) : hasThirdVolunteer ? (
                                   <div className="flex justify-center">
                                     <button
-                                      onClick={() => {
-                                        setSelectedDate(signup.date)
-                                        setFormData({ ...formData, role: 'volunteer4' })
-                                      }}
-                                      className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                      onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                      className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                                     >
-                                      Sign Up
+                                      Cancel
                                     </button>
                                   </div>
-                                ) : null}
-                            </td>
-                          </>
+                                </div>
+                              ) : hasThirdVolunteer ? (
+                                <div className="flex justify-center">
+                                  <button
+                                    onClick={() => {
+                                      setSelectedDate(signup.date)
+                                      setFormData({ ...formData, role: 'volunteer4' })
+                                    }}
+                                    className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                  >
+                                    Sign Up
+                                  </button>
+                                </div>
+                              ) : null}
+                          </td>
                         )}
                       </tr>
+                      
+                      {/* Volunteer 3 & 4 - Mobile row (shown below main row on tablets/phones) */}
+                      {showExtraVolunteers && (
+                        <tr className={`lg:hidden ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-t-0`}>
+                          <td className="px-4 py-2 text-xs text-gray-500 font-medium"></td>
+                          <td colSpan={2} className="px-4 py-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {/* Volunteer 3 Mobile Card */}
+                              {(signup.volunteer3 || bothFilled) && (
+                                <div className="border border-gray-300 rounded-lg p-3 bg-white">
+                                  <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Volunteer #3</div>
+                                  {signup.volunteer3 ? (
+                                    <div>
+                                      <div className="mb-2">
+                                        <p className="font-medium text-gray-900 text-sm">{signup.volunteer3.name}</p>
+                                        <p className="text-xs text-gray-600">{signup.volunteer3.email}</p>
+                                        {signup.volunteer3.phone && (
+                                          <p className="text-xs text-gray-600">{signup.volunteer3.phone}</p>
+                                        )}
+                                      </div>
+                                      <div className="flex justify-center">
+                                        <button
+                                          onClick={() => handleCancelClick(signup.volunteer3!.id, signup.volunteer3!.name, signup.displayDate)}
+                                          className="px-3 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors w-full"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex justify-center">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedDate(signup.date)
+                                          setFormData({ ...formData, role: 'volunteer3' })
+                                        }}
+                                        className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm min-h-[44px] rounded-full transition-colors font-medium w-full"
+                                      >
+                                        Sign Up
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Volunteer 4 Mobile Card */}
+                              {(signup.volunteer4 || hasThirdVolunteer) && (
+                                <div className="border border-gray-300 rounded-lg p-3 bg-white">
+                                  <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Volunteer #4</div>
+                                  {signup.volunteer4 ? (
+                                    <div>
+                                      <div className="mb-2">
+                                        <p className="font-medium text-gray-900 text-sm">{signup.volunteer4.name}</p>
+                                        <p className="text-xs text-gray-600">{signup.volunteer4.email}</p>
+                                        {signup.volunteer4.phone && (
+                                          <p className="text-xs text-gray-600">{signup.volunteer4.phone}</p>
+                                        )}
+                                      </div>
+                                      <div className="flex justify-center">
+                                        <button
+                                          onClick={() => handleCancelClick(signup.volunteer4!.id, signup.volunteer4!.name, signup.displayDate)}
+                                          className="px-3 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors w-full"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex justify-center">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedDate(signup.date)
+                                          setFormData({ ...formData, role: 'volunteer4' })
+                                        }}
+                                        className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm min-h-[44px] rounded-full transition-colors font-medium w-full"
+                                      >
+                                        Sign Up
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      </React.Fragment>
                     )
                   })}
                   </tbody>
