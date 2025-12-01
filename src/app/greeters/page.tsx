@@ -238,6 +238,13 @@ export default function Greeters() {
               Greeter Signups
             </h1>
             <p className="text-lg md:text-base text-gray-600">Q1 2026 - Sundays</p>
+            <a 
+              href="/greeters/schedule-summary" 
+              target="_blank"
+              className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+            >
+              📋 View Schedule Summary
+            </a>
           </div>
 
           {loading ? (
