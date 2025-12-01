@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       
       // CRITICAL: Invalidate ALL cache entries for this table type
       // Don't try to guess the quarter - just invalidate everything
-      const tablePrefix = tableName === 'Food Distribution' ? 'food' : 'liturgists'
+      const tablePrefix = tableName === 'Food Distribution' ? 'food' : tableName === 'Greeters' ? 'greeters' : 'liturgists'
       const allKeys = serviceCache.getAllQuarters()
       const keysToInvalidate = allKeys.filter(key => key.startsWith(tablePrefix))
       keysToInvalidate.forEach(key => {
@@ -576,7 +576,7 @@ export async function DELETE(request: NextRequest) {
       
       // CRITICAL: Invalidate ALL cache entries for this table type
       // Don't try to guess the quarter - just invalidate everything
-      const tablePrefix = tableName === 'Food Distribution' ? 'food' : 'liturgists'
+      const tablePrefix = tableName === 'Food Distribution' ? 'food' : tableName === 'Greeters' ? 'greeters' : 'liturgists'
       const allKeys = serviceCache.getAllQuarters()
       const keysToInvalidate = allKeys.filter(key => key.startsWith(tablePrefix))
       keysToInvalidate.forEach(key => {

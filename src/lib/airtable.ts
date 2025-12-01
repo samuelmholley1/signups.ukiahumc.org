@@ -10,7 +10,8 @@ const base = airtable.base(process.env.AIRTABLE_BASE_ID || '')
 // Table constants for multi-table support
 export const TABLES = {
   LITURGISTS: process.env.AIRTABLE_LITURGISTS_TABLE || 'Liturgists',
-  FOOD_DISTRIBUTION: process.env.AIRTABLE_FOOD_TABLE || 'Food Distribution'
+  FOOD_DISTRIBUTION: process.env.AIRTABLE_FOOD_TABLE || 'Food Distribution',
+  GREETERS: process.env.AIRTABLE_GREETERS_TABLE || 'Greeters'
 }
 
 // Helper to get table by name
