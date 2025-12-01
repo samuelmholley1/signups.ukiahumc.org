@@ -1,6 +1,7 @@
 /**
  * Server-side in-memory cache for Airtable data
  * This cache stores service data and is invalidated when webhooks arrive
+ * Updated: 2025-12-01
  */
 
 interface CacheEntry {
