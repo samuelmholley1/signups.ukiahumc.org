@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         }
         
         const firstName = body.name.split(' ')[0] || body.name || 'Unknown'
-        const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        const fromName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
         
         // Email CC/BCC logic
         let ccRecipients: string | undefined
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           ccRecipients = isTrudySigningUp ? undefined : 'morganmiller@pacific.net'
           bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
         } else {
-          // Liturgist: Sam is CC'd (not BCC'd), no Trudy
+          // Liturgist & Greeter: Sam is CC'd (not BCC'd), no Trudy
           ccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
           bccRecipients = undefined
         }
@@ -325,7 +325,8 @@ export async function GET(request: NextRequest) {
           // Detect if this is food distribution based on role
           const role = userRole.toLowerCase().trim()
           const isFoodDistribution = role.startsWith('volunteer')
-          const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+          const isGreeters = role.startsWith('greeter')
+          const systemName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
         
         const emailHtml = generateCancellationEmail({
           name: recordData.record.name as string,
@@ -345,9 +346,9 @@ export async function GET(request: NextRequest) {
           }
           
           const firstName = userName.split(' ' )[0] || userName || 'Unknown'
-          const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+          const fromName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
           
-          // Email CC/BCC logic for email-link cancellations
+          // Email CC/BCC logic for duplicate slot error
           let ccRecipients: string | undefined
           let bccRecipients: string | undefined
           
@@ -428,6 +429,7 @@ export async function GET(request: NextRequest) {
         // Detect table type from role for error email
         const userRole = recordData.record.role as string
         const isFoodDistribution = userRole && userRole.toLowerCase().startsWith('volunteer')
+        const isGreeters = userRole && userRole.toLowerCase().startsWith('greeter')
         
         const errorEmailHtml = generateErrorEmail({
           errorType: 'Email Link Cancellation Failed',
@@ -436,12 +438,14 @@ export async function GET(request: NextRequest) {
           userEmail: recordData.record.email as string,
           serviceDate: recordData.record.displayDate as string,
           stackTrace: result.error instanceof Error ? result.error.stack : undefined,
-          serviceType: isFoodDistribution ? 'Food Distribution' : 'Liturgists'
+          serviceType: isFoodDistribution ? 'Food Distribution' : isGreeters ? 'Greeters' : 'Liturgists'
         })
-        const errorFromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        const errorFromName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
         const errorSubject = isFoodDistribution 
           ? '🚨 ERROR: Food Distribution Email Link Cancellation Failed'
-          : '🚨 ERROR: Liturgist Email Link Cancellation Failed'
+          : isGreeters
+            ? '🚨 ERROR: Greeter Email Link Cancellation Failed'
+            : '🚨 ERROR: Liturgist Email Link Cancellation Failed'
         
         await sendEmail({
           to: 'sam@samuelholley.com',
@@ -694,7 +698,8 @@ export async function DELETE(request: NextRequest) {
           const userName = recordData.record.name as string
           const isSamCancelling = userEmail.toLowerCase() === 'sam@samuelholley.com'
           const isFoodDistribution = tableName === 'Food Distribution'
-          const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+          const isGreeters = tableName === 'Greeters'
+          const systemName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
           
           const emailHtml = generateCancellationEmail({
             name: recordData.record.name as string,
@@ -731,13 +736,13 @@ export async function DELETE(request: NextRequest) {
             ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
             bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else {
-            // Liturgist: Sam is CC'd (not BCC'd), no Trudy
+            // Liturgist & Greeter: Sam is CC'd (not BCC'd), no Trudy
             ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
             bccRecipients = undefined
           }
           
           const finalSubject = `❌ ${roleLabel} Sign-up Cancelled: ${firstName} | ${formattedDateForSubject}`
-          const fromName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+          const fromName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
           
           await sendEmail({
             to: userEmail,
