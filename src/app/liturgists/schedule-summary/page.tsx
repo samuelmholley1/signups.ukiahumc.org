@@ -360,45 +360,46 @@ export default function ScheduleSummary() {
               {(() => {
                 let rowIndex = 0
                 return filteredServices.map((service) => {
-                  const isChristmasEve = service.displayDate?.includes('Christmas Eve')
-                  console.log(`🔍 SCHEDULE SUMMARY DEBUG: Processing service: displayDate="${service.displayDate}", isChristmasEve=${isChristmasEve}, hasLiturgist=${!!service.liturgist}, hasLiturgist2=${!!service.liturgist2}`)
+                  // COMMENTED OUT - No longer need Christmas Eve special handling
+                  // const isChristmasEve = service.displayDate?.includes('Christmas Eve')
+                  // console.log(`🔍 SCHEDULE SUMMARY DEBUG: Processing service: displayDate="${service.displayDate}", isChristmasEve=${isChristmasEve}, hasLiturgist=${!!service.liturgist}, hasLiturgist2=${!!service.liturgist2}`)
                   
                   // For Christmas Eve, always show two separate liturgist lines
-                  if (isChristmasEve) {
-                    console.log('🔍 SCHEDULE SUMMARY DEBUG: Rendering Christmas Eve with 2 liturgists')
-                    return (
-                      <React.Fragment key={service.id}>
-                        {/* First liturgist row */}
-                        <tr className={rowIndex++ % 2 === 0 ? 'bg-white' : 'bg-gray-200'}>
-                          <td className="border border-gray-400 px-3 py-1 text-gray-900 font-semibold whitespace-nowrap">
-                            Christmas Eve Liturgist #1
-                          </td>
-                          <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
-                            {service.liturgist ? service.liturgist.name : ''}
-                          </td>
-                          {showBackupColumn && (
-                            <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
-                              {service.backup ? service.backup.name : ''}
-                            </td>
-                          )}
-                        </tr>
-                        {/* Second liturgist row */}
-                        <tr className={rowIndex++ % 2 === 0 ? 'bg-white' : 'bg-gray-200'}>
-                          <td className="border border-gray-400 px-3 py-1 text-gray-900 font-semibold whitespace-nowrap">
-                            Christmas Eve Liturgist #2
-                          </td>
-                          <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
-                            {service.liturgist2 ? service.liturgist2.name : ''}
-                          </td>
-                          {showBackupColumn && (
-                            <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
-                              {service.backup2 ? service.backup2.name : ''}
-                            </td>
-                          )}
-                        </tr>
-                      </React.Fragment>
-                    )
-                  }
+                  // if (isChristmasEve) {
+                  //   console.log('🔍 SCHEDULE SUMMARY DEBUG: Rendering Christmas Eve with 2 liturgists')
+                  //   return (
+                  //     <React.Fragment key={service.id}>
+                  //       {/* First liturgist row */}
+                  //       <tr className={rowIndex++ % 2 === 0 ? 'bg-white' : 'bg-gray-200'}>
+                  //         <td className="border border-gray-400 px-3 py-1 text-gray-900 font-semibold whitespace-nowrap">
+                  //           Christmas Eve Liturgist #1
+                  //         </td>
+                  //         <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
+                  //           {service.liturgist ? service.liturgist.name : ''}
+                  //         </td>
+                  //         {showBackupColumn && (
+                  //           <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
+                  //             {service.backup ? service.backup.name : ''}
+                  //           </td>
+                  //         )}
+                  //       </tr>
+                  //       {/* Second liturgist row */}
+                  //       <tr className={rowIndex++ % 2 === 0 ? 'bg-white' : 'bg-gray-200'}>
+                  //         <td className="border border-gray-400 px-3 py-1 text-gray-900 font-semibold whitespace-nowrap">
+                  //           Christmas Eve Liturgist #2
+                  //         </td>
+                  //         <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
+                  //           {service.liturgist2 ? service.liturgist2.name : ''}
+                  //         </td>
+                  //         {showBackupColumn && (
+                  //           <td className="border border-gray-400 px-3 py-1 text-gray-900 whitespace-nowrap">
+                  //             {service.backup2 ? service.backup2.name : ''}
+                  //           </td>
+                  //         )}
+                  //       </tr>
+                  //     </React.Fragment>
+                  //   )
+                  // }
                   
                   // For regular services
                   const dateLabel = service.displayDate.replace(/, \d{4}$/, '') + ' Liturgist'

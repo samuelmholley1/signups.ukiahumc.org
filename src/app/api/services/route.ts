@@ -342,30 +342,31 @@ function generateSundaysForQuarter(quarterString: string) {
     currentDate.setDate(currentDate.getDate() + 7) // Next Sunday
   }
   
+  // COMMENTED OUT - No longer need Christmas Eve liturgist
   // Add Christmas Eve service if it falls in this quarter
-  const christmasEve = new Date(yearNum, 11, 24) // December 24
-  if (christmasEve.getMonth() >= startMonth && christmasEve.getMonth() <= endMonth) {
-    const christmasEveDate = christmasEve.toISOString().split('T')[0]
-    const christmasEveDisplay = christmasEve.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })
-    
-    sundays.push({
-      id: christmasEveDate,
-      date: christmasEveDate,
-      displayDate: christmasEveDisplay + ' (Christmas Eve)',
-      liturgist: null,
-      liturgist2: null,
-      backup: null,
-      backup2: null,
-      attendance: [],
-      notes: 'Christmas Eve Service — Light the Christ Candle (white center candle) + all 4 Advent candles'
-    })
-  }
+  // const christmasEve = new Date(yearNum, 11, 24) // December 24
+  // if (christmasEve.getMonth() >= startMonth && christmasEve.getMonth() <= endMonth) {
+  //   const christmasEveDate = christmasEve.toISOString().split('T')[0]
+  //   const christmasEveDisplay = christmasEve.toLocaleDateString('en-US', { 
+  //     year: 'numeric', 
+  //     month: 'long', 
+  //     day: 'numeric' 
+  //   })
+  //   
+  //   sundays.push({
+  //     id: christmasEveDate,
+  //     date: christmasEveDate,
+  //     displayDate: christmasEveDisplay + ' (Christmas Eve)',
+  //     liturgist: null,
+  //     liturgist2: null,
+  //     backup: null,
+  //     backup2: null,
+  //     attendance: [],
+  //     notes: 'Christmas Eve Service — Light the Christ Candle (white center candle) + all 4 Advent candles'
+  //   })
+  // }
   
-  // Sort all services by date (Christmas Eve might not be chronological)
+  // Sort all services by date
   sundays.sort((a, b) => a.date.localeCompare(b.date))
   
   return sundays
