@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     console.log('Received signup request:', body)
     
     // Determine which table to use
-    tableName = body.table === 'food' ? 'Food Distribution' : 'Liturgists'
+    tableName = body.table === 'food' ? 'Food Distribution' : body.table === 'greeters' ? 'Greeters' : 'Liturgists'
     console.log('Using table:', tableName)
     
     // Validate required fields
@@ -143,9 +143,13 @@ export async function POST(request: NextRequest) {
         
         // Determine role label based on table type
         let roleLabel = ''
+        const isGreeters = tableName === 'Greeters'
         if (isFoodDistribution) {
           // Food distribution roles: volunteer1, volunteer2, volunteer3, volunteer4
           roleLabel = 'Food Distribution Volunteer'
+        } else if (isGreeters) {
+          // Greeter roles: greeter1, greeter2
+          roleLabel = 'Greeter'
         } else {
           // Liturgist roles: liturgist, backup, liturgist2
           const isBackup = role === 'backup'
@@ -548,7 +552,7 @@ export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const recordId = searchParams.get('recordId')
   const table = searchParams.get('table') || 'liturgists'
-  const tableName = table === 'food' ? 'Food Distribution' : 'Liturgists'
+  const tableName = table === 'food' ? 'Food Distribution' : table === 'greeters' ? 'Greeters' : 'Liturgists'
   
   try {
     if (!recordId) {

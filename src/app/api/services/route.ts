@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     console.log(`[API] Cache miss for ${table} - ${quarter}, fetching from Airtable`)
     
     // Determine which table to use
-    const tableName = table === 'food' ? 'Food Distribution' : 'Liturgists'
+    const tableName = table === 'food' ? 'Food Distribution' : table === 'greeters' ? 'Greeters' : 'Liturgists'
     
     // Generate Sundays for the requested quarter (or Saturdays for food distribution)
     const allDates = table === 'food' 
@@ -87,9 +87,28 @@ export async function GET(request: NextRequest) {
 
       // Organize by role - check for all variants (old, new, and lowercase)
       // Support volunteer1/volunteer2/volunteer3/volunteer4 for food distribution
+      // Support greeter1/greeter2 for greeters
       if (signup.role === 'volunteer1' || normalizedRole === 'volunteer1') {
         console.log(`🔍 API DEBUG: Assigning as volunteer1: ${signup.name}`)
         service.volunteer1 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
+      } else if (signup.role === 'greeter1' || normalizedRole === 'greeter1') {
+        console.log(`🔍 API DEBUG: Assigning as greeter1: ${signup.name}`)
+        service.greeter1 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
+      } else if (signup.role === 'greeter2' || normalizedRole === 'greeter2') {
+        console.log(`🔍 API DEBUG: Assigning as greeter2: ${signup.name}`)
+        service.greeter2 = {
           id: signup.id,
           name: signup.name,
           email: signup.email,
