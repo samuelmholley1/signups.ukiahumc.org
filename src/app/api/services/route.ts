@@ -41,7 +41,9 @@ export async function GET(request: NextRequest) {
     // Generate Sundays for the requested quarter (or Saturdays for food distribution)
     const allDates = table === 'food' 
       ? generateSaturdaysForDecember(quarter) 
-      : generateSundaysForQuarter(quarter)
+      : table === 'greeters'
+        ? generateGreeterSundays(quarter)
+        : generateSundaysForQuarter(quarter)
     
     // Get all signups from Airtable
     const signups = await getSignups(tableName)
@@ -283,6 +285,61 @@ function calculateAdventSundays(year: number): string[] {
   }
   
   return adventSundays
+}
+
+// Generate Sundays for greeters (same as liturgists but with greeter fields)
+function generateGreeterSundays(quarter: string) {
+  const sundays = []
+  
+  // Parse quarter string
+  const [q, year] = quarter.split('-')
+  const yearNum = parseInt(year)
+  
+  // Determine start and end months for the quarter
+  let startMonth: number, endMonth: number
+  if (q === 'Q1') {
+    startMonth = 0 // January
+    endMonth = 2   // March
+  } else if (q === 'Q2') {
+    startMonth = 3 // April
+    endMonth = 5   // June
+  } else if (q === 'Q3') {
+    startMonth = 6 // July
+    endMonth = 8   // September
+  } else { // Q4
+    startMonth = 9  // October
+    endMonth = 11   // December
+  }
+  
+  // Find first Sunday in the start month
+  let currentDate = new Date(yearNum, startMonth, 1)
+  while (currentDate.getDay() !== 0) {
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  
+  // Generate all Sundays in the quarter
+  while (currentDate.getMonth() <= endMonth) {
+    const dateString = currentDate.toISOString().split('T')[0]
+    const displayDate = currentDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+
+    sundays.push({
+      id: dateString,
+      date: dateString,
+      displayDate,
+      greeter1: null,
+      greeter2: null,
+      attendance: [],
+      notes: undefined
+    })
+    
+    currentDate.setDate(currentDate.getDate() + 7) // Next Sunday
+  }
+  
+  return sundays
 }
 
 // Generate Sundays for a specific quarter (e.g., "Q4-2025" or "Q1-2026")
