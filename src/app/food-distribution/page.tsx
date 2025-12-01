@@ -112,13 +112,13 @@ export default function FoodDistribution() {
       'Edward Dick': { email: 'edwardpdick@gmail.com' },
       'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
       'Billy Jenne': { email: 'billyjenne2@gmail.com' },
-      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com' },
+      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
       'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
-      'Trudy Morgan': { email: 'morganmiller@pacific.net' },
+      'Trudy Morgan': { email: 'morganmiller@pacific.net', phone: '707-367-0783' },
       'Vicki Okey': { email: 'vokey123@gmail.com' },
       'Bonnie Reda': { email: 'bonireda@aol.com' },
       'Michele Robbins': { email: 'shalompastor3@gmail.com' },
-      'Diana Waddle': { email: 'waddlediana@yahoo.com' },
+      'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
     
