@@ -333,9 +333,9 @@ export default function ScheduleSummary() {
           </div>
 
           {/* Simple Spreadsheet Table */}
-          <div ref={tableRef} className="w-fit">
+          <div ref={tableRef} className="w-fit border border-gray-400">
             {/* Title - Only appears in PNG */}
-            <div className="bg-white px-4 py-3 text-center border border-gray-400 border-b-0">
+            <div className="bg-white px-4 py-3 text-center border-b-0">
               <h2 className="text-lg font-bold text-gray-900">Liturgist Signups | {(() => {
                 if (filteredServices.length === 0) return currentQuarter;
                 const months = Array.from(new Set(filteredServices.map(s => s.displayDate.split(' ')[0])));
@@ -346,7 +346,7 @@ export default function ScheduleSummary() {
               })()}</h2>
               <p className="text-sm text-gray-700">Ukiah United Methodist Church</p>
             </div>
-          <table className="w-full border-collapse border border-gray-400 table-auto">
+          <table className="w-full border-collapse table-auto">
             <thead>
               <tr className="bg-gray-300 border-b-2 border-gray-600">
                 <th className="border border-gray-400 px-3 py-2 text-left font-bold text-gray-900 whitespace-nowrap bg-gray-300">Service</th>
