@@ -1304,13 +1304,14 @@ export default function Home() {
                     )}
                     {service.notes && (() => {
                       // Check if it's Christmas Eve
-                      if (service.notes.includes('Christmas Eve')) {
-                        return (
-                          <span className="text-sm md:text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-1 md:py-0.5 rounded">
-                            🕯️ CHRISTMAS EVE • Liturgist lights 5 candles
-                          </span>
-                        )
-                      }
+                      // COMMENTED OUT - No longer need Christmas Eve liturgist
+                      // if (service.notes.includes('Christmas Eve')) {
+                      //   return (
+                      //     <span className="text-sm md:text-xs font-semibold text-amber-900 bg-amber-200 px-2 py-1 md:py-0.5 rounded">
+                      //       🕯️ CHRISTMAS EVE • Liturgist lights 5 candles
+                      //     </span>
+                      //   )
+                      // }
                       
                       // Extract info from Advent notes
                       const weekMatch = service.notes.match(/Advent Week (\d)/)
@@ -1333,7 +1334,8 @@ export default function Home() {
                   </div>
                   
                   {/* Service Rows - Different layout for Christmas Eve */}
-                  {service.displayDate?.includes('Christmas Eve') ? (
+                  {/* COMMENTED OUT - No longer need Christmas Eve special layout */}
+                  {false && service.displayDate?.includes('Christmas Eve') ? (
                     <div className="space-y-3 text-base md:text-sm">
                       {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
