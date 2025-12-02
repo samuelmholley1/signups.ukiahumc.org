@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         // Send email confirmation
         // If Sam signs up: TO sam@ only (no CC)
         // If others sign up: TO their email, CC sam@
-        const isSamSigningUp = body.email.toLowerCase() === 'sam@samuelholley.com'
+        const isSamSigningUp = body.email.toLowerCase().includes('@samuelholley.com')
         const role = body.role.toLowerCase().trim()
         
         // Determine role label based on table type
