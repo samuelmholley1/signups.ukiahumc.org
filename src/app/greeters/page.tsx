@@ -224,8 +224,10 @@ export default function Greeters() {
 
   return (
     <PasswordGate 
+      title="Greeter Signups"
       description={
-        <div className="text-left max-w-md">
+        <div className="text-left">
+          <p className="text-gray-600 text-sm mb-4">Please enter the password to continue</p>
           <h2 className="text-xl font-bold text-blue-600 mb-4">What does the Greeter do?</h2>
           <p className="font-semibold text-gray-800 mb-3">
             Principle Responsibility: Welcoming and assisting people to feel comfortable at our services
