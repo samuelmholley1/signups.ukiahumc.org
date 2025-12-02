@@ -223,7 +223,7 @@ export default function Greeters() {
   }
 
   return (
-    <PasswordGate>
+    <PasswordGate title="Greeter Signups" color="purple">
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">

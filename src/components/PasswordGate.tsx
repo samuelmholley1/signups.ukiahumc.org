@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 
 interface PasswordGateProps {
   children: React.ReactNode
+  title?: string
+  color?: 'blue' | 'green' | 'purple'
 }
 
-export default function PasswordGate({ children }: PasswordGateProps) {
+export default function PasswordGate({ children, title = 'Liturgist Schedule', color = 'blue' }: PasswordGateProps) {
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [error, setError] = useState(false)
@@ -35,8 +37,14 @@ export default function PasswordGate({ children }: PasswordGateProps) {
     return <>{children}</>
   }
 
+  const gradients = {
+    blue: 'from-blue-50 to-indigo-100',
+    green: 'from-green-50 to-emerald-100',
+    purple: 'from-purple-50 to-violet-100'
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className={`min-h-screen bg-gradient-to-br ${gradients[color]} flex items-center justify-center p-4`}>
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <div className="text-center mb-6">
           <img
@@ -47,7 +55,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
             height={159}
           />
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Liturgist Schedule
+            {title}
           </h1>
           <p className="text-gray-600 text-sm">
             Please enter the password to continue
