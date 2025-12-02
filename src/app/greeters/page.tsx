@@ -223,7 +223,44 @@ export default function Greeters() {
   }
 
   return (
-    <PasswordGate>
+    <PasswordGate 
+      description={
+        <div className="text-left max-w-md">
+          <h2 className="text-xl font-bold text-blue-600 mb-4">What does the Greeter do?</h2>
+          <p className="font-semibold text-gray-800 mb-3">
+            Principle Responsibility: Welcoming and assisting people to feel comfortable at our services
+          </p>
+          
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-bold text-gray-900 mb-2">Before the service: Arrive by 9:30</h3>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                <li>Greet people as they come in (1 usher at the front and 1 usher at Chapel door is ideal)</li>
+                <li>Check their names off on the clipboard. Write people not listed on the last page</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-gray-900 mb-2">During the service:</h3>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                <li>For the "Praising" song, assist the acolyte by lighting the taper</li>
+                <li>Take the offering basket up and put it on the alter during the Doxology</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-gray-900 mb-2">After the service:</h3>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                <li>Count the attendees and fill in the totals on the clipboard. Clipboard goes into office on Debbie's desk</li>
+                <li>Gather up leftover bulletins etc from pews. Save unused Newcomer forms</li>
+                <li>Turn off the lights (behind the curtain & power strip behind the band)</li>
+                <li>Lock the doors (stage & chapel)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      }
+    >
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
@@ -239,7 +276,7 @@ export default function Greeters() {
             </h1>
             <p className="text-lg md:text-base text-gray-600">Q1 2026 - Sundays</p>
             
-            {/* Greeter Responsibilities */}
+            {/* Greeter Responsibilities - Keeping here too for after login */}
             <div className="mt-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 text-left">
               <h2 className="text-xl font-bold text-blue-600 mb-4">What does the Greeter do?</h2>
               <p className="font-semibold text-gray-800 mb-3">
