@@ -4,11 +4,9 @@ import { useState, useEffect } from 'react'
 
 interface PasswordGateProps {
   children: React.ReactNode
-  description?: React.ReactNode
-  title?: string
 }
 
-export default function PasswordGate({ children, description, title = 'Liturgist Schedule' }: PasswordGateProps) {
+export default function PasswordGate({ children }: PasswordGateProps) {
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [error, setError] = useState(false)
@@ -49,17 +47,11 @@ export default function PasswordGate({ children, description, title = 'Liturgist
             height={159}
           />
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            {title}
+            Liturgist Schedule
           </h1>
-          {description ? (
-            <div className="mt-4 mb-4">
-              {description}
-            </div>
-          ) : (
-            <p className="text-gray-600 text-sm">
-              Please enter the password to continue
-            </p>
-          )}
+          <p className="text-gray-600 text-sm">
+            Please enter the password to continue
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
