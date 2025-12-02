@@ -333,7 +333,7 @@ export default function ScheduleSummary() {
           </div>
 
           {/* Simple Spreadsheet Table */}
-          <div ref={tableRef} className="w-fit border border-gray-400">
+          <div ref={tableRef} className="w-fit">
             {/* Title - Only appears in PNG */}
             <div className="bg-white px-4 py-3 text-center border-b-0">
               <h2 className="text-lg font-bold text-gray-900">Liturgist Signups | {(() => {
