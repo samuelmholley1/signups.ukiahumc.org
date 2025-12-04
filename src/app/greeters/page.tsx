@@ -15,6 +15,7 @@ interface Signup {
   displayDate: string
   greeter1: Greeter | null
   greeter2: Greeter | null
+  greeter3?: Greeter | null
 }
 
 export default function Greeters() {
@@ -33,7 +34,7 @@ export default function Greeters() {
     lastName: '',
     email: '',
     phone: '',
-    role: 'greeter1' as 'greeter1' | 'greeter2'
+    role: 'greeter1' as 'greeter1' | 'greeter2' | 'greeter3'
   })
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function Greeters() {
   
   const fetchSignups = async () => {
     try {
-      const response = await fetch(`/api/services?table=greeters&quarter=Q1-2026&t=${Date.now()}`, {
+      const response = await fetch(`/api/services?table=greeters&quarter=Q4-2025&t=${Date.now()}`, {
         cache: 'no-store'
       })
       const data = await response.json()
@@ -53,7 +54,8 @@ export default function Greeters() {
           date: service.date,
           displayDate: service.displayDate,
           greeter1: service.greeter1 || null,
-          greeter2: service.greeter2 || null
+          greeter2: service.greeter2 || null,
+          greeter3: service.greeter3 || null
         }))
         
         setSignups(transformed)
@@ -73,13 +75,16 @@ export default function Greeters() {
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
     
-    // Map of preset people with their contact info (same as food distribution for now)
+    // Map of preset people with their contact info
     const presetPeople: { [key: string]: { email: string; phone?: string } } = {
-      'Kay Lieberknecht': { email: 'kay.hoofin.it@gmail.com', phone: '707-489-1148' },
-      'Linda Nagel': { email: 'lindab.nagel@gmail.com', phone: '707-462-3185' },
-      'Doug Pratt': { email: 'dmpratt@sbcglobal.net' },
-      'Gwen Hardage-Vergeer': { email: 'gwenehv@gmail.com', phone: '707-354-0803' },
-      'Lori Bialkowsky': { email: 'lbialkowsky@hotmail.com' },
+      'Julie Apostolu': { email: 'forestlove@comcast.net', phone: '707-357-6035' },
+      'Kay Lieberknecht': { email: 'kay.hoofin.it@gamail.com', phone: '707-621-3662' },
+      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
+      'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
+      'Annie Gould': { email: 'annia@pacific.net', phone: '707-513-9634' },
+      'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
+      'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920' },
+      'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
       'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
@@ -117,6 +122,7 @@ export default function Greeters() {
     setSignups(prev => prev.map(signup => {
       if (signup.greeter1?.id === recordId) return { ...signup, greeter1: null }
       if (signup.greeter2?.id === recordId) return { ...signup, greeter2: null }
+      if (signup.greeter3?.id === recordId) return { ...signup, greeter3: null }
       return signup
     }))
     
@@ -237,7 +243,7 @@ export default function Greeters() {
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               Greeter Signups
             </h1>
-            <p className="text-lg md:text-base text-gray-600">Q1 2026 - Sundays</p>
+            <p className="text-lg md:text-base text-gray-600">December 2025</p>
           </div>
           
           {/* Greeter Responsibilities */}
@@ -289,10 +295,19 @@ export default function Greeters() {
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Greeter #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Greeter #2</th>
+                      {(() => {
+                        const hasGreeter3 = signups.some(s => s.greeter3)
+                        return hasGreeter3 ? (
+                          <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Greeter #3</th>
+                        ) : null
+                      })()}
                     </tr>
                   </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {signups.map((signup, index) => (
+                  {signups.map((signup, index) => {
+                    const hasGreeter3 = signup.greeter3 !== undefined && signup.greeter3 !== null
+                    const showGreeter3Column = signups.some(s => s.greeter3)
+                    return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                         <td className="px-4 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
                           {signup.displayDate}
@@ -363,9 +378,45 @@ export default function Greeters() {
                             </div>
                           )}
                         </td>
+                        {showGreeter3Column && (
+                          <td className="px-4 py-4 align-top w-64">
+                            {signup.greeter3 ? (
+                              <div>
+                                <div className="mb-2 text-center">
+                                  <p className="font-medium text-gray-900 text-base">{signup.greeter3.name}</p>
+                                  <p className="text-base md:text-sm text-gray-600">{signup.greeter3.email}</p>
+                                  <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.greeter3.phone ? 'visible' : 'hidden' }}>
+                                    {signup.greeter3.phone || '111-111-1111'}
+                                  </p>
+                                </div>
+                                <div className="flex justify-center">
+                                  <button
+                                    onClick={() => handleCancelClick(signup.greeter3!.id, signup.greeter3!.name, signup.displayDate)}
+                                    className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : hasGreeter3 ? (
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => {
+                                    setSelectedDate(signup.date)
+                                    setFormData({ ...formData, role: 'greeter3' })
+                                  }}
+                                  className="px-5 py-3 md:px-4 md:py-2 bg-purple-600 text-white hover:bg-purple-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                >
+                                  Sign Up
+                                </button>
+                              </div>
+                            ) : null}
+                          </td>
+                        )}
                       </tr>
-                    ))}
-                  </tbody>
+                    )
+                  })}
+                </tbody>
                 </table>
               </div>
             </div>

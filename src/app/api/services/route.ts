@@ -117,6 +117,15 @@ export async function GET(request: NextRequest) {
           phone: signup.phone,
           preferredContact: 'email' as const
         }
+      } else if (signup.role === 'greeter3' || normalizedRole === 'greeter3') {
+        console.log(`🔍 API DEBUG: Assigning as greeter3: ${signup.name}`)
+        service.greeter3 = {
+          id: signup.id,
+          name: signup.name,
+          email: signup.email,
+          phone: signup.phone,
+          preferredContact: 'email' as const
+        }
       } else if (signup.role === 'volunteer2' || normalizedRole === 'volunteer2') {
         console.log(`🔍 API DEBUG: Assigning as volunteer2: ${signup.name}`)
         service.volunteer2 = {
@@ -295,6 +304,40 @@ function generateGreeterSundays(quarter: string) {
   const [q, year] = quarter.split('-')
   const yearNum = parseInt(year)
   
+  // Special case: December 2025 - all Sundays plus Christmas Eve
+  if (quarter === 'Q4-2025' || quarter === 'DEC-2025') {
+    // December 2025 Sundays: 7, 14, 21, 28
+    const decemberDates = [
+      { date: '2025-12-07', display: 'December 7, 2025', slots: 2 },
+      { date: '2025-12-14', display: 'December 14, 2025', slots: 2 },
+      { date: '2025-12-21', display: 'December 21, 2025', slots: 2 },
+      { date: '2025-12-24', display: 'December 24, 2025 - Christmas Eve', slots: 3 }, // 3 greeters
+      { date: '2025-12-28', display: 'December 28, 2025', slots: 2 }
+    ]
+    
+    decemberDates.forEach(({ date, display, slots }) => {
+      const service: any = {
+        id: date,
+        date: date,
+        displayDate: display,
+        greeter1: null,
+        greeter2: null,
+        attendance: [],
+        notes: undefined
+      }
+      
+      // Add greeter3 slot for Christmas Eve
+      if (slots === 3) {
+        service.greeter3 = null
+      }
+      
+      sundays.push(service)
+    })
+    
+    return sundays
+  }
+  
+  // Default quarter logic for other periods
   // Determine start and end months for the quarter
   let startMonth: number, endMonth: number
   if (q === 'Q1') {
