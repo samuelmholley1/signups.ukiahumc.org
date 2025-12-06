@@ -298,7 +298,7 @@ function calculateAdventSundays(year: number): string[] {
 
 // Generate Sundays for greeters (same as liturgists but with greeter fields)
 function generateGreeterSundays(quarter: string) {
-  const sundays = []
+  const sundays: any[] = []
   
   // Parse quarter string
   const [q, year] = quarter.split('-')
