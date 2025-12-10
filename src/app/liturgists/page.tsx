@@ -1546,7 +1546,7 @@ export default function Home() {
                       </div>
                       
                       {/* Backup Row */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
                           {service.backup ? (
@@ -1571,7 +1571,6 @@ export default function Home() {
                           )}
                         </div>
                         
-                        {/* Cancel Button - Right Side (only if filled) */}
                         {service.backup && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
@@ -1583,7 +1582,7 @@ export default function Home() {
                             </button>
                           </div>
                         )}
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </div>
