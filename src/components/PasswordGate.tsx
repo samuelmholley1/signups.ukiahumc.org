@@ -8,6 +8,7 @@ interface PasswordGateProps {
   color?: 'blue' | 'green' | 'purple'
 }
 
+// Cache bust: 2025-12-10
 export default function PasswordGate({ children, title = 'Liturgist Schedule', color = 'blue' }: PasswordGateProps) {
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)

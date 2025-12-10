@@ -61,7 +61,12 @@ export default function ScheduleSummary() {
     
     setIsExporting(true)
     try {
-      const { toPng } = await import('html-to-image')
+      // Dynamic import with error handling
+      const htmlToImage = await import('html-to-image').catch((error) => {
+        console.error('Failed to load html-to-image:', error)
+        throw new Error('Failed to load image export library. Please refresh and try again.')
+      })
+      const { toPng } = htmlToImage
       
       // Wait for fonts to load
       await document.fonts?.ready?.catch(() => {})

@@ -81,6 +81,7 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(true)
   const [currentQuarter, setCurrentQuarter] = useState('Q4-2025')
+  const [showDecemberOnly, setShowDecemberOnly] = useState(true) // Show only December for now
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [calendarQuarter, setCalendarQuarter] = useState(() => {
     // Start with current quarter
@@ -210,7 +211,15 @@ export default function Home() {
       })
       const data = await response.json()
       if (data.success) {
-        setServices(data.services)
+        // Filter to December only if flag is set
+        let filteredServices = data.services
+        if (showDecemberOnly) {
+          filteredServices = data.services.filter((service: any) => {
+            const serviceDate = new Date(service.date)
+            return serviceDate.getMonth() === 11 // December is month 11 (0-indexed)
+          })
+        }
+        setServices(filteredServices)
         setLastUpdated(new Date())
       }
     } catch (error) {
