@@ -323,6 +323,10 @@ export default function Home() {
   // Generate calendar data for all 3 months in the quarter
   const getQuarterMonths = (quarter: number, year: number) => {
     const startMonth = (quarter - 1) * 3
+    // If showing December only, return just December
+    if (showDecemberOnly) {
+      return [11] // December only (0-indexed)
+    }
     return [startMonth, startMonth + 1, startMonth + 2]
   }
   
