@@ -72,7 +72,7 @@ export default function Home() {
     lastName: '',
     email: '',
     phone: '',
-    role: 'liturgist' as 'liturgist' | 'liturgist2' | 'backup' | 'backup2'
+    role: 'liturgist' as 'liturgist' | 'liturgist2' // | 'backup' | 'backup2'
   })
   const [isClient, setIsClient] = useState(false)
   const [services, setServices] = useState<Service[]>([])
@@ -335,11 +335,11 @@ export default function Home() {
     generateCalendarData(services, mainServiceDate, month, calendarQuarter.year)
   )
 
-  const handleSignup = (serviceId: string, preferredRole?: 'liturgist' | 'liturgist2' | 'backup' | 'backup2') => {
+  const handleSignup = (serviceId: string, preferredRole?: 'liturgist' | 'liturgist2' /* | 'backup' | 'backup2' */) => {
     const service = services.find(s => s.id === serviceId)
     
     // Determine which role to sign up for
-    let roleToSignup: 'liturgist' | 'liturgist2' | 'backup' | 'backup2' = preferredRole || 'liturgist'
+    let roleToSignup: 'liturgist' | 'liturgist2' /* | 'backup' | 'backup2' */ = preferredRole || 'liturgist'
     
     // For Christmas Eve, handle all four roles
     const isChristmasEve = service?.displayDate?.includes('Christmas Eve')
@@ -349,62 +349,62 @@ export default function Home() {
       if (roleToSignup === 'liturgist' && service?.liturgist) {
         if (!service?.liturgist2) {
           roleToSignup = 'liturgist2'
-        } else if (!service?.backup) {
-          roleToSignup = 'backup'
-        } else if (!service?.backup2) {
-          roleToSignup = 'backup2'
-        }
+        } // else if (!service?.backup) {
+        //   roleToSignup = 'backup'
+        // } else if (!service?.backup2) {
+        //   roleToSignup = 'backup2'
+        // }
       } else if (roleToSignup === 'liturgist2' && service?.liturgist2) {
         if (!service?.liturgist) {
           roleToSignup = 'liturgist'
-        } else if (!service?.backup) {
-          roleToSignup = 'backup'
-        } else if (!service?.backup2) {
-          roleToSignup = 'backup2'
-        }
-      } else if (roleToSignup === 'backup' && service?.backup) {
-        if (!service?.liturgist) {
-          roleToSignup = 'liturgist'
-        } else if (!service?.liturgist2) {
-          roleToSignup = 'liturgist2'
-        } else if (!service?.backup2) {
-          roleToSignup = 'backup2'
-        }
-      } else if (roleToSignup === 'backup2' && service?.backup2) {
-        if (!service?.liturgist) {
-          roleToSignup = 'liturgist'
-        } else if (!service?.liturgist2) {
-          roleToSignup = 'liturgist2'
-        } else if (!service?.backup) {
-          roleToSignup = 'backup'
-        }
-      }
+        } // else if (!service?.backup) {
+        //   roleToSignup = 'backup'
+        // } else if (!service?.backup2) {
+        //   roleToSignup = 'backup2'
+        // }
+      } // else if (roleToSignup === 'backup' && service?.backup) {
+      //   if (!service?.liturgist) {
+      //     roleToSignup = 'liturgist'
+      //   } else if (!service?.liturgist2) {
+      //     roleToSignup = 'liturgist2'
+      //   } else if (!service?.backup2) {
+      //     roleToSignup = 'backup2'
+      //   }
+      // } else if (roleToSignup === 'backup2' && service?.backup2) {
+      //   if (!service?.liturgist) {
+      //     roleToSignup = 'liturgist'
+      //   } else if (!service?.liturgist2) {
+      //     roleToSignup = 'liturgist2'
+      //   } else if (!service?.backup) {
+      //     roleToSignup = 'backup'
+      //   }
+      // }
       
-      // Check if all four roles are taken for Christmas Eve
-      if (service?.liturgist && service?.liturgist2 && service?.backup && service?.backup2) {
+      // Check if all roles are taken for Christmas Eve (liturgist + liturgist2 only now)
+      if (service?.liturgist && service?.liturgist2) { // && service?.backup && service?.backup2) {
         setModalState({
           isOpen: true,
           type: 'warning',
           title: 'Service Full',
-          message: 'All positions (Main Liturgist, Second Liturgist, First Backup, and Second Backup) are filled for Christmas Eve. Please choose a different Sunday.'
+          message: 'All positions (Main Liturgist and Second Liturgist) are filled for Christmas Eve. Please choose a different Sunday.'
         })
         return
       }
     } else {
-      // Regular service logic (liturgist and backup only)
-      if (roleToSignup === 'liturgist' && service?.liturgist) {
-        roleToSignup = 'backup'
-      } else if (roleToSignup === 'backup' && service?.backup) {
-        roleToSignup = 'liturgist'
-      }
+      // Regular service logic (liturgist only)
+      // if (roleToSignup === 'liturgist' && service?.liturgist) {
+      //   roleToSignup = 'backup'
+      // } else if (roleToSignup === 'backup' && service?.backup) {
+      //   roleToSignup = 'liturgist'
+      // }
       
-      // Check if both roles are taken for regular services
-      if (service?.liturgist && service?.backup) {
+      // Check if liturgist position is taken for regular services
+      if (service?.liturgist) { // && service?.backup) {
         setModalState({
           isOpen: true,
           type: 'warning',
           title: 'Service Full',
-          message: 'Both the Main Liturgist and Backup positions are filled for this service. Please choose a different Sunday.'
+          message: 'The Main Liturgist position is filled for this service. Please choose a different Sunday.'
         })
         return
       }
@@ -912,14 +912,14 @@ export default function Home() {
                       <span className="text-red-600 font-semibold">Available</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  {/* <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-700">Backup Liturgist:</span>
                     {selectedService?.backup ? (
                       <span className="text-orange-700 font-semibold">✓ Filled by {selectedService.backup.name}</span>
                     ) : (
                       <span className="text-gray-500">Available</span>
                     )}
-                  </div>
+                  </div> */}
                   {selectedService?.displayDate?.includes('Christmas Eve') && (
                     <>
                       <div className="flex items-center gap-2">
@@ -930,14 +930,14 @@ export default function Home() {
                           <span className="text-red-600 font-semibold">Available</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
+                      {/* <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-700">Second Backup:</span>
                         {selectedService?.backup2 ? (
                           <span className="text-orange-700 font-semibold">✓ Filled by {selectedService.backup2.name}</span>
                         ) : (
                           <span className="text-gray-500">Available</span>
                         )}
-                      </div>
+                      </div> */}
                     </>
                   )}
                 </div>
@@ -1065,7 +1065,7 @@ export default function Home() {
                       )}
                       
                       {/* Second Backup - Only show for Christmas Eve */}
-                      {selectedService?.displayDate?.includes('Christmas Eve') && (
+                      {/* {selectedService?.displayDate?.includes('Christmas Eve') && (
                         <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
                           signupForm.role === 'backup2' 
                             ? 'bg-blue-50 border-blue-500 shadow-sm' 
@@ -1094,9 +1094,9 @@ export default function Home() {
                             )}
                           </div>
                         </label>
-                      )}
+                      )} */}
                       
-                      <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
+                      {/* <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
                         signupForm.role === 'backup' 
                           ? 'bg-blue-50 border-blue-500 shadow-sm' 
                           : 'border-gray-200 hover:border-gray-300'
@@ -1123,7 +1123,7 @@ export default function Home() {
                             </span>
                           )}
                         </div>
-                      </label>
+                      </label> */}
                     </div>
                     
                     {/* Explanation text */}
@@ -1391,7 +1391,7 @@ export default function Home() {
                       </div>
                       
                       {/* First Backup Row */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
                           {service.backup ? (
@@ -1410,7 +1410,6 @@ export default function Home() {
                           )}
                         </div>
                         
-                        {/* Cancel Button - Right Side (only if filled) */}
                         {service.backup && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
@@ -1422,7 +1421,7 @@ export default function Home() {
                             </button>
                           </div>
                         )}
-                      </div>
+                      </div> */}
                       
                       {/* Second Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -1465,7 +1464,7 @@ export default function Home() {
                       </div>
                       
                       {/* Second Backup Row */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
                           {service.backup2 ? (
@@ -1490,7 +1489,6 @@ export default function Home() {
                           )}
                         </div>
                         
-                        {/* Cancel Button - Right Side (only if filled) */}
                         {service.backup2 && (
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
@@ -1502,7 +1500,7 @@ export default function Home() {
                             </button>
                           </div>
                         )}
-                      </div>
+                      </div> */}
                     </div>
                   ) : (
                     /* Regular Service Layout */
