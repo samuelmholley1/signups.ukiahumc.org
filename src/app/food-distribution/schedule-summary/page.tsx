@@ -232,6 +232,7 @@ export default function ScheduleSummary() {
               ))}
             </tbody>
           </table>
+          <div className="border-b-2 border-gray-600"></div>
           </div>
         </div>
       </main>
