@@ -16,24 +16,28 @@ export async function GET(request: NextRequest) {
     // Create cache key with both quarter and table
     const cacheKey = `${table}-${quarter}`
     
-    // Check cache first
-    const cachedData = serviceCache.get(cacheKey)
-    if (cachedData) {
-      console.log(`[API] Returning cached data for ${table} - ${quarter}`)
-      return NextResponse.json(
-        cachedData,
-        { 
-          headers: {
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            'X-Cache': 'HIT'
-          }
-        }
-      )
-    }
+    // ALWAYS fetch fresh from Airtable - no cache check
+    // This ensures manual Airtable changes appear immediately
+    console.log(`[API] Fetching fresh data for ${table} - ${quarter} from Airtable`)
     
-    console.log(`[API] Cache miss for ${table} - ${quarter}, fetching from Airtable`)
+    // Check cache first - DISABLED for always-fresh data
+    // const cachedData = serviceCache.get(cacheKey)
+    // if (cachedData) {
+    //   console.log(`[API] Returning cached data for ${table} - ${quarter}`)
+    //   return NextResponse.json(
+    //     cachedData,
+    //     { 
+    //       headers: {
+    //         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+    //         'Pragma': 'no-cache',
+    //         'Expires': '0',
+    //         'X-Cache': 'HIT'
+    //       }
+    //     }
+    //   )
+    // }
+    
+    // console.log(`[API] Cache miss for ${table} - ${quarter}, fetching from Airtable`)
     
     // Determine which table to use
     const tableName = table === 'food' ? 'Food Distribution' : table === 'greeters' ? 'Greeters' : 'Liturgists'
@@ -231,9 +235,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Store in cache
-    serviceCache.set(cacheKey, responseData)
-    console.log(`[API] Cached data for ${table} - ${quarter}`)
+    // Cache disabled - always fetch fresh from Airtable
+    // serviceCache.set(cacheKey, responseData)
+    // console.log(`[API] Cached data for ${table} - ${quarter}`)
 
     return NextResponse.json(
       responseData,
@@ -242,7 +246,7 @@ export async function GET(request: NextRequest) {
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
           'Pragma': 'no-cache',
           'Expires': '0',
-          'X-Cache': 'MISS'
+          'X-Cache': 'FRESH'
         }
       }
     )
