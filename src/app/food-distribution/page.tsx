@@ -197,22 +197,22 @@ export default function FoodDistribution() {
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
     
-    // Map of preset people with their contact info
+    // Map of preset people with their contact info (alphabetized by last name)
     const presetPeople: { [key: string]: { email: string; phone?: string } } = {
+      'Marly Anderson': { email: 'mnanderson75@yahoo.com', phone: '707-272-8710' },
       'Raul Chairez': { email: 'raulshealinghands3@gmail.com' },
       'Don Damp': { email: 'donalddamp@gmail.com' },
       'Edward Dick': { email: 'edwardpdick@gmail.com' },
       'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
       'Billy Jenne': { email: 'billyjenne2@gmail.com' },
       'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
+      'Noreen McDonald': { email: 'norio@xmission.com', phone: '801-664-4626' },
       'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
       'Trudy Morgan': { email: 'morganmiller@pacific.net', phone: '707-367-0783' },
       'Vicki Okey': { email: 'vokey123@gmail.com' },
       'Bonnie Reda': { email: 'bonireda@aol.com' },
       'Michele Robbins': { email: 'shalompastor3@gmail.com' },
       'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
-      'Noreen McDonald': { email: 'norio@xmission.com', phone: '801-664-4626' },
-      'Marly Anderson': { email: 'mnanderson75@yahoo.com', phone: '707-272-8710' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
     
@@ -896,20 +896,20 @@ export default function FoodDistribution() {
                       className="w-full border rounded-lg px-3 py-2"
                     >
                       <option value="">-- Choose --</option>
+                      <option value="Marly Anderson">Marly Anderson</option>
                       <option value="Raul Chairez">Raul Chairez</option>
                       <option value="Don Damp">Don Damp</option>
                       <option value="Edward Dick">Edward Dick</option>
                       <option value="Samuel Holley">Samuel Holley</option>
                       <option value="Billy Jenne">Billy Jenne</option>
                       <option value="Daphne Macneil">Daphne Macneil</option>
+                      <option value="Noreen McDonald">Noreen McDonald</option>
                       <option value="Cathy McKeon">Cathy McKeon</option>
                       <option value="Trudy Morgan">Trudy Morgan</option>
                       <option value="Vicki Okey">Vicki Okey</option>
                       <option value="Bonnie Reda">Bonnie Reda</option>
                       <option value="Michele Robbins">Michele Robbins</option>
                       <option value="Diana Waddle">Diana Waddle</option>
-                      <option value="Noreen McDonald">Noreen McDonald</option>
-                      <option value="Marly Anderson">Marly Anderson</option>
                       <option value="Test User">Test User</option>
                       <option value="other">Other (not listed)</option>
                     </select>
