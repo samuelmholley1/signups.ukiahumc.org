@@ -71,9 +71,20 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
 }
 
 export default function FoodDistribution() {
-  // Start with January 2026
-  const [currentMonth, setCurrentMonth] = useState(0) // 0 = January
-  const [currentYear, setCurrentYear] = useState(2026)
+  // Get current month/year dynamically (Pacific Time)
+  const getCurrentMonthYear = () => {
+    const now = new Date()
+    const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+    return {
+      month: pacificTime.getMonth(), // 0-11
+      year: pacificTime.getFullYear()
+    }
+  }
+  
+  const { month: initialMonth, year: initialYear } = getCurrentMonthYear()
+  
+  const [currentMonth, setCurrentMonth] = useState(initialMonth)
+  const [currentYear, setCurrentYear] = useState(initialYear)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
