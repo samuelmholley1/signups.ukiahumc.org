@@ -30,6 +30,46 @@ const getMonthName = (month: number, year: number): string => {
   return new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 }
 
+// Generate calendar data for a specific month (food distribution - Saturdays)
+const generateCalendarData = (signups: Signup[], month: number, year: number) => {
+  const now = new Date()
+  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+  const todayString = pacificTime.toISOString().split('T')[0]
+  
+  const firstDay = new Date(year, month, 1)
+  const lastDay = new Date(year, month + 1, 0)
+  const daysInMonth = lastDay.getDate()
+  const startingDay = firstDay.getDay()
+  
+  const calendarDays = []
+  
+  // Add empty cells for days before the first day of the month
+  for (let i = 0; i < startingDay; i++) {
+    calendarDays.push(null)
+  }
+  
+  // Add days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day)
+    const dateString = date.toISOString().split('T')[0]
+    const hasSignup = signups.find((s: Signup) => s.date === dateString)
+    
+    calendarDays.push({
+      day,
+      date: dateString,
+      isToday: dateString === todayString,
+      isSaturday: date.getDay() === 6, // Saturday = 6
+      hasSignup: !!hasSignup,
+      signupData: hasSignup
+    })
+  }
+  
+  return {
+    monthName: firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    days: calendarDays
+  }
+}
+
 export default function FoodDistribution() {
   // Start with January 2026
   const [currentMonth, setCurrentMonth] = useState(0) // 0 = January
@@ -40,6 +80,7 @@ export default function FoodDistribution() {
   const [lastUpdate, setLastUpdate] = useState(Date.now()) // Force re-render trigger
   const [isCancelling, setIsCancelling] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(true) // Calendar widget state
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -356,10 +397,100 @@ export default function FoodDistribution() {
     }
   }
 
+  // Generate calendar data for current month
+  const calendarData = generateCalendarData(signups, currentMonth, currentYear)
+
   return (
     <PasswordGate title="Food Distribution Signups" color="green">
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
-        <div className="max-w-4xl mx-auto">
+        
+        {/* Calendar Widget - Collapsible (Hidden on mobile) */}
+        {calendarOpen ? (
+          <div className="hidden md:block fixed top-20 left-4 z-50">
+            {/* Close Button */}
+            <button
+              onClick={() => setCalendarOpen(false)}
+              className="w-full bg-green-600 text-white rounded-t-lg px-4 py-3 shadow-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
+              title="Close calendar"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Close Calendar
+            </button>
+            
+            {/* Calendar */}
+            <div className="bg-white shadow-xl rounded-b-lg border-2 border-gray-200 w-72 lg:w-80">
+              <div className="p-3 lg:p-4">
+                <div className="flex items-center justify-between mb-3 sticky top-0 bg-white z-10 pb-2">
+                  <div className="flex-1">
+                    <h1 className="text-sm font-bold text-gray-800">Food Distribution</h1>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handlePreviousMonth}
+                        className="text-green-600 hover:text-green-800 p-0.5"
+                        title="Previous month"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <p className="text-xs text-green-600 font-medium">{getMonthName(currentMonth, currentYear)}</p>
+                      <button
+                        onClick={handleNextMonth}
+                        className="text-green-600 hover:text-green-800 p-0.5"
+                        title="Next month"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              
+                <div className="grid grid-cols-7 gap-1 text-xs">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                    <div key={day} className="text-center font-medium text-gray-600 py-1">
+                      {day}
+                    </div>
+                  ))}
+                  {calendarData.days.map((day, index) => (
+                    <div
+                      key={index}
+                      className={`text-center py-1 rounded text-xs transition-colors relative ${
+                        !day ? '' :
+                        day.isSaturday && day.hasSignup ? 'bg-green-100 font-medium' :
+                        day.isSaturday ? 'bg-orange-100 font-medium' :
+                        day.isToday ? 'bg-blue-100 font-bold' :
+                        'text-gray-600'
+                      }`}
+                      title={
+                        day?.isSaturday && day?.hasSignup ? `Food Distribution: ${day.signupData?.displayDate}` : 
+                        day?.isSaturday ? 'Food Distribution Day' : ''
+                      }
+                    >
+                      {day?.day || ''}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setCalendarOpen(true)}
+            className="hidden md:flex fixed top-20 left-4 z-50 bg-green-600 text-white rounded-lg px-4 py-3 shadow-lg hover:bg-green-700 transition-colors items-center gap-2"
+            title="Open calendar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="font-semibold text-sm">Open Calendar</span>
+          </button>
+        )}
+
+        <div className={`max-w-4xl mx-auto transition-all duration-300 ${calendarOpen ? 'md:ml-72 lg:ml-80' : ''}`}>
           <div className="text-center mb-8">
             <img
               src="/logo-for-church-larger.jpg"
