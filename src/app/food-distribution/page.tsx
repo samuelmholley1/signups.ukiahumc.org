@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
+// CRITICAL: Increment this to force ALL users to hard reload
+const APP_VERSION = '1.0.0'
+
 interface Volunteer {
   id: string
   name: string
@@ -117,6 +120,24 @@ export default function FoodDistribution() {
   })
 
   useEffect(() => {
+    // AGGRESSIVE VERSION CHECK - Force reload if version mismatch
+    const storedVersion = localStorage.getItem('foodDistributionVersion')
+    if (storedVersion !== APP_VERSION) {
+      console.log(`Version mismatch: stored=${storedVersion}, current=${APP_VERSION}. Forcing reload...`)
+      localStorage.setItem('foodDistributionVersion', APP_VERSION)
+      
+      // Clear all caches and force reload
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name))
+        })
+      }
+      
+      // Force hard reload
+      window.location.reload()
+      return
+    }
+    
     fetchSignups()
   }, [currentMonth, currentYear])
   
@@ -190,6 +211,8 @@ export default function FoodDistribution() {
       'Bonnie Reda': { email: 'bonireda@aol.com' },
       'Michele Robbins': { email: 'shalompastor3@gmail.com' },
       'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
+      'Noreen McDonald': { email: 'norio@xmission.com', phone: '801-664-4626' },
+      'Marly Anderson': { email: 'mnanderson75@yahoo.com', phone: '707-272-8710' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
     
@@ -884,8 +907,10 @@ export default function FoodDistribution() {
                       <option value="Vicki Okey">Vicki Okey</option>
                       <option value="Bonnie Reda">Bonnie Reda</option>
                       <option value="Michele Robbins">Michele Robbins</option>
-                      <option value="Test User">Test User</option>
                       <option value="Diana Waddle">Diana Waddle</option>
+                      <option value="Noreen McDonald">Noreen McDonald</option>
+                      <option value="Marly Anderson">Marly Anderson</option>
+                      <option value="Test User">Test User</option>
                       <option value="other">Other (not listed)</option>
                     </select>
                   </div>
