@@ -3,13 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
-// December 2025 Saturdays
-const DECEMBER_SATURDAYS = [
-  { date: '2025-12-06', display: 'December 6, 2025' },
-  { date: '2025-12-13', display: 'December 13, 2025' },
-  { date: '2025-12-20', display: 'December 20, 2025' },
-  { date: '2025-12-27', display: 'December 27, 2025' },
-]
+// Default quarter to display
+const DEFAULT_QUARTER = 'Q1-2026'
 
 interface Volunteer {
   id: string
@@ -52,7 +47,7 @@ export default function FoodDistribution() {
   
   const fetchSignups = async () => {
     try {
-      const response = await fetch(`/api/services?table=food&quarter=Q1-2026&t=${Date.now()}`, {
+      const response = await fetch(`/api/services?table=food&quarter=${DEFAULT_QUARTER}&t=${Date.now()}`, {
         cache: 'no-store'
       })
       const data = await response.json()
@@ -87,16 +82,8 @@ export default function FoodDistribution() {
       }
     } catch (error) {
       console.error('Error fetching signups:', error)
-      // Fall back to empty signups
-      const initialSignups = DECEMBER_SATURDAYS.map(sat => ({
-        date: sat.date,
-        displayDate: sat.display,
-        volunteer1: null,
-        volunteer2: null,
-        volunteer3: null,
-        volunteer4: null
-      }))
-      setSignups(initialSignups)
+      // Fall back to empty signups - API should provide the dates
+      setSignups([])
     } finally {
       setLoading(false)
     }
@@ -345,7 +332,14 @@ export default function FoodDistribution() {
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               Food Distribution Signups
             </h1>
-            <p className="text-lg md:text-base text-gray-600">December 2025 - Saturdays</p>
+            <p className="text-lg md:text-base text-gray-600">
+              {DEFAULT_QUARTER === 'Q1-2026' ? 'January - March 2026' : 
+               DEFAULT_QUARTER === 'Q2-2026' ? 'April - June 2026' :
+               DEFAULT_QUARTER === 'Q3-2026' ? 'July - September 2026' :
+               DEFAULT_QUARTER === 'Q4-2025' ? 'October - December 2025' :
+               DEFAULT_QUARTER === 'Q4-2026' ? 'October - December 2026' :
+               DEFAULT_QUARTER} - Saturdays
+            </p>
           </div>
 
           {loading ? (

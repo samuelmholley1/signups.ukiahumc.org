@@ -572,28 +572,52 @@ function generateUpcomingSundays() {
   return sundays
 }
 
-// Generate December 2025 Saturdays for food distribution
+// Generate Saturdays for a specific quarter (for food distribution)
 function generateSaturdaysForDecember(quarterString: string) {
   const saturdays: any[] = []
+  const [quarter, year] = quarterString.split('-')
+  const yearNum = parseInt(year)
   
-  // Only support December 2025 for now
-  if (!quarterString.includes('2025')) {
-    return []
+  // Determine month range for quarter
+  let startMonth: number, endMonth: number
+  if (quarter === 'Q1') {
+    startMonth = 0  // January
+    endMonth = 2    // March
+  } else if (quarter === 'Q2') {
+    startMonth = 3  // April
+    endMonth = 5    // June
+  } else if (quarter === 'Q3') {
+    startMonth = 6  // July
+    endMonth = 8    // September
+  } else { // Q4
+    startMonth = 9  // October
+    endMonth = 11   // December
   }
   
-  // December 2025 Saturdays
-  const dates = [
-    { date: '2025-12-06', display: 'December 6, 2025' },
-    { date: '2025-12-13', display: 'December 13, 2025' },
-    { date: '2025-12-20', display: 'December 20, 2025' },
-    { date: '2025-12-27', display: 'December 27, 2025' },
-  ]
+  // Start from first day of first month in quarter
+  let currentDate = new Date(yearNum, startMonth, 1)
   
-  dates.forEach(({ date, display }) => {
+  // Find first Saturday (day 6 = Saturday)
+  while (currentDate.getDay() !== 6) {
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  
+  // End of last month in quarter
+  const endDate = new Date(yearNum, endMonth + 1, 0) // Last day of endMonth
+  
+  // Generate all Saturdays in the quarter
+  while (currentDate <= endDate) {
+    const dateString = currentDate.toISOString().split('T')[0]
+    const displayDate = currentDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+    
     saturdays.push({
-      id: date,
-      date,
-      displayDate: display,
+      id: dateString,
+      date: dateString,
+      displayDate,
       volunteer1: null,
       volunteer2: null,
       volunteer3: null,
@@ -601,7 +625,9 @@ function generateSaturdaysForDecember(quarterString: string) {
       attendance: [],
       notes: undefined
     })
-  })
+    
+    currentDate.setDate(currentDate.getDate() + 7) // Next Saturday
+  }
   
   return saturdays
 }
