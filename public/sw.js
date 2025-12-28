@@ -1,4 +1,4 @@
-const CACHE_NAME = 'uumc-liturgist-v6';
+const CACHE_NAME = 'uumc-liturgist-v7';
 const urlsToCache = [
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
