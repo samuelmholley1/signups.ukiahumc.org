@@ -3,9 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
-// Default quarter to display
-const DEFAULT_QUARTER = 'Q1-2026'
-
 interface Volunteer {
   id: string
   name: string
@@ -22,7 +19,21 @@ interface Signup {
   volunteer4: Volunteer | null
 }
 
+// Helper to convert month/year to quarter string
+const getQuarterString = (month: number, year: number): string => {
+  const quarter = Math.floor(month / 3) + 1
+  return `Q${quarter}-${year}`
+}
+
+// Helper to get month name
+const getMonthName = (month: number, year: number): string => {
+  return new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+}
+
 export default function FoodDistribution() {
+  // Start with January 2026
+  const [currentMonth, setCurrentMonth] = useState(0) // 0 = January
+  const [currentYear, setCurrentYear] = useState(2026)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -43,25 +54,34 @@ export default function FoodDistribution() {
 
   useEffect(() => {
     fetchSignups()
-  }, [])
+  }, [currentMonth, currentYear])
   
   const fetchSignups = async () => {
     try {
-      const response = await fetch(`/api/services?table=food&quarter=${DEFAULT_QUARTER}&t=${Date.now()}`, {
+      const quarterString = getQuarterString(currentMonth, currentYear)
+      const response = await fetch(`/api/services?table=food&quarter=${quarterString}&t=${Date.now()}`, {
         cache: 'no-store'
       })
       const data = await response.json()
       
       if (data.success && data.services) {
-        // Transform API data to our format
-        const transformed = data.services.map((service: any) => ({
-          date: service.date,
-          displayDate: service.displayDate,
-          volunteer1: service.volunteer1 || null,
-          volunteer2: service.volunteer2 || null,
-          volunteer3: service.volunteer3 || null,
-          volunteer4: service.volunteer4 || null
-        }))
+        // Filter to only show current month
+        const monthStart = new Date(currentYear, currentMonth, 1)
+        const monthEnd = new Date(currentYear, currentMonth + 1, 0)
+        const monthStartStr = monthStart.toISOString().split('T')[0]
+        const monthEndStr = monthEnd.toISOString().split('T')[0]
+        
+        // Transform API data to our format and filter by month
+        const transformed = data.services
+          .filter((service: any) => service.date >= monthStartStr && service.date <= monthEndStr)
+          .map((service: any) => ({
+            date: service.date,
+            displayDate: service.displayDate,
+            volunteer1: service.volunteer1 || null,
+            volunteer2: service.volunteer2 || null,
+            volunteer3: service.volunteer3 || null,
+            volunteer4: service.volunteer4 || null
+          }))
         
         console.log('🔍 [FETCH] Raw API response:', JSON.stringify(data.services, null, 2))
         console.log('🔍 [FETCH] Transformed data:', JSON.stringify(transformed, null, 2))
@@ -317,6 +337,25 @@ export default function FoodDistribution() {
     }
   }
 
+  // Navigation functions
+  const handlePreviousMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11)
+      setCurrentYear(currentYear - 1)
+    } else {
+      setCurrentMonth(currentMonth - 1)
+    }
+  }
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0)
+      setCurrentYear(currentYear + 1)
+    } else {
+      setCurrentMonth(currentMonth + 1)
+    }
+  }
+
   return (
     <PasswordGate title="Food Distribution Signups" color="green">
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
@@ -332,14 +371,29 @@ export default function FoodDistribution() {
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               Food Distribution Signups
             </h1>
-            <p className="text-lg md:text-base text-gray-600">
-              {DEFAULT_QUARTER === 'Q1-2026' ? 'January - March 2026' : 
-               DEFAULT_QUARTER === 'Q2-2026' ? 'April - June 2026' :
-               DEFAULT_QUARTER === 'Q3-2026' ? 'July - September 2026' :
-               DEFAULT_QUARTER === 'Q4-2025' ? 'October - December 2025' :
-               DEFAULT_QUARTER === 'Q4-2026' ? 'October - December 2026' :
-               DEFAULT_QUARTER} - Saturdays
-            </p>
+            
+            {/* Month Navigation */}
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <button
+                onClick={handlePreviousMonth}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+              >
+                <span className="text-xl">←</span>
+                <span>Previous</span>
+              </button>
+              
+              <p className="text-lg md:text-base text-gray-600 font-semibold min-w-[200px]">
+                {getMonthName(currentMonth, currentYear)} - Saturdays
+              </p>
+              
+              <button
+                onClick={handleNextMonth}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+              >
+                <span>Next</span>
+                <span className="text-xl">→</span>
+              </button>
+            </div>
           </div>
 
           {loading ? (
