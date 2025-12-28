@@ -520,34 +520,37 @@ export default function FoodDistribution() {
               alt="Ukiah United Methodist Church"
               width={320}
               height={213}
-              className="mx-auto rounded-lg shadow-md mb-4 w-80 md:w-[300px]"
+              className="mx-auto rounded-lg shadow-md mb-4 w-64 md:w-80 lg:w-[300px]"
             />
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
               Food Distribution Signups
             </h1>
             
             {/* Month Navigation */}
-            <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-2 md:gap-4 mb-4">
               <button
                 onClick={handlePreviousMonth}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                className="px-3 py-2 md:px-4 md:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
+                aria-label="Previous month"
               >
-                <span className="text-xl">←</span>
-                <span>Previous</span>
+                <span className="text-lg md:text-xl">←</span>
+                <span className="hidden sm:inline">Previous</span>
               </button>
               
-              <p className="text-lg md:text-base text-gray-600 font-semibold min-w-[200px]">
-                {getMonthName(currentMonth, currentYear)} - Saturdays
+              <p className="text-sm md:text-lg text-gray-600 font-semibold min-w-[140px] md:min-w-[200px] text-center">
+                {getMonthName(currentMonth, currentYear).replace(' - Saturdays', '')}
               </p>
               
               <button
                 onClick={handleNextMonth}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                className="px-3 py-2 md:px-4 md:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
+                aria-label="Next month"
               >
-                <span>Next</span>
-                <span className="text-xl">→</span>
+                <span className="hidden sm:inline">Next</span>
+                <span className="text-lg md:text-xl">→</span>
               </button>
             </div>
+            <p className="text-xs md:text-sm text-gray-500 mb-2">Saturdays</p>
           </div>
 
           {loading ? (
@@ -555,14 +558,14 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden w-fit mx-auto">
+            <div className="bg-white rounded-lg shadow-xl overflow-x-auto w-full">
               <div>
-                <table className="w-auto" key={lastUpdate}>
+                <table className="w-full min-w-[640px]" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
-                      <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Volunteer #1</th>
-                      <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Volunteer #2</th>
+                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold whitespace-nowrap text-sm md:text-base">Date</th>
+                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base">Volunteer #1</th>
+                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base">Volunteer #2</th>
                       {(() => {
                         const shouldShowVol3 = signups.some(s => s.volunteer1 && s.volunteer2)
                         console.log('🔍 [VOL3 COLUMN CHECK]', {
@@ -603,10 +606,10 @@ export default function FoodDistribution() {
                     return (
                       <React.Fragment key={signup.date}>
                       <tr className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-4 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
+                        <td className="px-2 md:px-4 py-3 md:py-4 font-medium text-gray-900 align-top whitespace-nowrap text-sm md:text-base">
                           {signup.displayDate}
                         </td>
-                        <td className="px-4 py-4 align-top w-64">
+                        <td className="px-2 md:px-4 py-3 md:py-4 align-top">
                           {signup.volunteer1 ? (
                             <div>
                               <div className="mb-2 text-center">
@@ -639,20 +642,20 @@ export default function FoodDistribution() {
                             </div>
                           )}
                         </td>
-                        <td className="px-4 py-4 align-top w-64">
+                        <td className="px-2 md:px-4 py-3 md:py-4 align-top">
                           {signup.volunteer2 ? (
                             <div>
                               <div className="mb-2 text-center">
-                                <p className="font-medium text-gray-900 text-base">{signup.volunteer2.name}</p>
-                                <p className="text-base md:text-sm text-gray-600">{signup.volunteer2.email}</p>
-                                <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
+                                <p className="font-medium text-gray-900 text-sm md:text-base">{signup.volunteer2.name}</p>
+                                <p className="text-xs md:text-sm text-gray-600">{signup.volunteer2.email}</p>
+                                <p className="text-xs md:text-sm text-gray-600" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
                                   {signup.volunteer2.phone || '111-111-1111'}
                                 </p>
                               </div>
                               <div className="flex justify-center">
                                 <button
                                   onClick={() => handleCancelClick(signup.volunteer2!.id, signup.volunteer2!.name, signup.displayDate)}
-                                  className="px-4 py-2.5 md:px-3 md:py-1 text-base md:text-sm bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
+                                  className="px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base bg-red-100 text-red-700 hover:bg-red-200 min-h-[44px] rounded-full transition-colors"
                                 >
                                   Cancel
                                 </button>
@@ -665,7 +668,7 @@ export default function FoodDistribution() {
                                   setSelectedDate(signup.date)
                                   setFormData({ ...formData, role: 'volunteer2' })
                                 }}
-                                className="px-5 py-3 md:px-4 md:py-2 bg-green-600 text-white hover:bg-green-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
+                                className="px-4 py-2.5 md:px-5 md:py-3 bg-green-600 text-white hover:bg-green-700 text-sm md:text-base min-h-[44px] rounded-full transition-colors font-medium"
                               >
                                 Sign Up
                               </button>
@@ -674,7 +677,7 @@ export default function FoodDistribution() {
                         </td>
                         {/* Volunteer 3 & 4 - Desktop only */}
                         {signups.some(s => s.volunteer1 && s.volunteer2) && (
-                          <td className="px-4 py-4 align-top w-64 hidden lg:table-cell">
+                          <td className="px-2 md:px-4 py-3 md:py-4 align-top hidden lg:table-cell">
                             {signup.volunteer3 ? (
                                 <div>
                                   <div className="mb-2 text-center">
