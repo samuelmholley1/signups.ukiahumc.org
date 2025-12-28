@@ -558,14 +558,14 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-x-auto w-full">
+            <div className="bg-white rounded-lg shadow-xl overflow-x-auto w-full md:w-auto md:mx-auto">
               <div>
-                <table className="w-full min-w-[640px]" key={lastUpdate}>
+                <table className="w-full md:w-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold whitespace-nowrap text-sm md:text-base">Date</th>
-                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base">Volunteer #1</th>
-                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base">Volunteer #2</th>
+                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base md:w-64">Volunteer #1</th>
+                      <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base md:w-64">Volunteer #2</th>
                       {(() => {
                         const shouldShowVol3 = signups.some(s => s.volunteer1 && s.volunteer2)
                         console.log('🔍 [VOL3 COLUMN CHECK]', {
