@@ -7,7 +7,7 @@ import { getAllLiturgists } from '@/admin/liturgists'
 import { reportError } from '@/lib/errorReporting'
 
 // App version for cache busting - increment when you make changes
-const APP_VERSION = '2.2.0'
+const APP_VERSION = '3.0.0'
 
 interface Service {
   id: string
@@ -19,6 +19,38 @@ interface Service {
   backup2?: any | null  // Second backup for special services like Christmas Eve
   attendance: any[]
   notes?: string
+}
+
+// Get current month and year with 25th-of-month advance logic
+const getCurrentMonthYear = () => {
+  const now = new Date()
+  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+  const day = pacificTime.getDate()
+  let month = pacificTime.getMonth()
+  let year = pacificTime.getFullYear()
+  
+  // On/after 25th, advance to next month
+  if (day >= 25) {
+    month++
+    if (month > 11) {
+      month = 0
+      year++
+    }
+  }
+  
+  return { month, year }
+}
+
+// Convert month to quarter string for API
+const getQuarterString = (month: number, year: number) => {
+  const quarter = Math.floor(month / 3) + 1
+  return `Q${quarter}-${year}`
+}
+
+// Get month name for display
+const getMonthName = (month: number, year: number) => {
+  const date = new Date(year, month, 1)
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 }
 
 // Generate calendar data for a specific month
@@ -80,34 +112,9 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(true)
-  const [currentQuarter, setCurrentQuarter] = useState('Q4-2025')
-  const [showDecemberOnly, setShowDecemberOnly] = useState(true) // Show only December for now
+  const [currentMonth, setCurrentMonth] = useState(0) // January (0-indexed)
+  const [currentYear, setCurrentYear] = useState(2026)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [calendarQuarter, setCalendarQuarter] = useState(() => {
-    // Start with current quarter
-    const today = new Date()
-    const month = today.getMonth()
-    const year = today.getFullYear()
-    
-    if (month >= 0 && month <= 2) return { quarter: 1, year }
-    if (month >= 3 && month <= 5) return { quarter: 2, year }
-    if (month >= 6 && month <= 8) return { quarter: 3, year }
-    return { quarter: 4, year }
-  })
-  
-  // Calculate current quarter dynamically
-  const getCurrentQuarter = () => {
-    const now = new Date()
-    const month = now.getMonth()
-    const year = now.getFullYear()
-    
-    if (month >= 0 && month <= 2) return `Q1-${year}`
-    if (month >= 3 && month <= 5) return `Q2-${year}`
-    if (month >= 6 && month <= 8) return `Q3-${year}`
-    return `Q4-${year}`
-  }
-  
-  const CURRENT_QUARTER = getCurrentQuarter()
   
   const [modalState, setModalState] = useState<{
     isOpen: boolean
@@ -118,9 +125,6 @@ export default function Home() {
   } | null>(null)
   
   const liturgists = getAllLiturgists()
-  
-  // Check if viewing a locked future quarter
-  const isLockedQuarter = currentQuarter === 'Q1-2026'
 
   useEffect(() => {
     setIsClient(true)
@@ -147,10 +151,11 @@ export default function Home() {
     
     fetchServices()
     
-    // Setup SSE connection for real-time updates (only for current unlocked quarter)
+    // Setup SSE connection for real-time updates
     let eventSource: EventSource | null = null
+    const currentQuarter = getQuarterString(currentMonth, currentYear)
     
-    if (!isLockedQuarter && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       console.log(`[SSE Client] Connecting to SSE for quarter: ${currentQuarter}`)
       eventSource = new EventSource(`/api/sse?quarter=${currentQuarter}`)
       
@@ -180,22 +185,20 @@ export default function Home() {
         
         // Attempt to reconnect after 5 seconds
         setTimeout(() => {
-          if (!isLockedQuarter) {
-            console.log('[SSE Client] Attempting to reconnect...')
-            // The effect will run again and recreate the connection
-          }
+          console.log('[SSE Client] Attempting to reconnect...')
+          // The effect will run again and recreate the connection
         }, 5000)
       }
     }
     
-    // Cleanup SSE connection on unmount or quarter change
+    // Cleanup SSE connection on unmount or month change
     return () => {
       if (eventSource) {
         console.log('[SSE Client] Closing SSE connection')
         eventSource.close()
       }
     }
-  }, [currentQuarter, isLockedQuarter])
+  }, [currentMonth, currentYear])
 
   const fetchServices = async (silent = false) => {
     if (!silent) {
@@ -203,7 +206,8 @@ export default function Home() {
     }
     
     try {
-      const response = await fetch(`/api/services?quarter=${currentQuarter}`, {
+      const quarter = getQuarterString(currentMonth, currentYear)
+      const response = await fetch(`/api/services?quarter=${quarter}`, {
         cache: 'no-store', // Prevent caching
         headers: {
           'Cache-Control': 'no-cache'
@@ -211,14 +215,11 @@ export default function Home() {
       })
       const data = await response.json()
       if (data.success) {
-        // Filter to December only if flag is set
-        let filteredServices = data.services
-        if (showDecemberOnly) {
-          filteredServices = data.services.filter((service: any) => {
-            const serviceDate = new Date(service.date)
-            return serviceDate.getMonth() === 11 // December is month 11 (0-indexed)
-          })
-        }
+        // Filter to current month only
+        const filteredServices = data.services.filter((service: any) => {
+          const serviceDate = new Date(service.date)
+          return serviceDate.getMonth() === currentMonth && serviceDate.getFullYear() === currentYear
+        })
         setServices(filteredServices)
         setLastUpdated(new Date())
       }
@@ -232,8 +233,8 @@ export default function Home() {
     }
   }
   
-  const handleQuarterChange = (direction: 'prev' | 'next') => {
-    // Close any open signup modal when changing quarters (prevent state leak)
+  const handleMonthChange = (direction: 'prev' | 'next') => {
+    // Close any open signup modal when changing months (prevent state leak)
     setSelectedSignup(null)
     setSignupForm({
       selectedPerson: '',
@@ -244,31 +245,21 @@ export default function Home() {
       role: 'liturgist'
     })
     
-    if (direction === 'next' && currentQuarter === 'Q4-2025') {
-      setCurrentQuarter('Q1-2026')
-    } else if (direction === 'prev' && currentQuarter === 'Q1-2026') {
-      setCurrentQuarter('Q4-2025')
-    } else if (direction === 'prev' && currentQuarter === 'Q4-2025') {
-      setCurrentQuarter('Q3-2025')
-    } else if (direction === 'next' && currentQuarter === 'Q3-2025') {
-      setCurrentQuarter('Q4-2025')
-    }
-  }
-  
-  const handleCalendarQuarterChange = (direction: 'prev' | 'next') => {
-    setCalendarQuarter(prev => {
-      if (direction === 'next') {
-        if (prev.quarter === 4) {
-          return { quarter: 1, year: prev.year + 1 }
-        }
-        return { quarter: prev.quarter + 1, year: prev.year }
+    if (direction === 'next') {
+      if (currentMonth === 11) {
+        setCurrentMonth(0)
+        setCurrentYear(currentYear + 1)
       } else {
-        if (prev.quarter === 1) {
-          return { quarter: 4, year: prev.year - 1 }
-        }
-        return { quarter: prev.quarter - 1, year: prev.year }
+        setCurrentMonth(currentMonth + 1)
       }
-    })
+    } else {
+      if (currentMonth === 0) {
+        setCurrentMonth(11)
+        setCurrentYear(currentYear - 1)
+      } else {
+        setCurrentMonth(currentMonth - 1)
+      }
+    }
   }
 
   // Add scroll behavior to highlight service when scrolling
@@ -320,20 +311,8 @@ export default function Home() {
   
   const mainServiceDate = getMainServiceDate()
   
-  // Generate calendar data for all 3 months in the quarter
-  const getQuarterMonths = (quarter: number, year: number) => {
-    const startMonth = (quarter - 1) * 3
-    // If showing December only, return just December
-    if (showDecemberOnly) {
-      return [11] // December only (0-indexed)
-    }
-    return [startMonth, startMonth + 1, startMonth + 2]
-  }
-  
-  const quarterMonths = getQuarterMonths(calendarQuarter.quarter, calendarQuarter.year)
-  const calendarDataForQuarter = quarterMonths.map(month => 
-    generateCalendarData(services, mainServiceDate, month, calendarQuarter.year)
-  )
+  // Generate calendar data for current month only
+  const calendarData = generateCalendarData(services, mainServiceDate, currentMonth, currentYear)
 
   const handleSignup = (serviceId: string, preferredRole?: 'liturgist' | 'liturgist2' /* | 'backup' | 'backup2' */) => {
     const service = services.find(s => s.id === serviceId)
@@ -794,19 +773,19 @@ export default function Home() {
                     <h1 className="text-sm font-bold text-gray-800">Liturgist Schedule</h1>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleCalendarQuarterChange('prev')}
+                        onClick={() => handleMonthChange('prev')}
                         className="text-blue-600 hover:text-blue-800 p-0.5"
-                        title="Previous quarter"
+                        title="Previous month"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                       </button>
-                      <p className="text-xs text-blue-600 font-medium">Q{calendarQuarter.quarter} {calendarQuarter.year}</p>
+                      <p className="text-xs text-blue-600 font-medium">{getMonthName(currentMonth, currentYear)}</p>
                       <button
-                        onClick={() => handleCalendarQuarterChange('next')}
+                        onClick={() => handleMonthChange('next')}
                         className="text-blue-600 hover:text-blue-800 p-0.5"
-                        title="Next quarter"
+                        title="Next month"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -827,46 +806,44 @@ export default function Home() {
                 </button>
               </div>
             
-            {/* Render all 3 months in the quarter */}
-            {calendarDataForQuarter.map((calendarData, monthIndex) => (
-              <div key={monthIndex} className={monthIndex > 0 ? 'mt-4 pt-4 border-t border-gray-200' : ''}>
-                <h2 className="text-xs font-bold text-gray-700 mb-2">{calendarData.monthName}</h2>
-                <div className="grid grid-cols-7 gap-1 text-xs">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                    <div key={day} className="text-center font-medium text-gray-600 py-1">
-                      {day}
-                    </div>
-                  ))}
-                  {calendarData.days.map((day, index) => (
-                    <div
-                      key={index}
-                      className={`text-center py-1 rounded text-xs transition-colors relative ${
-                        !day ? '' :
-                        day.isMainService ? 'bg-purple-600 text-white font-bold cursor-pointer hover:bg-purple-700' :
-                        day.isSunday && day.hasService ? (
-                          hoveredService === day.serviceData?.id ? 'bg-yellow-300 font-bold border border-yellow-500' : 'bg-green-100 font-medium cursor-pointer hover:bg-green-200'
-                        ) :
-                        day.isSunday ? 'bg-orange-100 font-medium' :
-                        'text-gray-600'
-                      }`}
-                      title={
-                        day?.isMainService ? `Next Service: ${day.serviceData?.displayDate}` :
-                        day?.serviceData?.notes ? `${day.serviceData?.notes}` :
-                        day?.isSunday && day?.hasService ? `Service on ${day.serviceData?.displayDate}` : ''
-                      }
-                      onClick={day?.hasService && isClient ? () => scrollToService(day.serviceData!.id) : undefined}
-                    >
-                      {day?.day || ''}
-                      {day?.isMainService && (
-                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[9px] text-purple-200 whitespace-nowrap font-semibold">
-                          NEXT
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+            {/* Render single month */}
+            <div>
+              <h2 className="text-xs font-bold text-gray-700 mb-2">{calendarData.monthName}</h2>
+              <div className="grid grid-cols-7 gap-1 text-xs">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                  <div key={day} className="text-center font-medium text-gray-600 py-1">
+                    {day}
+                  </div>
+                ))}
+                {calendarData.days.map((day, index) => (
+                  <div
+                    key={index}
+                    className={`text-center py-1 rounded text-xs transition-colors relative ${
+                      !day ? '' :
+                      day.isMainService ? 'bg-purple-600 text-white font-bold cursor-pointer hover:bg-purple-700' :
+                      day.isSunday && day.hasService ? (
+                        hoveredService === day.serviceData?.id ? 'bg-yellow-300 font-bold border border-yellow-500' : 'bg-green-100 font-medium cursor-pointer hover:bg-green-200'
+                      ) :
+                      day.isSunday ? 'bg-orange-100 font-medium' :
+                      'text-gray-600'
+                    }`}
+                    title={
+                      day?.isMainService ? `Next Service: ${day.serviceData?.displayDate}` :
+                      day?.serviceData?.notes ? `${day.serviceData?.notes}` :
+                      day?.isSunday && day?.hasService ? `Service on ${day.serviceData?.displayDate}` : ''
+                    }
+                    onClick={day?.hasService && isClient ? () => scrollToService(day.serviceData!.id) : undefined}
+                  >
+                    {day?.day || ''}
+                    {day?.isMainService && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[9px] text-purple-200 whitespace-nowrap font-semibold">
+                        NEXT
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
         </div>
@@ -1227,9 +1204,9 @@ export default function Home() {
                 <svg className="w-8 h-8 md:w-6 md:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                 </svg>
-                Liturgist Services - {currentQuarter.replace('-', ' ')}
+                Liturgist Services - {getMonthName(currentMonth, currentYear)}
               </h2>
-              {lastUpdated && !isLockedQuarter && (
+              {lastUpdated && (
                 <p className="text-xs text-gray-500 ml-8 mt-1">
                   Live updates • Last refreshed: {lastUpdated.toLocaleTimeString()}
                 </p>
@@ -1237,30 +1214,20 @@ export default function Home() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => handleQuarterChange('prev')}
-                disabled={currentQuarter === CURRENT_QUARTER}
-                className={`px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] ${
-                  currentQuarter === CURRENT_QUARTER
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
+                onClick={() => handleMonthChange('prev')}
+                className="px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
               >
                 <svg className="w-5 h-5 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span className="hidden sm:inline">Previous Quarter</span>
+                <span className="hidden sm:inline">Previous Month</span>
                 <span className="sm:hidden">Prev</span>
               </button>
               <button
-                onClick={() => handleQuarterChange('next')}
-                disabled={currentQuarter === 'Q1-2026'}
-                className={`px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] ${
-                  currentQuarter === 'Q1-2026'
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
+                onClick={() => handleMonthChange('next')}
+                className="px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
               >
-                <span className="hidden sm:inline">Next Quarter</span>
+                <span className="hidden sm:inline">Next Month</span>
                 <span className="sm:hidden">Next</span>
                 <svg className="w-5 h-5 md:w-4 md:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1268,24 +1235,6 @@ export default function Home() {
               </button>
             </div>
           </div>
-          
-          {/* Locked Quarter Notice */}
-          {isLockedQuarter && (
-            <div className="mb-4 p-4 bg-amber-50 border border-amber-300 rounded-lg">
-              <div className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <div>
-                  <h3 className="font-bold text-amber-900 text-lg mb-1">Sign-ups Open in December</h3>
-                  <p className="text-sm text-amber-800">
-                    Q1 2026 sign-ups will open in the month before the quarter begins. 
-                    Check back in December 2025 to sign up for services in January-March 2026.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
           
           <div className="space-y-3">
             {services.map((service: Service) => {
@@ -1296,16 +1245,14 @@ export default function Home() {
                   key={service.id}
                   id={`service-${service.id}`}
                   className={`border rounded-lg p-3 transition-all ${
-                    isLockedQuarter 
-                      ? 'border-gray-300 bg-gray-100 opacity-60'
-                      : isMainService
-                        ? 'border-purple-500 bg-purple-50 shadow-md'
-                        : hoveredService === service.id 
+                    isMainService
+                      ? 'border-purple-500 bg-purple-50 shadow-md'
+                      : hoveredService === service.id 
                           ? 'border-yellow-400 bg-yellow-50' 
                           : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
-                  onMouseEnter={() => !isLockedQuarter && setHoveredService(service.id)}
-                  onMouseLeave={() => !isLockedQuarter && setHoveredService(null)}
+                  onMouseEnter={() => setHoveredService(service.id)}
+                  onMouseLeave={() => setHoveredService(null)}
                 >
                   {/* Date and Special Badges */}
                   <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -1368,7 +1315,7 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => handleSignup(service.id, 'liturgist')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
@@ -1381,7 +1328,7 @@ export default function Home() {
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
                               onClick={() => handleCancelSignup(service.liturgist!.id, service.liturgist!.name, service.displayDate, 'Liturgist')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
@@ -1414,7 +1361,7 @@ export default function Home() {
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
                               onClick={() => handleCancelSignup(service.backup!.id, service.backup!.name, service.displayDate, 'Backup')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
@@ -1441,7 +1388,7 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => handleSignup(service.id, 'liturgist2')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
@@ -1454,7 +1401,7 @@ export default function Home() {
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
                               onClick={() => handleCancelSignup(service.liturgist2!.id, service.liturgist2!.name, service.displayDate, 'Second Liturgist')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
@@ -1481,7 +1428,7 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => handleSignup(service.id, 'backup2')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
@@ -1493,7 +1440,7 @@ export default function Home() {
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
                               onClick={() => handleCancelSignup(service.backup2!.id, service.backup2!.name, service.displayDate, 'Second Backup')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
@@ -1523,7 +1470,7 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => handleSignup(service.id, 'liturgist')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
@@ -1536,7 +1483,7 @@ export default function Home() {
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
                               onClick={() => handleCancelSignup(service.liturgist!.id, service.liturgist!.name, service.displayDate, 'Liturgist')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
@@ -1563,7 +1510,7 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => handleSignup(service.id, 'backup')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-5 py-2.5 md:px-3 md:py-1.5 text-base md:text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                               Sign Up
@@ -1575,7 +1522,7 @@ export default function Home() {
                           <div className="flex-shrink-0 sm:ml-2">
                             <button
                               onClick={() => handleCancelSignup(service.backup!.id, service.backup!.name, service.displayDate, 'Backup')}
-                              disabled={isLockedQuarter}
+                              disabled={false}
                               className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-base md:text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
                             >
                               Cancel
