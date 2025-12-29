@@ -483,7 +483,7 @@ export default function FoodDistribution() {
                       </button>
                       <p className="text-xs text-green-600 font-medium">{getMonthName(currentMonth, currentYear)}</p>
                       <button
-                        onClick={handleNextMonth}
+                        onClick={handleNextMonth} aria-label="Next month"
                         className="text-green-600 hover:text-green-800 p-0.5"
                         title="Next month"
                       >
@@ -565,7 +565,7 @@ export default function FoodDistribution() {
               </p>
               
               <button
-                onClick={handleNextMonth}
+                onClick={handleNextMonth} aria-label="Next month"
                 className="px-3 py-2 md:px-4 md:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
                 aria-label="Next month"
               >
@@ -579,6 +579,15 @@ export default function FoodDistribution() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+            </div>
+          ) : signups.length === 0 ? (
+            <div className="p-8 text-center bg-blue-50 dark:bg-gray-700 rounded-lg border-2 border-dashed border-blue-300 dark:border-blue-500">
+              <svg className="w-16 h-16 mx-auto mb-4 text-blue-400 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">No Saturdays Found</h3>
+              <p className="text-gray-600 dark:text-gray-300">There are no Saturday food distributions in {getMonthName(currentMonth, currentYear)}.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Try navigating to a different month.</p>
             </div>
           ) : (
             <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl overflow-x-auto w-full md:w-auto md:mx-auto">

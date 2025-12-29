@@ -112,8 +112,11 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(true)
-  const [currentMonth, setCurrentMonth] = useState(0) // January (0-indexed)
-  const [currentYear, setCurrentYear] = useState(2026)
+  
+  // CRITICAL: Use getCurrentMonthYear() for dynamic month detection
+  const { month: initialMonth, year: initialYear } = getCurrentMonthYear()
+  const [currentMonth, setCurrentMonth] = useState(initialMonth)
+  const [currentYear, setCurrentYear] = useState(initialYear)
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   const [modalState, setModalState] = useState<{
@@ -773,7 +776,7 @@ export default function Home() {
                     <h1 className="text-sm font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100">Liturgist Schedule</h1>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleMonthChange('prev')}
+                        onClick={() => handleMonthChange('prev')} aria-label="Previous month"
                         className="text-blue-600 hover:text-blue-800 p-0.5"
                         title="Previous month"
                       >
@@ -783,7 +786,7 @@ export default function Home() {
                       </button>
                       <p className="text-xs text-blue-600 font-medium">{getMonthName(currentMonth, currentYear)}</p>
                       <button
-                        onClick={() => handleMonthChange('next')}
+                        onClick={() => handleMonthChange('next')} aria-label="Next month"
                         className="text-blue-600 hover:text-blue-800 p-0.5"
                         title="Next month"
                       >
@@ -1214,7 +1217,7 @@ export default function Home() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => handleMonthChange('prev')}
+                onClick={() => handleMonthChange('prev')} aria-label="Previous month"
                 className="px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
               >
                 <svg className="w-5 h-5 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1224,7 +1227,7 @@ export default function Home() {
                 <span className="sm:hidden">Prev</span>
               </button>
               <button
-                onClick={() => handleMonthChange('next')}
+                onClick={() => handleMonthChange('next')} aria-label="Next month"
                 className="px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
               >
                 <span className="hidden sm:inline">Next Month</span>
@@ -1236,8 +1239,19 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="space-y-3">
-            {services.map((service: Service) => {
+          {/* Empty State */}
+          {!loading && services.length === 0 && (
+            <div className="p-8 text-center bg-blue-50 dark:bg-gray-700 rounded-lg border-2 border-dashed border-blue-300 dark:border-blue-500">
+              <svg className="w-16 h-16 mx-auto mb-4 text-blue-400 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">No Services Found</h3>
+              <p className="text-gray-600 dark:text-gray-300">There are no services scheduled for {getMonthName(currentMonth, currentYear)}.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Try navigating to a different month.</p>
+            </div>
+          )}
+          
+          <div className="space-y-3">{services.map((service: Service) => {
               const isMainService = service.date === mainServiceDate
               
               return (
