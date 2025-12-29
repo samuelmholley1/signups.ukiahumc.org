@@ -47,7 +47,7 @@ export default function PasswordGate({ children, title = 'Liturgist Schedule', c
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${gradients[color]} flex items-center justify-center p-4`}>
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+      <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl p-8 max-w-md w-full">
         <div className="text-center mb-6">
           <img
             src="/logo-for-church-larger.jpg"
@@ -56,10 +56,10 @@ export default function PasswordGate({ children, title = 'Liturgist Schedule', c
             width={240}
             height={159}
           />
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
             {title}
           </h1>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 text-sm">
             Please enter the password to continue
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function PasswordGate({ children, title = 'Liturgist Schedule', c
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${
                 error 
                   ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-300 focus:ring-blue-500'
+                  : 'border-gray-300 dark:border-gray-600 dark:border-gray-600 focus:ring-blue-500'
               }`}
               autoFocus
             />

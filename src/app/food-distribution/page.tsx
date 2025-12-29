@@ -466,11 +466,11 @@ export default function FoodDistribution() {
             </button>
             
             {/* Calendar */}
-            <div className="bg-white shadow-xl rounded-b-lg border-2 border-gray-200 w-72 lg:w-80">
+            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 dark:border-gray-700 w-72 lg:w-80">
               <div className="p-3 lg:p-4">
-                <div className="flex items-center justify-between mb-3 sticky top-0 bg-white z-10 pb-2">
+                <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 dark:bg-gray-800 dark:bg-gray-800 z-10 pb-2">
                   <div className="flex-1">
-                    <h1 className="text-sm font-bold text-gray-800">Food Distribution</h1>
+                    <h1 className="text-sm font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100">Food Distribution</h1>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={handlePreviousMonth}
@@ -497,7 +497,7 @@ export default function FoodDistribution() {
               
                 <div className="grid grid-cols-7 gap-1 text-xs">
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                    <div key={day} className="text-center font-medium text-gray-600 py-1">
+                    <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400 py-1">
                       {day}
                     </div>
                   ))}
@@ -545,7 +545,7 @@ export default function FoodDistribution() {
               height={213}
               className="mx-auto rounded-lg shadow-md mb-4 w-64 md:w-80 lg:w-[300px]"
             />
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
               Food Distribution Signups
             </h1>
             
@@ -560,7 +560,7 @@ export default function FoodDistribution() {
                 <span className="hidden sm:inline">Previous</span>
               </button>
               
-              <p className="text-sm md:text-lg text-gray-600 font-semibold min-w-[140px] md:min-w-[200px] text-center">
+              <p className="text-sm md:text-lg text-gray-600 dark:text-gray-400 dark:text-gray-400 font-semibold min-w-[140px] md:min-w-[200px] text-center">
                 {getMonthName(currentMonth, currentYear).replace(' - Saturdays', '')}
               </p>
               
@@ -581,7 +581,7 @@ export default function FoodDistribution() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-x-auto w-full md:w-auto md:mx-auto">
+            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl overflow-x-auto w-full md:w-auto md:mx-auto">
               <div>
                 <table className="w-full md:w-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
@@ -629,16 +629,16 @@ export default function FoodDistribution() {
                     return (
                       <React.Fragment key={signup.date}>
                       <tr className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-2 md:px-4 py-3 md:py-4 font-medium text-gray-900 align-top whitespace-nowrap text-sm md:text-base">
+                        <td className="px-2 md:px-4 py-3 md:py-4 font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 align-top whitespace-nowrap text-sm md:text-base">
                           {signup.displayDate}
                         </td>
                         <td className="px-2 md:px-4 py-3 md:py-4 align-top">
                           {signup.volunteer1 ? (
                             <div>
                               <div className="mb-2 text-center">
-                                <p className="font-medium text-gray-900 text-base">{signup.volunteer1.name}</p>
-                                <p className="text-base md:text-sm text-gray-600">{signup.volunteer1.email}</p>
-                                <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer1.phone ? 'visible' : 'hidden' }}>
+                                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-base">{signup.volunteer1.name}</p>
+                                <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.volunteer1.email}</p>
+                                <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.volunteer1.phone ? 'visible' : 'hidden' }}>
                                   {signup.volunteer1.phone || '111-111-1111'}
                                 </p>
                               </div>
@@ -669,9 +669,9 @@ export default function FoodDistribution() {
                           {signup.volunteer2 ? (
                             <div>
                               <div className="mb-2 text-center">
-                                <p className="font-medium text-gray-900 text-sm md:text-base">{signup.volunteer2.name}</p>
-                                <p className="text-xs md:text-sm text-gray-600">{signup.volunteer2.email}</p>
-                                <p className="text-xs md:text-sm text-gray-600" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
+                                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-sm md:text-base">{signup.volunteer2.name}</p>
+                                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.volunteer2.email}</p>
+                                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.volunteer2.phone ? 'visible' : 'hidden' }}>
                                   {signup.volunteer2.phone || '111-111-1111'}
                                 </p>
                               </div>
@@ -704,9 +704,9 @@ export default function FoodDistribution() {
                             {signup.volunteer3 ? (
                                 <div>
                                   <div className="mb-2 text-center">
-                                    <p className="font-medium text-gray-900 text-base">{signup.volunteer3.name}</p>
-                                    <p className="text-base md:text-sm text-gray-600">{signup.volunteer3.email}</p>
-                                    <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-base">{signup.volunteer3.name}</p>
+                                    <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.volunteer3.email}</p>
+                                    <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
                                       {signup.volunteer3.phone || '111-111-1111'}
                                     </p>
                                   </div>
@@ -739,9 +739,9 @@ export default function FoodDistribution() {
                             {signup.volunteer4 ? (
                                 <div>
                                   <div className="mb-2 text-center">
-                                    <p className="font-medium text-gray-900 text-base">{signup.volunteer4.name}</p>
-                                    <p className="text-base md:text-sm text-gray-600">{signup.volunteer4.email}</p>
-                                    <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-base">{signup.volunteer4.name}</p>
+                                    <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.volunteer4.email}</p>
+                                    <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
                                       {signup.volunteer4.phone || '111-111-1111'}
                                     </p>
                                   </div>
@@ -780,13 +780,13 @@ export default function FoodDistribution() {
                           <td className="px-2 md:px-4 py-3 md:py-4 align-top">
                             {(signup.volunteer3 || bothFilled) && (
                               <>
-                                <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Vol #3</div>
+                                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 text-center">Vol #3</div>
                                 {signup.volunteer3 ? (
                                   <div>
                                     <div className="mb-2 text-center">
-                                      <p className="font-medium text-gray-900 text-sm">{signup.volunteer3.name}</p>
-                                      <p className="text-xs text-gray-600">{signup.volunteer3.email}</p>
-                                      <p className="text-xs text-gray-600" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
+                                      <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-sm">{signup.volunteer3.name}</p>
+                                      <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.volunteer3.email}</p>
+                                      <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.volunteer3.phone ? 'visible' : 'hidden' }}>
                                         {signup.volunteer3.phone || '111-111-1111'}
                                       </p>
                                     </div>
@@ -820,13 +820,13 @@ export default function FoodDistribution() {
                           <td className="px-2 md:px-4 py-3 md:py-4 align-top">
                             {(signup.volunteer4 || hasThirdVolunteer) && (
                               <>
-                                <div className="text-xs font-semibold text-gray-700 mb-2 text-center">Vol #4</div>
+                                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 text-center">Vol #4</div>
                                 {signup.volunteer4 ? (
                                   <div>
                                     <div className="mb-2 text-center">
-                                      <p className="font-medium text-gray-900 text-sm">{signup.volunteer4.name}</p>
-                                      <p className="text-xs text-gray-600">{signup.volunteer4.email}</p>
-                                      <p className="text-xs text-gray-600" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
+                                      <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-sm">{signup.volunteer4.name}</p>
+                                      <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.volunteer4.email}</p>
+                                      <p className="text-xs text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.volunteer4.phone ? 'visible' : 'hidden' }}>
                                         {signup.volunteer4.phone || '111-111-1111'}
                                       </p>
                                     </div>
@@ -869,7 +869,7 @@ export default function FoodDistribution() {
           {/* Signup Modal */}
           {selectedDate && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -882,7 +882,7 @@ export default function FoodDistribution() {
                 <h3 className="text-xl font-bold mb-4 text-center">
                   Sign Up as Volunteer #{formData.role === 'volunteer1' ? '1' : formData.role === 'volunteer2' ? '2' : formData.role === 'volunteer3' ? '3' : '4'}
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 mb-4">
                   {signups.find(s => s.date === selectedDate)?.displayDate}
                 </p>
                 
@@ -968,7 +968,7 @@ export default function FoodDistribution() {
                     <button
                       type="button"
                       onClick={() => setSelectedDate(null)}
-                      className="flex-1 px-4 py-2 border rounded-full hover:bg-gray-50"
+                      className="flex-1 px-4 py-2 border rounded-full hover:bg-gray-50 dark:bg-gray-700 dark:bg-gray-700 dark:bg-gray-700"
                     >
                       Cancel
                     </button>
@@ -987,7 +987,7 @@ export default function FoodDistribution() {
           {/* Error Modal */}
           {errorModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -999,8 +999,8 @@ export default function FoodDistribution() {
                 </div>
                 <div className="text-center mb-4">
                   <div className="text-5xl mb-2">⚠️</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{errorModal.title}</h3>
-                  <p className="text-gray-600">{errorModal.message}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">{errorModal.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{errorModal.message}</p>
                 </div>
                 <button
                   onClick={() => setErrorModal({ show: false, title: '', message: '' })}
@@ -1015,7 +1015,7 @@ export default function FoodDistribution() {
           {/* Success Modal */}
           {successModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -1027,8 +1027,8 @@ export default function FoodDistribution() {
                 </div>
                 <div className="text-center mb-4">
                   <div className="text-5xl mb-2">✅</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Success!</h3>
-                  <p className="text-gray-600">{successModal.message}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">Success!</h3>
+                  <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{successModal.message}</p>
                 </div>
                 <button
                   onClick={() => setSuccessModal({ show: false, message: '' })}
@@ -1043,7 +1043,7 @@ export default function FoodDistribution() {
           {/* Cancel Confirmation Modal */}
           {cancelConfirmModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -1055,18 +1055,18 @@ export default function FoodDistribution() {
                 </div>
                 <div className="text-center mb-6">
                   <div className="text-5xl mb-3">❓</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Confirm Cancellation</h3>
-                  <p className="text-gray-700 mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3">Confirm Cancellation</h3>
+                  <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
                     Are you sure you want to cancel <span className="font-semibold">{cancelConfirmModal.name}</span>&apos;s signup?
                   </p>
-                  <p className="text-gray-600 text-sm font-medium">
+                  <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 text-sm font-medium">
                     {cancelConfirmModal.displayDate} - Food Distribution
                   </p>
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setCancelConfirmModal({ show: false, recordId: '', name: '', displayDate: '' })}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors font-medium"
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 dark:text-gray-100 dark:text-gray-100 rounded-full hover:bg-gray-300 transition-colors font-medium"
                   >
                     No, Keep It
                   </button>

@@ -642,7 +642,7 @@ export default function Home() {
         <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading services...</p>
+            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">Loading services...</p>
           </div>
         </main>
       </PasswordGate>
@@ -654,7 +654,7 @@ export default function Home() {
       {/* Custom Modal for Alerts/Confirmations */}
       {modalState?.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-2xl p-6 max-w-md w-full">
             {/* Church Logo */}
             <div className="flex justify-center mb-3">
               <img 
@@ -697,12 +697,12 @@ export default function Home() {
             </div>
             
             {/* Title */}
-            <h3 className="text-xl font-semibold text-gray-900 text-center mb-3">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-center mb-3">
               {modalState.title}
             </h3>
             
             {/* Message */}
-            <p className="text-gray-700 text-center mb-6 whitespace-pre-line">
+            <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 text-center mb-6 whitespace-pre-line">
               {modalState.message}
             </p>
             
@@ -712,7 +712,7 @@ export default function Home() {
                 <>
                   <button
                     onClick={() => setModalState(null)}
-                    className="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                    className="px-6 py-2.5 bg-gray-200 text-gray-800 dark:text-gray-100 dark:text-gray-100 rounded-lg font-medium hover:bg-gray-300 transition-colors"
                   >
                     Cancel
                   </button>
@@ -740,7 +740,7 @@ export default function Home() {
         </div>
       )}
       
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       
       {/* Live Update Indicator */}
       {refreshing && (
@@ -765,12 +765,12 @@ export default function Home() {
           </button>
           
           {/* Calendar */}
-          <div className="bg-white shadow-xl rounded-b-lg border-2 border-gray-200 w-72 lg:w-80">
+          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-72 lg:w-80">
             <div className="p-3 lg:p-4">
-              <div className="flex items-center justify-between mb-3 sticky top-0 bg-white z-10 pb-2">
+              <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 dark:bg-gray-800 z-10 pb-2">
                 <div className="flex items-center space-x-2">
                   <div className="flex-1">
-                    <h1 className="text-sm font-bold text-gray-800">Liturgist Schedule</h1>
+                    <h1 className="text-sm font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100">Liturgist Schedule</h1>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleMonthChange('prev')}
@@ -808,10 +808,10 @@ export default function Home() {
             
             {/* Render single month */}
             <div>
-              <h2 className="text-xs font-bold text-gray-700 mb-2">{calendarData.monthName}</h2>
+              <h2 className="text-xs font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">{calendarData.monthName}</h2>
               <div className="grid grid-cols-7 gap-1 text-xs">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                  <div key={day} className="text-center font-medium text-gray-600 py-1">
+                  <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400 py-1">
                     {day}
                   </div>
                 ))}
@@ -873,8 +873,8 @@ export default function Home() {
         {/* Signup Modal */}
         {selectedSignup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
                 Sign up for {selectedService?.displayDate}
               </h3>
               
@@ -882,7 +882,7 @@ export default function Home() {
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="text-sm space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-700">Main Liturgist:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">Main Liturgist:</span>
                     {selectedService?.liturgist ? (
                       <span className="text-green-700 font-semibold">✓ Filled by {selectedService.liturgist.name}</span>
                     ) : (
@@ -890,7 +890,7 @@ export default function Home() {
                     )}
                   </div>
                   {/* <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-700">Backup Liturgist:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">Backup Liturgist:</span>
                     {selectedService?.backup ? (
                       <span className="text-orange-700 font-semibold">✓ Filled by {selectedService.backup.name}</span>
                     ) : (
@@ -900,7 +900,7 @@ export default function Home() {
                   {selectedService?.displayDate?.includes('Christmas Eve') && (
                     <>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-700">Second Liturgist:</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">Second Liturgist:</span>
                         {selectedService?.liturgist2 ? (
                           <span className="text-green-700 font-semibold">✓ Filled by {selectedService.liturgist2.name}</span>
                         ) : (
@@ -908,7 +908,7 @@ export default function Home() {
                         )}
                       </div>
                       {/* <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-700">Second Backup:</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">Second Backup:</span>
                         {selectedService?.backup2 ? (
                           <span className="text-orange-700 font-semibold">✓ Filled by {selectedService.backup2.name}</span>
                         ) : (
@@ -923,14 +923,14 @@ export default function Home() {
               <form onSubmit={handleSubmitSignup} className="space-y-4">
                 {/* Person Dropdown */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-1">
                     Select Your Name *
                   </label>
                   <select
                     required
                     value={signupForm.selectedPerson}
                     onChange={(e) => handlePersonSelect(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">-- Select --</option>
                     {liturgists.map((liturgist) => (
@@ -946,7 +946,7 @@ export default function Home() {
                 {signupForm.selectedPerson === 'other' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-1">
                         First Name *
                       </label>
                       <input
@@ -954,12 +954,12 @@ export default function Home() {
                         required
                         value={signupForm.firstName}
                         onChange={(e) => setSignupForm({ ...signupForm, firstName: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-1">
                         Last Name *
                       </label>
                       <input
@@ -967,7 +967,7 @@ export default function Home() {
                         required
                         value={signupForm.lastName}
                         onChange={(e) => setSignupForm({ ...signupForm, lastName: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </>
@@ -976,14 +976,14 @@ export default function Home() {
                 {/* Role Selection */}
                 {signupForm.selectedPerson && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
                       Sign up as: *
                     </label>
                     <div className="space-y-2">
                       <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
                         signupForm.role === 'liturgist' 
                           ? 'bg-blue-50 border-blue-500 shadow-sm' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-gray-200 dark:border-gray-700 dark:border-gray-700 hover:border-gray-300'
                       } ${selectedService?.liturgist ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                         <input
                           type="radio"
@@ -1014,7 +1014,7 @@ export default function Home() {
                         <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
                           signupForm.role === 'liturgist2' 
                             ? 'bg-blue-50 border-blue-500 shadow-sm' 
-                            : 'border-gray-200 hover:border-gray-300'
+                            : 'border-gray-200 dark:border-gray-700 dark:border-gray-700 hover:border-gray-300'
                         } ${selectedService?.liturgist2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                           <input
                             type="radio"
@@ -1046,7 +1046,7 @@ export default function Home() {
                         <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
                           signupForm.role === 'backup2' 
                             ? 'bg-blue-50 border-blue-500 shadow-sm' 
-                            : 'border-gray-200 hover:border-gray-300'
+                            : 'border-gray-200 dark:border-gray-700 dark:border-gray-700 hover:border-gray-300'
                         } ${selectedService?.backup2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                           <input
                             type="radio"
@@ -1076,7 +1076,7 @@ export default function Home() {
                       {/* <label className={`flex items-center p-3 border-2 rounded-lg transition-all ${
                         signupForm.role === 'backup' 
                           ? 'bg-blue-50 border-blue-500 shadow-sm' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-gray-200 dark:border-gray-700 dark:border-gray-700 hover:border-gray-300'
                       } ${selectedService?.backup ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                         <input
                           type="radio"
@@ -1104,7 +1104,7 @@ export default function Home() {
                     </div>
                     
                     {/* Explanation text */}
-                    <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                    <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-700 dark:bg-gray-700 rounded text-xs text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">
                       <strong>Note:</strong> Positions update every 5 seconds. Grayed out options have already been filled. If your preferred role is unavailable, choose a different Sunday or select the available role.
                     </div>
                     
@@ -1128,7 +1128,7 @@ export default function Home() {
                 {signupForm.selectedPerson && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-1">
                         Email *
                       </label>
                       <input
@@ -1137,20 +1137,20 @@ export default function Home() {
                         value={signupForm.email}
                         onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                         autoComplete="off"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         readOnly={signupForm.selectedPerson !== 'other'}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-1">
                         Phone (optional)
                       </label>
                       <input
                         type="tel"
                         value={signupForm.phone}
                         onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="123-456-7890"
                       />
                     </div>
@@ -1186,7 +1186,7 @@ export default function Home() {
                         role: 'liturgist'
                       })
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                    className="flex-1 bg-gray-300 text-gray-700 dark:text-gray-300 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-400 transition-colors"
                   >
                     Cancel
                   </button>
@@ -1197,10 +1197,10 @@ export default function Home() {
         )}
 
         {/* Upcoming Services */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h2 className="text-3xl md:text-2xl font-semibold text-gray-800 flex items-center">
+              <h2 className="text-3xl md:text-2xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 flex items-center">
                 <svg className="w-8 h-8 md:w-6 md:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                 </svg>
@@ -1249,14 +1249,14 @@ export default function Home() {
                       ? 'border-purple-500 bg-purple-50 shadow-md'
                       : hoveredService === service.id 
                           ? 'border-yellow-400 bg-yellow-50' 
-                          : 'border-gray-200 bg-white hover:border-gray-300'
+                          : 'border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-white dark:bg-gray-800 dark:bg-gray-800 hover:border-gray-300'
                   }`}
                   onMouseEnter={() => setHoveredService(service.id)}
                   onMouseLeave={() => setHoveredService(null)}
                 >
                   {/* Date and Special Badges */}
                   <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <p className="font-semibold text-gray-800 text-lg md:text-base">
+                    <p className="font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 text-lg md:text-base">
                       {service.displayDate.replace(/, \d{4}/, '')}
                     </p>
                     {isMainService && (
@@ -1300,7 +1300,7 @@ export default function Home() {
                       {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap text-base">Liturgist:</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 whitespace-nowrap text-base">Liturgist:</span>
                           {service.liturgist ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-green-900 truncate" title={service.liturgist.name}>
@@ -1340,7 +1340,7 @@ export default function Home() {
                       {/* First Backup Row */}
                       {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 whitespace-nowrap">Backup:</span>
                           {service.backup ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-blue-900 truncate" title={service.backup.name}>
@@ -1373,7 +1373,7 @@ export default function Home() {
                       {/* Second Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Second Liturgist:</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 whitespace-nowrap">Second Liturgist:</span>
                           {service.liturgist2 ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-green-900 truncate" title={service.liturgist2.name}>
@@ -1413,7 +1413,7 @@ export default function Home() {
                       {/* Second Backup Row */}
                       {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 whitespace-nowrap">Backup:</span>
                           {service.backup2 ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-blue-900 truncate" title={service.backup2.name}>
@@ -1455,7 +1455,7 @@ export default function Home() {
                       {/* Liturgist Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap text-base">Liturgist:</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 whitespace-nowrap text-base">Liturgist:</span>
                           {service.liturgist ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-green-900 truncate" title={service.liturgist.name}>
@@ -1495,7 +1495,7 @@ export default function Home() {
                       {/* Backup Row */}
                       {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="font-medium text-gray-700 whitespace-nowrap">Backup:</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 whitespace-nowrap">Backup:</span>
                           {service.backup ? (
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 min-w-0 flex-1">
                               <span className="font-semibold text-blue-900 truncate" title={service.backup.name}>
@@ -1539,19 +1539,19 @@ export default function Home() {
         </div>
 
         {/* Information Section */}
-        <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">What Does a Liturgist Do?</h3>
+        <div className="mt-8 bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-4">What Does a Liturgist Do?</h3>
           <div className="prose prose-blue max-w-none text-sm">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 mb-4">
               As a liturgist, you'll help lead our congregation in worship by:
             </p>
-            <ul className="text-gray-600 space-y-1 mb-4 text-sm">
+            <ul className="text-gray-600 dark:text-gray-400 dark:text-gray-400 space-y-1 mb-4 text-sm">
               <li>• Reading the Call to Worship</li>
               <li>• Leading the Responsive Reading</li>
               <li>• Reading the Scripture lesson(s)</li>
               <li>• Assisting with other liturgical elements as needed</li>
             </ul>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 text-sm">
               The bulletin and readings will be provided to you in advance. 
               If you have any questions, please contact the church office.
             </p>
@@ -1559,7 +1559,7 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-gray-600 mt-8 text-sm">
+        <footer className="text-center text-gray-600 dark:text-gray-400 dark:text-gray-400 mt-8 text-sm">
           <p className="mb-1">
             <strong>Ukiah United Methodist Church</strong>
           </p>

@@ -15,11 +15,11 @@ export default function LandingPage() {
         </div>
 
         {/* Welcome Section */}
-        <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-4">
+        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl p-8 mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-center mb-4">
             Welcome to Church Signups
           </h1>
-          <p className="text-gray-600 text-center text-lg mb-8">
+          <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 text-center text-lg mb-8">
             Choose the service you'd like to sign up for:
           </p>
 
@@ -67,7 +67,7 @@ export default function LandingPage() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-gray-600 text-sm">
+        <footer className="text-center text-gray-600 dark:text-gray-400 dark:text-gray-400 text-sm">
           <p className="mb-1">
             <strong>Ukiah United Methodist Church</strong>
           </p>

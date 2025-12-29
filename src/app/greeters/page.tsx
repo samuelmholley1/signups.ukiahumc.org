@@ -240,39 +240,39 @@ export default function Greeters() {
               height={213}
               className="mx-auto rounded-lg shadow-md mb-4 w-80 md:w-[300px]"
             />
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
               Greeter Signups
             </h1>
-            <p className="text-lg md:text-base text-gray-600">December 2025</p>
+            <p className="text-lg md:text-base text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">December 2025</p>
           </div>
           
           {/* Greeter Responsibilities */}
-          <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 text-left mb-8">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-md p-6 text-left mb-8">
               <h2 className="text-xl font-bold text-purple-600 mb-4">What does the Greeter do?</h2>
-              <p className="font-semibold text-gray-800 mb-3">
+              <p className="font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-3">
                 Principle Responsibility: Welcoming and assisting people to feel comfortable at our services
               </p>
               
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Before the service: Arrive by 9:30</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">Before the service: Arrive by 9:30</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">
                     <li>Greet people as they come in (1 usher at the front and 1 usher at Chapel door is ideal)</li>
                     <li>Check their names off on the clipboard. Write people not listed on the last page</li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">During the service:</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">During the service:</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">
                     <li>For the "Praising" song, assist the acolyte by lighting the taper</li>
                     <li>Take the offering basket up and put it on the alter during the Doxology</li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">After the service:</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">After the service:</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">
                     <li>Count the attendees and fill in the totals on the clipboard. Clipboard goes into office on Debbie's desk</li>
                     <li>Gather up leftover bulletins etc from pews. Save unused Newcomer forms</li>
                     <li>Turn off the lights (behind the curtain & power strip behind the band)</li>
@@ -287,7 +287,7 @@ export default function Greeters() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden w-fit mx-auto">
+            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden w-fit mx-auto">
               <div>
                 <table className="w-auto" key={lastUpdate}>
                   <thead className="bg-purple-600 text-white">
@@ -309,16 +309,16 @@ export default function Greeters() {
                     const showGreeter3Column = signups.some(s => s.greeter3)
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-4 py-4 font-medium text-gray-900 align-top whitespace-nowrap text-base">
+                        <td className="px-4 py-4 font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 align-top whitespace-nowrap text-base">
                           {signup.displayDate}
                         </td>
                         <td className="px-4 py-4 align-top w-64">
                           {signup.greeter1 ? (
                             <div>
                               <div className="mb-2 text-center">
-                                <p className="font-medium text-gray-900 text-base">{signup.greeter1.name}</p>
-                                <p className="text-base md:text-sm text-gray-600">{signup.greeter1.email}</p>
-                                <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.greeter1.phone ? 'visible' : 'hidden' }}>
+                                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-base">{signup.greeter1.name}</p>
+                                <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.greeter1.email}</p>
+                                <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.greeter1.phone ? 'visible' : 'hidden' }}>
                                   {signup.greeter1.phone || '111-111-1111'}
                                 </p>
                               </div>
@@ -349,9 +349,9 @@ export default function Greeters() {
                           {signup.greeter2 ? (
                             <div>
                               <div className="mb-2 text-center">
-                                <p className="font-medium text-gray-900 text-base">{signup.greeter2.name}</p>
-                                <p className="text-base md:text-sm text-gray-600">{signup.greeter2.email}</p>
-                                <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.greeter2.phone ? 'visible' : 'hidden' }}>
+                                <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-base">{signup.greeter2.name}</p>
+                                <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.greeter2.email}</p>
+                                <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.greeter2.phone ? 'visible' : 'hidden' }}>
                                   {signup.greeter2.phone || '111-111-1111'}
                                 </p>
                               </div>
@@ -383,9 +383,9 @@ export default function Greeters() {
                             {signup.greeter3 ? (
                               <div>
                                 <div className="mb-2 text-center">
-                                  <p className="font-medium text-gray-900 text-base">{signup.greeter3.name}</p>
-                                  <p className="text-base md:text-sm text-gray-600">{signup.greeter3.email}</p>
-                                  <p className="text-base md:text-sm text-gray-600" style={{ visibility: signup.greeter3.phone ? 'visible' : 'hidden' }}>
+                                  <p className="font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 text-base">{signup.greeter3.name}</p>
+                                  <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{signup.greeter3.email}</p>
+                                  <p className="text-base md:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" style={{ visibility: signup.greeter3.phone ? 'visible' : 'hidden' }}>
                                     {signup.greeter3.phone || '111-111-1111'}
                                   </p>
                                 </div>
@@ -425,7 +425,7 @@ Bon              </div>
           {/* Signup Modal */}
           {selectedDate && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -438,7 +438,7 @@ Bon              </div>
                 <h3 className="text-xl font-bold mb-4 text-center">
                   Sign Up as Greeter #{formData.role === 'greeter1' ? '1' : '2'}
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 mb-4">
                   {signups.find(s => s.date === selectedDate)?.displayDate}
                 </p>
                 
@@ -516,7 +516,7 @@ Bon              </div>
                     <button
                       type="button"
                       onClick={() => setSelectedDate(null)}
-                      className="flex-1 px-4 py-2 border rounded-full hover:bg-gray-50"
+                      className="flex-1 px-4 py-2 border rounded-full hover:bg-gray-50 dark:bg-gray-700 dark:bg-gray-700 dark:bg-gray-700"
                     >
                       Cancel
                     </button>
@@ -535,7 +535,7 @@ Bon              </div>
           {/* Error Modal */}
           {errorModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -547,8 +547,8 @@ Bon              </div>
                 </div>
                 <div className="text-center mb-4">
                   <div className="text-5xl mb-2">⚠️</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{errorModal.title}</h3>
-                  <p className="text-gray-600">{errorModal.message}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">{errorModal.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{errorModal.message}</p>
                 </div>
                 <button
                   onClick={() => setErrorModal({ show: false, title: '', message: '' })}
@@ -563,7 +563,7 @@ Bon              </div>
           {/* Success Modal */}
           {successModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -575,8 +575,8 @@ Bon              </div>
                 </div>
                 <div className="text-center mb-4">
                   <div className="text-5xl mb-2">✅</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Success!</h3>
-                  <p className="text-gray-600">{successModal.message}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">Success!</h3>
+                  <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{successModal.message}</p>
                 </div>
                 <button
                   onClick={() => setSuccessModal({ show: false, message: '' })}
@@ -591,7 +591,7 @@ Bon              </div>
           {/* Cancel Confirmation Modal */}
           {cancelConfirmModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -603,18 +603,18 @@ Bon              </div>
                 </div>
                 <div className="text-center mb-6">
                   <div className="text-5xl mb-3">❓</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Confirm Cancellation</h3>
-                  <p className="text-gray-700 mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3">Confirm Cancellation</h3>
+                  <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
                     Are you sure you want to cancel <span className="font-semibold">{cancelConfirmModal.name}</span>&apos;s signup?
                   </p>
-                  <p className="text-gray-600 text-sm font-medium">
+                  <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 text-sm font-medium">
                     {cancelConfirmModal.displayDate} - Greeter
                   </p>
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setCancelConfirmModal({ show: false, recordId: '', name: '', displayDate: '' })}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors font-medium"
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 dark:text-gray-100 dark:text-gray-100 rounded-full hover:bg-gray-300 transition-colors font-medium"
                   >
                     No, Keep It
                   </button>
