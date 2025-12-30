@@ -218,8 +218,11 @@ export default function Home() {
       setRefreshing(true)
     }
     
+    console.log('[LITURGISTS] fetchServices called with currentMonth:', currentMonth, 'currentYear:', currentYear)
+    
     try {
       const quarter = getQuarterString(currentMonth, currentYear)
+      console.log('[LITURGISTS] Fetching quarter:', quarter)
       const response = await fetch(`/api/services?quarter=${quarter}`, {
         cache: 'no-store', // Prevent caching
         headers: {
@@ -227,12 +230,18 @@ export default function Home() {
         }
       })
       const data = await response.json()
+      console.log('[LITURGISTS] API returned', data.services?.length, 'services')
       if (data.success) {
         // Filter to current month only
         const filteredServices = data.services.filter((service: any) => {
           const serviceDate = new Date(service.date)
-          return serviceDate.getMonth() === currentMonth && serviceDate.getFullYear() === currentYear
+          const matches = serviceDate.getMonth() === currentMonth && serviceDate.getFullYear() === currentYear
+          if (!matches) {
+            console.log('[LITURGISTS] Filtered out:', service.displayDate, 'serviceMonth:', serviceDate.getMonth(), 'targetMonth:', currentMonth)
+          }
+          return matches
         })
+        console.log('[LITURGISTS] After filtering:', filteredServices.length, 'services for month', currentMonth)
         setServices(filteredServices)
         setLastUpdated(new Date())
       }
