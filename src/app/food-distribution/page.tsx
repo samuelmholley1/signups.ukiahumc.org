@@ -425,7 +425,7 @@ export default function FoodDistribution() {
 
   return (
     <PasswordGate title="Food Distribution Signups" color="green">
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-4 sm:py-6 md:py-8 px-2 sm:px-4">
         
         {/* Calendar Widget - Collapsible (Hidden on mobile) */}
         {calendarOpen ? (
@@ -514,7 +514,7 @@ export default function FoodDistribution() {
         )}
 
         <div className={`max-w-4xl mx-auto transition-all duration-300 ${calendarOpen ? 'md:ml-72 lg:ml-80' : ''}`}>
-          <div className="text-center mb-8">
+          <div className="text-center mb-4 sm:mb-6 md:mb-8">
             <img
               src="/logo-for-church-larger.jpg"
               alt="Ukiah United Methodist Church"
@@ -855,7 +855,7 @@ export default function FoodDistribution() {
           {/* Signup Modal */}
           {selectedDate && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -973,7 +973,7 @@ export default function FoodDistribution() {
           {/* Error Modal */}
           {errorModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -1001,7 +1001,7 @@ export default function FoodDistribution() {
           {/* Success Modal */}
           {successModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -1029,7 +1029,7 @@ export default function FoodDistribution() {
           {/* Cancel Confirmation Modal */}
           {cancelConfirmModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -1039,7 +1039,7 @@ export default function FoodDistribution() {
                     className="rounded-lg"
                   />
                 </div>
-                <div className="text-center mb-6">
+                <div className="text-center mb-3 sm:mb-4 md:mb-6">
                   <div className="text-5xl mb-3">❓</div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3">Confirm Cancellation</h3>
                   <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">

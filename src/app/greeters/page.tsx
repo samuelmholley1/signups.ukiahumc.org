@@ -319,9 +319,9 @@ export default function Greeters() {
 
   return (
     <PasswordGate title="Greeter Signups" color="purple">
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 py-4 sm:py-6 md:py-8 px-2 sm:px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
+          <div className="text-center mb-4 sm:mb-6 md:mb-8">
             <img
               src="/logo-for-church-larger.jpg"
               alt="Ukiah United Methodist Church"
@@ -336,7 +336,7 @@ export default function Greeters() {
           </div>
           
           {/* Greeter Responsibilities */}
-          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-md p-6 text-left mb-8">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 md:p-6 text-left mb-4 sm:mb-6 md:mb-8">
               <h2 className="text-xl font-bold text-purple-600 mb-4">What does the Greeter do?</h2>
               <p className="font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-3">
                 Principle Responsibility: Welcoming and assisting people to feel comfortable at our services
@@ -514,7 +514,7 @@ Bon              </div>
           {/* Signup Modal */}
           {selectedDate && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -624,7 +624,7 @@ Bon              </div>
           {/* Error Modal */}
           {errorModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -652,7 +652,7 @@ Bon              </div>
           {/* Success Modal */}
           {successModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -680,7 +680,7 @@ Bon              </div>
           {/* Cancel Confirmation Modal */}
           {cancelConfirmModal.show && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+              <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg p-3 sm:p-4 md:p-6 max-w-md w-full shadow-2xl">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/logo-for-church-larger.jpg"
@@ -690,7 +690,7 @@ Bon              </div>
                     className="rounded-lg"
                   />
                 </div>
-                <div className="text-center mb-6">
+                <div className="text-center mb-3 sm:mb-4 md:mb-6">
                   <div className="text-5xl mb-3">❓</div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3">Confirm Cancellation</h3>
                   <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
