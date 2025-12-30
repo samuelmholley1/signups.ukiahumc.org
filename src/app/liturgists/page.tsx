@@ -882,21 +882,21 @@ export default function Home() {
         </button>
       )}
 
-      <div className={`container mx-auto px-4 py-8 max-w-4xl transition-all duration-300 ${calendarOpen ? 'md:ml-72 lg:ml-80 xl:ml-96 xl:pl-12' : ''}`}>
+      <div className={`container mx-auto px-2 sm:px-4 py-4 sm:py-6 md:py-8 max-w-4xl transition-all duration-300 ${calendarOpen ? 'md:ml-72 lg:ml-80 xl:ml-96 xl:pl-12' : ''}`}>
         {/* Church Logo at Top */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-3 sm:mb-4 md:mb-6">
           <img 
             src="/logo-for-church-larger.jpg" 
             alt="Ukiah United Methodist Church" 
-            className="w-80 md:w-96 h-auto rounded-lg shadow-lg"
+            className="w-48 sm:w-64 md:w-80 lg:w-96 h-auto rounded-lg shadow-lg"
           />
         </div>
 
         {/* Signup Modal */}
         {selectedSignup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
                 Sign up for {selectedService?.displayDate}
               </h3>
               
@@ -1219,27 +1219,27 @@ export default function Home() {
         )}
 
         {/* Upcoming Services */}
-        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h2 className="text-3xl md:text-2xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 flex items-center">
-                <svg className="w-8 h-8 md:w-6 md:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3 sm:mb-4">
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-2xl font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 flex items-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-6 lg:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                 </svg>
                 Liturgist Services - {getMonthName(currentMonth, currentYear)}
               </h2>
               {lastUpdated && (
-                <p className="text-xs text-gray-500 ml-8 mt-1">
+                <p className="text-[10px] sm:text-xs text-gray-500 ml-6 sm:ml-8 mt-0.5 sm:mt-1">
                   Live updates • Last refreshed: {lastUpdated.toLocaleTimeString()}
                 </p>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2 w-full sm:w-auto">
               <button
                 onClick={() => handleMonthChange('prev')} aria-label="Previous month"
-                className="px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
+                className="flex-1 sm:flex-initial px-3 py-2 sm:px-4 sm:py-3 md:px-3 md:py-1 rounded-md text-sm sm:text-base md:text-sm font-medium flex items-center justify-center min-h-[40px] sm:min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
               >
-                <svg className="w-5 h-5 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-4 md:h-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span className="hidden sm:inline">Previous Month</span>
@@ -1247,11 +1247,11 @@ export default function Home() {
               </button>
               <button
                 onClick={() => handleMonthChange('next')} aria-label="Next month"
-                className="px-4 py-3 md:px-3 md:py-1 rounded-md text-base md:text-sm font-medium flex items-center min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
+                className="flex-1 sm:flex-initial px-3 py-2 sm:px-4 sm:py-3 md:px-3 md:py-1 rounded-md text-sm sm:text-base md:text-sm font-medium flex items-center justify-center min-h-[40px] sm:min-h-[44px] bg-blue-600 text-white hover:bg-blue-700"
               >
                 <span className="hidden sm:inline">Next Month</span>
                 <span className="sm:hidden">Next</span>
-                <svg className="w-5 h-5 md:w-4 md:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-4 md:h-4 ml-0.5 sm:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -1270,7 +1270,7 @@ export default function Home() {
             </div>
           )}
           
-          <div className="space-y-3">{services.map((service: Service) => {
+          <div className="space-y-2 sm:space-y-3">{services.map((service: Service) => {
               const isMainService = service.date === mainServiceDate
               
               return (
