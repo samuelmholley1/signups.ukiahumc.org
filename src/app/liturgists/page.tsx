@@ -123,10 +123,9 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(true)
   
-  // CRITICAL: Use getCurrentMonthYear() for dynamic month detection
-  const { month: initialMonth, year: initialYear } = getCurrentMonthYear()
-  const [currentMonth, setCurrentMonth] = useState(initialMonth)
-  const [currentYear, setCurrentYear] = useState(initialYear)
+  // START WITH OCTOBER 2025
+  const [currentMonth, setCurrentMonth] = useState(9) // October (0-indexed)
+  const [currentYear, setCurrentYear] = useState(2025)
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   const [modalState, setModalState] = useState<{

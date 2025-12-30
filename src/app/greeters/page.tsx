@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
+// App version for cache busting
+const APP_VERSION = '1.0.0'
+
 interface Greeter {
   id: string
   name: string
@@ -18,13 +21,68 @@ interface Signup {
   greeter3?: Greeter | null
 }
 
+// Convert month to quarter string for API
+const getQuarterString = (month: number, year: number) => {
+  const quarter = Math.floor(month / 3) + 1
+  return `Q${quarter}-${year}`
+}
+
+// Get month name for display
+const getMonthName = (month: number, year: number) => {
+  return new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+}
+
+// Generate calendar data for a specific month (greeters - Sundays)
+const generateCalendarData = (signups: Signup[], month: number, year: number) => {
+  const now = new Date()
+  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+  const todayString = pacificTime.toISOString().split('T')[0]
+  
+  const firstDay = new Date(year, month, 1)
+  const lastDay = new Date(year, month + 1, 0)
+  const daysInMonth = lastDay.getDate()
+  const startingDay = firstDay.getDay()
+  
+  const calendarDays = []
+  
+  // Add empty cells for days before the first day of the month
+  for (let i = 0; i < startingDay; i++) {
+    calendarDays.push(null)
+  }
+  
+  // Add days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day)
+    const dateString = date.toISOString().split('T')[0]
+    const hasSignup = signups.find((s: Signup) => s.date === dateString)
+    
+    calendarDays.push({
+      day,
+      date: dateString,
+      isToday: dateString === todayString,
+      isSunday: date.getDay() === 0, // Sunday = 0
+      hasSignup: !!hasSignup,
+      signupData: hasSignup
+    })
+  }
+  
+  return {
+    monthName: firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    days: calendarDays
+  }
+}
+
 export default function Greeters() {
+  // START WITH JANUARY 2026 (Sundays)
+  const [currentMonth, setCurrentMonth] = useState(0) // January (0-indexed)
+  const [currentYear, setCurrentYear] = useState(2026)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState(Date.now())
   const [isCancelling, setIsCancelling] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(true)
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -38,27 +96,35 @@ export default function Greeters() {
   })
 
   useEffect(() => {
+    // Version check for cache busting
+    const storedVersion = localStorage.getItem('greetersVersion')
+    if (storedVersion !== APP_VERSION) {
+      localStorage.setItem('greetersVersion', APP_VERSION)
+      if ('caches' in window) {
+        caches.keys().then(names => names.forEach(name => caches.delete(name)))
+      }
+      window.location.reload()
+      return
+    }
     fetchSignups()
-  }, [])
+  }, [currentMonth, currentYear])
   
   const fetchSignups = async () => {
     try {
-      const response = await fetch(`/api/services?table=greeters&quarter=Q4-2025&t=${Date.now()}`, {
+      const quarterString = getQuarterString(currentMonth, currentYear)
+      const response = await fetch(`/api/services?table=greeters&quarter=${quarterString}&t=${Date.now()}`, {
         cache: 'no-store'
       })
       const data = await response.json()
       
       if (data.success && data.services) {
-        // Transform API data to our format
-        const transformed = data.services.map((service: any) => ({
-          date: service.date,
-          displayDate: service.displayDate,
-          greeter1: service.greeter1 || null,
-          greeter2: service.greeter2 || null,
-          greeter3: service.greeter3 || null
-        }))
+        // Filter to current month only (Sundays)
+        const filteredSignups = data.services.filter((service: any) => {
+          const serviceDate = new Date(service.date)
+          return serviceDate.getMonth() === currentMonth && serviceDate.getFullYear() === currentYear
+        })
         
-        setSignups(transformed)
+        setSignups(filteredSignups)
         
         setTimeout(() => {
           setLastUpdate(Date.now())
@@ -71,6 +137,29 @@ export default function Greeters() {
       setLoading(false)
     }
   }
+
+  const handleMonthChange = (direction: 'prev' | 'next') => {
+    setSelectedDate(null) // Close any open modal
+    
+    if (direction === 'next') {
+      if (currentMonth === 11) {
+        setCurrentMonth(0)
+        setCurrentYear(currentYear + 1)
+      } else {
+        setCurrentMonth(currentMonth + 1)
+      }
+    } else {
+      if (currentMonth === 0) {
+        setCurrentMonth(11)
+        setCurrentYear(currentYear - 1)
+      } else {
+        setCurrentMonth(currentMonth - 1)
+      }
+    }
+  }
+
+  // Generate calendar data
+  const calendarData = generateCalendarData(signups, currentMonth, currentYear)
 
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))

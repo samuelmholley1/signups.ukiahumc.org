@@ -74,32 +74,9 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
 }
 
 export default function FoodDistribution() {
-  // Get current month/year dynamically (Pacific Time)
-  // If it's the 25th or later, show next month
-  const getCurrentMonthYear = () => {
-    const now = new Date()
-    const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
-    
-    let month = pacificTime.getMonth() // 0-11
-    let year = pacificTime.getFullYear()
-    const day = pacificTime.getDate()
-    
-    // If it's the 25th or later, advance to next month
-    if (day >= 25) {
-      month++
-      if (month > 11) {
-        month = 0
-        year++
-      }
-    }
-    
-    return { month, year }
-  }
-  
-  const { month: initialMonth, year: initialYear } = getCurrentMonthYear()
-  
-  const [currentMonth, setCurrentMonth] = useState(initialMonth)
-  const [currentYear, setCurrentYear] = useState(initialYear)
+  // START WITH DECEMBER 2025 (Saturdays)
+  const [currentMonth, setCurrentMonth] = useState(11) // December (0-indexed)
+  const [currentYear, setCurrentYear] = useState(2025)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
