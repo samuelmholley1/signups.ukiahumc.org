@@ -29,6 +29,14 @@ const getCurrentMonthYear = () => {
   let month = pacificTime.getMonth()
   let year = pacificTime.getFullYear()
   
+  console.log('[LITURGISTS] getCurrentMonthYear DEBUG:', {
+    rawDate: now.toISOString(),
+    pacificDate: pacificTime.toLocaleString(),
+    day,
+    monthBefore: month,
+    yearBefore: year
+  })
+  
   // On/after 25th, advance to next month
   if (day >= 25) {
     month++
@@ -37,6 +45,8 @@ const getCurrentMonthYear = () => {
       year++
     }
   }
+  
+  console.log('[LITURGISTS] After 25th logic:', { monthAfter: month, yearAfter: year })
   
   return { month, year }
 }
