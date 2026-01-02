@@ -143,10 +143,10 @@ export default function Home() {
     setIsClient(true)
     
     // Check version and force reload if outdated
-    const storedVersion = localStorage.getItem('appVersion')
+    const storedVersion = localStorage.getItem('appVersion_v2')
     if (storedVersion && storedVersion !== APP_VERSION) {
       console.log('New version detected, clearing cache and reloading...')
-      localStorage.setItem('appVersion', APP_VERSION)
+      localStorage.setItem('appVersion_v2', APP_VERSION)
       // Unregister service worker and reload
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then((registrations) => {
@@ -159,7 +159,7 @@ export default function Home() {
       }
       return
     } else if (!storedVersion) {
-      localStorage.setItem('appVersion', APP_VERSION)
+      localStorage.setItem('appVersion_v2', APP_VERSION)
     }
     
     fetchServices()

@@ -118,9 +118,9 @@ export default function Greeters() {
 
   useEffect(() => {
     // Version check for cache busting
-    const storedVersion = localStorage.getItem('greetersVersion')
+    const storedVersion = localStorage.getItem('greetersVersion_v2')
     if (storedVersion !== APP_VERSION) {
-      localStorage.setItem('greetersVersion', APP_VERSION)
+      localStorage.setItem('greetersVersion_v2', APP_VERSION)
       if ('caches' in window) {
         caches.keys().then(names => names.forEach(name => caches.delete(name)))
       }

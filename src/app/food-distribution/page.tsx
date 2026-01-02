@@ -119,10 +119,10 @@ export default function FoodDistribution() {
 
   useEffect(() => {
     // AGGRESSIVE VERSION CHECK - Force reload if version mismatch
-    const storedVersion = localStorage.getItem('foodDistributionVersion')
+    const storedVersion = localStorage.getItem('foodDistributionVersion_v2')
     if (storedVersion !== APP_VERSION) {
       console.log(`Version mismatch: stored=${storedVersion}, current=${APP_VERSION}. Forcing reload...`)
-      localStorage.setItem('foodDistributionVersion', APP_VERSION)
+      localStorage.setItem('foodDistributionVersion_v2', APP_VERSION)
       
       // Clear all caches and force reload
       if ('caches' in window) {
