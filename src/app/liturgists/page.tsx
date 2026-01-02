@@ -7,7 +7,7 @@ import { getAllLiturgists } from '@/admin/liturgists'
 import { reportError } from '@/lib/errorReporting'
 
 // App version for cache busting - increment when you make changes
-const APP_VERSION = '4.0.0'
+const APP_VERSION = '5.0.0'
 
 interface Service {
   id: string
@@ -123,9 +123,10 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(true)
   
-  // START WITH OCTOBER 2025
-  const [currentMonth, setCurrentMonth] = useState(9) // October (0-indexed)
-  const [currentYear, setCurrentYear] = useState(2025)
+  // Use dynamic month/year with 25th advance logic
+  const initialMonthYear = getCurrentMonthYear()
+  const [currentMonth, setCurrentMonth] = useState(initialMonthYear.month)
+  const [currentYear, setCurrentYear] = useState(initialMonthYear.year)
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   const [modalState, setModalState] = useState<{

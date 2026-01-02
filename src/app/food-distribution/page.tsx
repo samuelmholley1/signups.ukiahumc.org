@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
 // CRITICAL: Increment this to force ALL users to hard reload
-const APP_VERSION = '2.0.0'
+const APP_VERSION = '3.0.0'
 
 interface Volunteer {
   id: string
@@ -73,10 +73,31 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
   }
 }
 
+// Get current month and year with 25th-of-month advance logic
+const getCurrentMonthYear = () => {
+  const now = new Date()
+  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+  const day = pacificTime.getDate()
+  let month = pacificTime.getMonth()
+  let year = pacificTime.getFullYear()
+  
+  // On/after 25th, advance to next month
+  if (day >= 25) {
+    month++
+    if (month > 11) {
+      month = 0
+      year++
+    }
+  }
+  
+  return { month, year }
+}
+
 export default function FoodDistribution() {
-  // START WITH JANUARY 2026 (Saturdays)
-  const [currentMonth, setCurrentMonth] = useState(0) // January (0-indexed)
-  const [currentYear, setCurrentYear] = useState(2026)
+  // Use dynamic month/year with 25th advance logic
+  const initialMonthYear = getCurrentMonthYear()
+  const [currentMonth, setCurrentMonth] = useState(initialMonthYear.month)
+  const [currentYear, setCurrentYear] = useState(initialMonthYear.year)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
