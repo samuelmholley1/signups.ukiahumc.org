@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
 // CRITICAL: Increment this to force ALL users to hard reload
-const APP_VERSION = '3.0.0'
+const APP_VERSION = '10.0.0'
 
 interface Volunteer {
   id: string

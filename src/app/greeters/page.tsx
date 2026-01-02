@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
 // App version for cache busting
-const APP_VERSION = '2.0.0'
+const APP_VERSION = '10.0.0'
 
 interface Greeter {
   id: string
