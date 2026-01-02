@@ -3,6 +3,35 @@
 import React, { useState, useEffect } from 'react'
 import PasswordGate from '@/components/PasswordGate'
 
+// IMMEDIATE CACHE BUST - Runs before React initializes
+if (typeof window !== 'undefined') {
+  const FORCE_RELOAD_FLAG = 'greeters_force_reloaded_v3'
+  const hasReloaded = sessionStorage.getItem(FORCE_RELOAD_FLAG)
+  
+  if (!hasReloaded) {
+    console.log('[CACHE BUST] Forcing reload - clearing all caches')
+    sessionStorage.setItem(FORCE_RELOAD_FLAG, 'true')
+    localStorage.clear()
+    
+    // Unregister all service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => registration.unregister())
+      })
+    }
+    
+    // Clear all caches
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => caches.delete(name))
+      })
+    }
+    
+    // Hard reload
+    window.location.reload()
+  }
+}
+
 // App version for cache busting
 const APP_VERSION = '10.0.0'
 
