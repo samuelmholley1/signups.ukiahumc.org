@@ -7,7 +7,7 @@ import { getAllLiturgists } from '@/admin/liturgists'
 import { reportError } from '@/lib/errorReporting'
 
 // App version for cache busting - increment when you make changes
-const APP_VERSION = '3.0.0'
+const APP_VERSION = '4.0.0'
 
 interface Service {
   id: string
