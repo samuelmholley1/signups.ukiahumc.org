@@ -72,10 +72,31 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
   }
 }
 
+// Get current month and year with 25th-of-month advance logic
+const getCurrentMonthYear = () => {
+  const now = new Date()
+  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+  const day = pacificTime.getDate()
+  let month = pacificTime.getMonth()
+  let year = pacificTime.getFullYear()
+  
+  // On/after 25th, advance to next month
+  if (day >= 25) {
+    month++
+    if (month > 11) {
+      month = 0
+      year++
+    }
+  }
+  
+  return { month, year }
+}
+
 export default function Greeters() {
-  // START WITH JANUARY 2026 (Sundays)
-  const [currentMonth, setCurrentMonth] = useState(0) // January (0-indexed)
-  const [currentYear, setCurrentYear] = useState(2026)
+  // Use dynamic month/year with 25th advance logic
+  const initialMonthYear = getCurrentMonthYear()
+  const [currentMonth, setCurrentMonth] = useState(initialMonthYear.month)
+  const [currentYear, setCurrentYear] = useState(initialMonthYear.year)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -120,8 +141,9 @@ export default function Greeters() {
       if (data.success && data.services) {
         // Filter to current month only (Sundays)
         const filteredSignups = data.services.filter((service: any) => {
-          const serviceDate = new Date(service.date)
-          return serviceDate.getMonth() === currentMonth && serviceDate.getFullYear() === currentYear
+          // Parse date string as YYYY-MM-DD to avoid timezone issues
+          const [year, month, day] = service.date.split('-').map(Number)
+          return month - 1 === currentMonth && year === currentYear
         })
         
         setSignups(filteredSignups)
@@ -450,42 +472,6 @@ export default function Greeters() {
             </div>
             <p className="text-xs md:text-sm text-gray-500 mb-2">Sundays</p>
           </div>
-          
-          {/* Greeter Responsibilities */}
-          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 md:p-6 text-left mb-4 sm:mb-6 md:mb-8">
-              <h2 className="text-xl font-bold text-purple-600 mb-4">What does the Greeter do?</h2>
-              <p className="font-semibold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-3">
-                Principle Responsibility: Welcoming and assisting people to feel comfortable at our services
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">Before the service: Arrive by 9:30</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">
-                    <li>Greet people as they come in (1 usher at the front and 1 usher at Chapel door is ideal)</li>
-                    <li>Check their names off on the clipboard. Write people not listed on the last page</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">During the service:</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">
-                    <li>For the "Praising" song, assist the acolyte by lighting the taper</li>
-                    <li>Take the offering basket up and put it on the alter during the Doxology</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">After the service:</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 dark:text-gray-300 dark:text-gray-300">
-                    <li>Count the attendees and fill in the totals on the clipboard. Clipboard goes into office on Debbie's desk</li>
-                    <li>Gather up leftover bulletins etc from pews. Save unused Newcomer forms</li>
-                    <li>Turn off the lights (behind the curtain & power strip behind the band)</li>
-                    <li>Lock the doors (stage & chapel)</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
 
           {loading ? (
             <div className="text-center py-12">
@@ -626,7 +612,41 @@ export default function Greeters() {
 Bon              </div>
             </div>
           )}
-
+          {/* Greeter Responsibilities */}
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 md:p-6 text-left mt-4 sm:mt-6 md:mt-8">
+              <h2 className="text-xl font-bold text-purple-600 mb-4">What does the Greeter do?</h2>
+              <p className="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                Principle Responsibility: Welcoming and assisting people to feel comfortable at our services
+              </p>
+              
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2">Before the service: Arrive by 9:30</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                    <li>Greet people as they come in (1 usher at the front and 1 usher at Chapel door is ideal)</li>
+                    <li>Check their names off on the clipboard. Write people not listed on the last page</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2">During the service:</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                    <li>For the "Praising" song, assist the acolyte by lighting the taper</li>
+                    <li>Take the offering basket up and put it on the alter during the Doxology</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2">After the service:</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                    <li>Count the attendees and fill in the totals on the clipboard. Clipboard goes into office on Debbie's desk</li>
+                    <li>Gather up leftover bulletins etc from pews. Save unused Newcomer forms</li>
+                    <li>Turn off the lights (behind the curtain & power strip behind the band)</li>
+                    <li>Lock the doors (stage & chapel)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           {/* Signup Modal */}
           {selectedDate && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

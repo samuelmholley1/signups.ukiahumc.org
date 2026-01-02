@@ -233,10 +233,11 @@ export default function Home() {
       if (data.success) {
         // Filter to current month only
         const filteredServices = data.services.filter((service: any) => {
-          const serviceDate = new Date(service.date)
-          const matches = serviceDate.getMonth() === currentMonth && serviceDate.getFullYear() === currentYear
+          // Parse date string as YYYY-MM-DD to avoid timezone issues
+          const [year, month, day] = service.date.split('-').map(Number)
+          const matches = month - 1 === currentMonth && year === currentYear
           if (!matches) {
-            console.log('[LITURGISTS] Filtered out:', service.displayDate, 'serviceMonth:', serviceDate.getMonth(), 'targetMonth:', currentMonth)
+            console.log('[LITURGISTS] Filtered out:', service.displayDate, 'serviceMonth:', month - 1, 'targetMonth:', currentMonth)
           }
           return matches
         })
