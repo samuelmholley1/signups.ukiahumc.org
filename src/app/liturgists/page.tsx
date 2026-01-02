@@ -786,7 +786,7 @@ export default function Home() {
           </button>
           
           {/* Calendar */}
-          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-72 lg:w-80">
+          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-64 lg:w-72">
             <div className="p-3 lg:p-4">
               <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 dark:bg-gray-800 z-10 pb-2">
                 <div className="flex items-center space-x-2">
@@ -881,7 +881,7 @@ export default function Home() {
         </button>
       )}
 
-      <div className={`container mx-auto px-2 sm:px-4 py-4 sm:py-6 md:py-8 max-w-4xl transition-all duration-300 ${calendarOpen ? 'md:ml-72 lg:ml-80 xl:ml-96 xl:pl-12' : ''}`}>
+      <div className={`container mx-auto px-1 sm:px-2 md:px-4 py-4 sm:py-6 md:py-8 max-w-4xl transition-all duration-300 ${calendarOpen ? 'md:ml-48 lg:ml-60 xl:ml-72' : ''}`}>
         {/* Church Logo at Top */}
         <div className="flex justify-center mb-3 sm:mb-4 md:mb-6">
           <img 

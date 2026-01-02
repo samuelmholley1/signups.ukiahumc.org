@@ -74,9 +74,9 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
 }
 
 export default function FoodDistribution() {
-  // START WITH DECEMBER 2025 (Saturdays)
-  const [currentMonth, setCurrentMonth] = useState(11) // December (0-indexed)
-  const [currentYear, setCurrentYear] = useState(2025)
+  // START WITH JANUARY 2026 (Saturdays)
+  const [currentMonth, setCurrentMonth] = useState(0) // January (0-indexed)
+  const [currentYear, setCurrentYear] = useState(2026)
   const [signups, setSignups] = useState<Signup[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -513,7 +513,7 @@ export default function FoodDistribution() {
           </button>
         )}
 
-        <div className={`max-w-4xl mx-auto transition-all duration-300 ${calendarOpen ? 'md:ml-72 lg:ml-80' : ''}`}>
+        <div className={`max-w-4xl mx-auto px-1 sm:px-2 transition-all duration-300 ${calendarOpen ? 'md:ml-48 lg:ml-60 xl:ml-72' : ''}`}>
           <div className="text-center mb-4 sm:mb-6 md:mb-8">
             <img
               src="/logo-for-church-larger.jpg"

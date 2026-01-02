@@ -158,6 +158,10 @@ export default function Greeters() {
     }
   }
 
+  // Navigation helper functions for calendar widget
+  const handlePreviousMonth = () => handleMonthChange('prev')
+  const handleNextMonth = () => handleMonthChange('next')
+
   // Generate calendar data
   const calendarData = generateCalendarData(signups, currentMonth, currentYear)
 
@@ -320,7 +324,94 @@ export default function Greeters() {
   return (
     <PasswordGate title="Greeter Signups" color="purple">
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 py-4 sm:py-6 md:py-8 px-2 sm:px-4">
-        <div className="max-w-4xl mx-auto">
+        
+        {/* Calendar Widget - Collapsible (Hidden on mobile) */}
+        {calendarOpen ? (
+          <div className="hidden md:block fixed top-20 left-4 z-50">
+            {/* Close Button */}
+            <button
+              onClick={() => setCalendarOpen(false)}
+              className="w-full bg-purple-600 text-white rounded-t-lg px-4 py-3 shadow-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
+              title="Close calendar"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Close Calendar
+            </button>
+            
+            {/* Calendar */}
+            <div className="bg-white dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 w-64 lg:w-72">
+              <div className="p-3 lg:p-4">
+                <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-2">
+                  <div className="flex-1">
+                    <h1 className="text-sm font-bold text-gray-800 dark:text-gray-100">Greeters</h1>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handlePreviousMonth}
+                        className="text-purple-600 hover:text-purple-800 p-0.5"
+                        title="Previous month"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <p className="text-xs text-purple-600 font-medium">{getMonthName(currentMonth, currentYear)}</p>
+                      <button
+                        onClick={handleNextMonth}
+                        className="text-purple-600 hover:text-purple-800 p-0.5"
+                        title="Next month"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              
+                <div className="grid grid-cols-7 gap-1 text-xs">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                    <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 py-1">
+                      {day}
+                    </div>
+                  ))}
+                  {calendarData.days.map((day, index) => (
+                    <div
+                      key={index}
+                      className={`text-center py-1 rounded text-xs transition-colors relative ${
+                        !day ? '' :
+                        day.isSunday && day.hasSignup ? 'bg-purple-100 font-medium' :
+                        day.isSunday ? 'bg-orange-100 font-medium' :
+                        day.isToday ? 'bg-blue-100 font-bold' :
+                        'text-gray-600'
+                      }`}
+                      title={
+                        day?.isSunday && day?.hasSignup ? `Greeter Service: ${day.signupData?.displayDate}` : 
+                        day?.isSunday ? 'Greeter Service Day' : ''
+                      }
+                    >
+                      {day?.day || ''}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setCalendarOpen(true)}
+            className="hidden md:flex fixed top-20 left-4 z-50 bg-purple-600 text-white rounded-lg px-4 py-3 shadow-lg hover:bg-purple-700 transition-colors items-center gap-2"
+            title="Open calendar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span className="font-semibold text-sm">Open Calendar</span>
+          </button>
+        )}
+
+        <div className={`max-w-4xl mx-auto px-1 sm:px-2 transition-all duration-300 ${calendarOpen ? 'md:ml-40 lg:ml-48 xl:ml-60' : ''}`}>
           <div className="text-center mb-4 sm:mb-6 md:mb-8">
             <img
               src="/logo-for-church-larger.jpg"
@@ -329,10 +420,35 @@ export default function Greeters() {
               height={213}
               className="mx-auto rounded-lg shadow-md mb-4 w-80 md:w-[300px]"
             />
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 dark:text-gray-100 mb-2">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
               Greeter Signups
             </h1>
-            <p className="text-lg md:text-base text-gray-600 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">December 2025</p>
+            
+            {/* Month Navigation */}
+            <div className="flex items-center justify-center gap-2 md:gap-4 mb-4">
+              <button
+                onClick={handlePreviousMonth}
+                className="px-3 py-2 md:px-4 md:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
+                aria-label="Previous month"
+              >
+                <span className="text-lg md:text-xl">←</span>
+                <span className="hidden sm:inline">Previous</span>
+              </button>
+              
+              <p className="text-sm md:text-lg text-gray-600 dark:text-gray-400 font-semibold min-w-[140px] md:min-w-[200px] text-center">
+                {getMonthName(currentMonth, currentYear)}
+              </p>
+              
+              <button
+                onClick={handleNextMonth}
+                className="px-3 py-2 md:px-4 md:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-1 md:gap-2 text-sm md:text-base"
+                aria-label="Next month"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <span className="text-lg md:text-xl">→</span>
+              </button>
+            </div>
+            <p className="text-xs md:text-sm text-gray-500 mb-2">Sundays</p>
           </div>
           
           {/* Greeter Responsibilities */}
