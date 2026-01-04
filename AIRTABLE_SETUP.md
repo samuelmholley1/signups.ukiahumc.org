@@ -61,19 +61,67 @@ npm run dev
 
 ## 📋 AIRTABLE TABLE STRUCTURE
 
-Your Airtable table should have these fields:
+### Liturgists Table
 
-| Field Name | Field Type | Options |
-|------------|------------|---------|
-| Service Date | Date | Date only |
-| Display Date | Single line text | - |
-| Name | Single line text | - |
-| Email | Email | - |
-| Phone | Phone number | - |
-| Role | Single select | Liturgist, Backup, Attendance |
-| Attendance Status | Single select | Yes, No, Maybe |
-| Notes | Long text | - |
-| Submitted At | Date | Include time |
+Your **Liturgists** Airtable table should have these fields:
+
+| Field Name | Field Type | Options/Notes |
+|------------|------------|---------------|
+| Service Date | Date | Date only, Pacific timezone |
+| Display Date | Single line text | E.g., "January 4, 2026" |
+| Name | Single line text | Full name of signee |
+| Email | Email | Contact email |
+| Phone | Phone number | Optional phone number |
+| Role | Long text | **CRITICAL:** Use "Long text", not "Single select"<br>Values: `liturgist`, `liturgist2`, `backup`, `backup2` |
+| Attendance Status | Single select | Yes, No, Maybe (only for Attendance role) |
+| Notes | Long text | Optional notes |
+| Submitted At | Date | Include time, Pacific timezone |
+
+**⚠️ CRITICAL: Role Field Type**
+- The `Role` field **MUST** be `Long text` (not `Single select`)
+- This allows dynamic role assignment: `liturgist`, `liturgist2`, `backup`, `backup2`
+- Single select would limit flexibility and break signups
+
+### Greeters Table
+
+Your **Greeters** Airtable table should have these fields:
+
+| Field Name | Field Type | Options/Notes |
+|------------|------------|---------------|
+| Service Date | Date | Date only, Pacific timezone |
+| Display Date | Single line text | E.g., "January 5, 2026" |
+| Name | Single line text | Full name of greeter |
+| Email | Email | Contact email |
+| Phone | Phone number | Optional phone number |
+| Role | Long text | Values: `greeter1`, `greeter2`, `greeter3` |
+| Notes | Long text | Optional notes |
+| Submitted At | Date | Include time, Pacific timezone |
+
+### Food Distribution Table
+
+Your **Food Distribution** Airtable table should have these fields:
+
+| Field Name | Field Type | Options/Notes |
+|------------|------------|---------------|
+| Service Date | Date | Date only, Pacific timezone |
+| Display Date | Single line text | E.g., "December 6, 2025" |
+| Name | Single line text | Full name of volunteer |
+| Email | Email | Contact email |
+| Phone | Phone number | Optional phone number |
+| Role | Long text | Values: `volunteer1`, `volunteer2`, `volunteer3`, `volunteer4` |
+| Notes | Long text | Optional notes |
+| Submitted At | Date | Include time, Pacific timezone |
+
+## 🛠️ MANUAL SIGNUP (NO EMAIL)
+
+To manually add someone to a service **without sending an email**, use PowerShell:
+
+```powershell
+# Example: Add Doug Pratt to January 4th liturgist
+Invoke-RestMethod -Uri "https://signups.ukiahumc.org/api/signup" -Method POST -Headers @{"Content-Type"="application/json"} -Body '{"table":"liturgists","serviceDate":"2026-01-04","displayDate":"January 4, 2026","name":"Doug Pratt","email":"dmpratt@sbcglobal.net","phone":"","role":"liturgist"}'
+```
+
+**⚠️ NOTE:** This **WILL** send a confirmation email. To skip email, temporarily comment out the email sending code in `/src/app/api/signup/route.ts` (lines ~122-193).
 
 ---
 
