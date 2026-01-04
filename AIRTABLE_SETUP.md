@@ -114,14 +114,57 @@ Your **Food Distribution** Airtable table should have these fields:
 
 ## 🛠️ MANUAL SIGNUP (NO EMAIL)
 
-To manually add someone to a service **without sending an email**, use PowerShell:
+**⚠️ IMPORTANT:** Using the app's `/api/signup` endpoint **ALWAYS** sends confirmation emails. There's no way to skip it.
+
+### Method 1: Direct Airtable API (NO EMAIL SENT)
+
+To add someone **without triggering any emails**, call Airtable directly:
 
 ```powershell
-# Example: Add Doug Pratt to January 4th liturgist
+# Example: Add Doug Pratt to January 4th liturgist WITHOUT email
+$headers = @{
+    "Authorization" = "Bearer $env:AIRTABLE_PAT_TOKEN"
+    "Content-Type" = "application/json"
+}
+
+$body = @{
+    records = @(
+        @{
+            fields = @{
+                "Service Date" = "2026-01-04"
+                "Display Date" = "January 4, 2026"
+                "Name" = "Doug Pratt"
+                "Email" = "dmpratt@sbcglobal.net"
+                "Phone" = ""
+                "Role" = "liturgist"
+                "Submitted At" = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            }
+        }
+    )
+} | ConvertTo-Json -Depth 10
+
+Invoke-RestMethod -Uri "https://api.airtable.com/v0/$env:AIRTABLE_BASE_ID/Liturgists" -Method POST -Headers $headers -Body $body
+```
+
+**✅ This method:**
+- Goes directly to Airtable
+- Bypasses the app entirely
+- **Does NOT send any emails**
+- Requires `AIRTABLE_PAT_TOKEN` and `AIRTABLE_BASE_ID` environment variables
+
+### Method 2: App API (WILL SEND EMAIL)
+
+If you want the email confirmation, use the app's signup API:
+
+```powershell
+# Example: Add with email confirmation
 Invoke-RestMethod -Uri "https://signups.ukiahumc.org/api/signup" -Method POST -Headers @{"Content-Type"="application/json"} -Body '{"table":"liturgists","serviceDate":"2026-01-04","displayDate":"January 4, 2026","name":"Doug Pratt","email":"dmpratt@sbcglobal.net","phone":"","role":"liturgist"}'
 ```
 
-**⚠️ NOTE:** This **WILL** send a confirmation email. To skip email, temporarily comment out the email sending code in `/src/app/api/signup/route.ts` (lines ~122-193).
+**⚠️ This method WILL send confirmation email to:**
+- Signee (TO)
+- Sam (CC for liturgists/greeters, BCC for food distribution)
+- Trudy (CC for food distribution only)
 
 ---
 
