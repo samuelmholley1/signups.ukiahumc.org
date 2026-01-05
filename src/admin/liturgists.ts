@@ -40,6 +40,12 @@ export const liturgists: Liturgist[] = [
     email: 'pitts.mikey8@gmail.com',
     frequency: 'regular'
   },
+  {
+    name: 'Michelle Linderman',
+    email: 'chelle5869@gmail.com',
+    phone: '707-485-4138',
+    frequency: 'regular'
+  },
   
   // Occasional Liturgists
   {
