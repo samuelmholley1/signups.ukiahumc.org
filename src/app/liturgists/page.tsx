@@ -510,7 +510,7 @@ export default function Home() {
         setSignupForm(prev => ({
           ...prev,
           email: liturgist.email,
-          phone: '', // We don't have phone in the liturgist data
+          phone: liturgist.phone || '',
           firstName: '',
           lastName: ''
         }))
