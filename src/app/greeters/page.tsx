@@ -5,7 +5,7 @@ import PasswordGate from '@/components/PasswordGate'
 
 // IMMEDIATE CACHE BUST - Runs before React initializes
 if (typeof window !== 'undefined') {
-  const FORCE_RELOAD_FLAG = 'greeters_force_reloaded_v3'
+  const FORCE_RELOAD_FLAG = 'greeters_force_reloaded_v4'
   const hasReloaded = sessionStorage.getItem(FORCE_RELOAD_FLAG)
   
   if (!hasReloaded) {
@@ -33,7 +33,7 @@ if (typeof window !== 'undefined') {
 }
 
 // App version for cache busting
-const APP_VERSION = '10.0.0'
+const APP_VERSION = '11.0.0'
 
 interface Greeter {
   id: string
