@@ -101,28 +101,18 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
   }
 }
 
-// Get current month and year with 25th-of-month advance logic
+// Get current month and year
 const getCurrentMonthYear = () => {
   const now = new Date()
   const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
-  const day = pacificTime.getDate()
-  let month = pacificTime.getMonth()
-  let year = pacificTime.getFullYear()
-  
-  // On/after 25th, advance to next month
-  if (day >= 25) {
-    month++
-    if (month > 11) {
-      month = 0
-      year++
-    }
-  }
+  const month = pacificTime.getMonth()
+  const year = pacificTime.getFullYear()
   
   return { month, year }
 }
 
 export default function Greeters() {
-  // Use dynamic month/year with 25th advance logic
+  // Use dynamic month/year - shows current month + next 2 months
   const initialMonthYear = getCurrentMonthYear()
   const [currentMonth, setCurrentMonth] = useState(initialMonthYear.month)
   const [currentYear, setCurrentYear] = useState(initialMonthYear.year)
@@ -161,26 +151,42 @@ export default function Greeters() {
   
   const fetchSignups = async () => {
     try {
-      const quarterString = getQuarterString(currentMonth, currentYear)
-      const response = await fetch(`/api/services?table=greeters&quarter=${quarterString}&t=${Date.now()}`, {
-        cache: 'no-store'
-      })
-      const data = await response.json()
+      // Fetch data for 3 months: current month, next month, and month after
+      const allSignups: any[] = []
       
-      if (data.success && data.services) {
-        // Filter to current month only (Sundays)
-        const filteredSignups = data.services.filter((service: any) => {
-          // Parse date string as YYYY-MM-DD to avoid timezone issues
-          const [year, month, day] = service.date.split('-').map(Number)
-          return month - 1 === currentMonth && year === currentYear
+      for (let i = 0; i < 3; i++) {
+        let targetMonth = currentMonth + i
+        let targetYear = currentYear
+        
+        if (targetMonth > 11) {
+          targetMonth -= 12
+          targetYear++
+        }
+        
+        const quarterString = getQuarterString(targetMonth, targetYear)
+        const response = await fetch(`/api/services?table=greeters&quarter=${quarterString}&t=${Date.now()}`, {
+          cache: 'no-store'
         })
+        const data = await response.json()
         
-        setSignups(filteredSignups)
-        
-        setTimeout(() => {
-          setLastUpdate(Date.now())
-        }, 0)
+        if (data.success && data.services) {
+          // Filter to target month only (Sundays)
+          const filteredSignups = data.services.filter((service: any) => {
+            // Parse date string as YYYY-MM-DD to avoid timezone issues
+            const [year, month, day] = service.date.split('-').map(Number)
+            return month - 1 === targetMonth && year === targetYear
+          })
+          allSignups.push(...filteredSignups)
+        }
       }
+      
+      // Sort by date
+      allSignups.sort((a, b) => a.date.localeCompare(b.date))
+      setSignups(allSignups)
+      
+      setTimeout(() => {
+        setLastUpdate(Date.now())
+      }, 0)
     } catch (error) {
       console.error('Error fetching signups:', error)
       setSignups([])
@@ -213,21 +219,32 @@ export default function Greeters() {
   const handlePreviousMonth = () => handleMonthChange('prev')
   const handleNextMonth = () => handleMonthChange('next')
 
-  // Generate calendar data
-  const calendarData = generateCalendarData(signups, currentMonth, currentYear)
+  // Generate calendar data for 3 months
+  const calendarMonths = []
+  for (let i = 0; i < 3; i++) {
+    let targetMonth = currentMonth + i
+    let targetYear = currentYear
+    
+    if (targetMonth > 11) {
+      targetMonth -= 12
+      targetYear++
+    }
+    
+    calendarMonths.push(generateCalendarData(signups, targetMonth, targetYear))
+  }
 
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
     
     // Map of preset people with their contact info
-    const presetPeople: { [key: string]: { email: string; phone?: string } } = {
+    const presetPeople: { [key: string]: { email: string; phone?: string; ccEmail?: string } } = {
       'Julie Apostolu': { email: 'forestlove@comcast.net', phone: '707-357-6035' },
-      'Kay Lieberknecht': { email: 'kay.hoofin.it@gamail.com', phone: '707-621-3662' },
+      'Kay Lieberknecht': { email: 'kay.hoofin.it@gmail.com', phone: '707-621-3662' },
       'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
       'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
       'Annie Gould': { email: 'annia@pacific.net', phone: '707-513-9634' },
       'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
-      'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920' },
+      'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
       'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
       'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
       'Test User': { email: 'sam+test@samuelholley.com' }
@@ -326,6 +343,21 @@ export default function Greeters() {
     
     setIsSubmitting(true)
     
+    // Check if this person has a ccEmail (Chad Raugewitz)
+    const presetPeople: { [key: string]: { email: string; phone?: string; ccEmail?: string } } = {
+      'Julie Apostolu': { email: 'forestlove@comcast.net', phone: '707-357-6035' },
+      'Kay Lieberknecht': { email: 'kay.hoofin.it@gmail.com', phone: '707-621-3662' },
+      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
+      'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
+      'Annie Gould': { email: 'annia@pacific.net', phone: '707-513-9634' },
+      'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
+      'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
+      'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
+      'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
+      'Test User': { email: 'sam+test@samuelholley.com' }
+    }
+    const ccEmail = formData.selectedPerson !== 'other' && presetPeople[formData.selectedPerson]?.ccEmail
+    
     try {
       const response = await fetch('/api/signup', {
         method: 'POST',
@@ -337,7 +369,8 @@ export default function Greeters() {
           name: fullName,
           email: formData.email,
           phone: formData.phone,
-          role: formData.role
+          role: formData.role,
+          ...(ccEmail && { ccEmail })
         })
       })
       
@@ -421,31 +454,37 @@ export default function Greeters() {
                   </div>
                 </div>
               
-                <div className="grid grid-cols-7 gap-1 text-xs">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                    <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 py-1">
-                      {day}
+                {/* Render 3 months */}
+                {calendarMonths.map((monthData, monthIndex) => (
+                  <div key={monthIndex} className="mb-4">
+                    <h2 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">{monthData.monthName}</h2>
+                    <div className="grid grid-cols-7 gap-1 text-xs">
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                        <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 py-1">
+                          {day}
+                        </div>
+                      ))}
+                      {monthData.days.map((day: any, index: number) => (
+                        <div
+                          key={index}
+                          className={`text-center py-1 rounded text-xs transition-colors relative ${
+                            !day ? '' :
+                            day.isSunday && day.hasSignup ? 'bg-purple-100 font-medium' :
+                            day.isSunday ? 'bg-orange-100 font-medium' :
+                            day.isToday ? 'bg-blue-100 font-bold' :
+                            'text-gray-600'
+                          }`}
+                          title={
+                            day?.isSunday && day?.hasSignup ? `Greeter Service: ${day.signupData?.displayDate}` : 
+                            day?.isSunday ? 'Greeter Service Day' : ''
+                          }
+                        >
+                          {day?.day || ''}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                  {calendarData.days.map((day, index) => (
-                    <div
-                      key={index}
-                      className={`text-center py-1 rounded text-xs transition-colors relative ${
-                        !day ? '' :
-                        day.isSunday && day.hasSignup ? 'bg-purple-100 font-medium' :
-                        day.isSunday ? 'bg-orange-100 font-medium' :
-                        day.isToday ? 'bg-blue-100 font-bold' :
-                        'text-gray-600'
-                      }`}
-                      title={
-                        day?.isSunday && day?.hasSignup ? `Greeter Service: ${day.signupData?.displayDate}` : 
-                        day?.isSunday ? 'Greeter Service Day' : ''
-                      }
-                    >
-                      {day?.day || ''}
-                    </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -487,7 +526,11 @@ export default function Greeters() {
               </button>
               
               <p className="text-sm md:text-lg text-gray-600 dark:text-gray-400 font-semibold min-w-[140px] md:min-w-[200px] text-center">
-                {getMonthName(currentMonth, currentYear)}
+                {(() => {
+                  const month3 = (currentMonth + 2) % 12
+                  const year3 = currentMonth + 2 > 11 ? currentYear + 1 : currentYear
+                  return `${getMonthName(currentMonth, currentYear).split(' ')[0]} - ${getMonthName(month3, year3)}`
+                })()}
               </p>
               
               <button

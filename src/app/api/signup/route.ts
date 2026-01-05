@@ -190,6 +190,11 @@ export async function POST(request: NextRequest) {
           bccRecipients = undefined
         }
         
+        // Special case: Chad Raugewitz gets email on both addresses
+        if (body.ccEmail) {
+          ccRecipients = ccRecipients ? `${ccRecipients},${body.ccEmail}` : body.ccEmail
+        }
+        
         await sendEmail({
           to: body.email,
           cc: ccRecipients,
