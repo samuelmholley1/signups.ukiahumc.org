@@ -12,6 +12,20 @@ if (typeof window !== 'undefined') {
   console.log('🔵 FORCE_RELOAD_FLAG:', FORCE_RELOAD_FLAG)
   console.log('🔵 hasReloaded from sessionStorage:', hasReloaded)
   
+  // Force waiting service worker to activate immediately
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(registration => {
+        if (registration.waiting) {
+          console.log('⚠️ [SW] Forcing waiting service worker to activate')
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+          // Also trigger skipWaiting directly
+          registration.waiting.postMessage('skipWaiting')
+        }
+      })
+    })
+  }
+  
   if (!hasReloaded) {
     console.log('⚠️ [CACHE BUST] NOT RELOADED YET - Forcing reload and clearing all caches')
     sessionStorage.setItem(FORCE_RELOAD_FLAG, 'true')
