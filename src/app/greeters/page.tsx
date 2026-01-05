@@ -8,8 +8,12 @@ if (typeof window !== 'undefined') {
   const FORCE_RELOAD_FLAG = 'greeters_force_reloaded_v5'
   const hasReloaded = sessionStorage.getItem(FORCE_RELOAD_FLAG)
   
+  console.log('🔵 GREETERS PAGE LOADED - VERSION CHECK')
+  console.log('🔵 FORCE_RELOAD_FLAG:', FORCE_RELOAD_FLAG)
+  console.log('🔵 hasReloaded from sessionStorage:', hasReloaded)
+  
   if (!hasReloaded) {
-    console.log('[CACHE BUST] Forcing reload - clearing all caches')
+    console.log('⚠️ [CACHE BUST] NOT RELOADED YET - Forcing reload and clearing all caches')
     sessionStorage.setItem(FORCE_RELOAD_FLAG, 'true')
     localStorage.clear()
     
@@ -28,12 +32,16 @@ if (typeof window !== 'undefined') {
     }
     
     // Hard reload
+    console.log('⚠️ [CACHE BUST] About to hard reload now...')
     window.location.reload()
+  } else {
+    console.log('✅ [CACHE BUST] Already reloaded - page should be latest version')
   }
 }
 
 // App version for cache busting
 const APP_VERSION = '12.0.0'
+console.log('🔵 APP_VERSION:', APP_VERSION)
 
 interface Greeter {
   id: string
@@ -151,6 +159,7 @@ export default function Greeters() {
   
   const fetchSignups = async () => {
     try {
+      console.log('🌐 fetchSignups called - fetching 3 months of data')
       // Fetch data for 3 months: current month, next month, and month after
       const allSignups: any[] = []
       
@@ -220,6 +229,7 @@ export default function Greeters() {
   const handleNextMonth = () => handleMonthChange('next')
 
   // Generate calendar data for 3 months
+  console.log('📅 Generating calendar data for 3 MONTHS')
   const calendarMonths = []
   for (let i = 0; i < 3; i++) {
     let targetMonth = currentMonth + i
@@ -232,6 +242,7 @@ export default function Greeters() {
     
     calendarMonths.push(generateCalendarData(signups, targetMonth, targetYear))
   }
+  console.log('📅 Generated', calendarMonths.length, 'calendar months:', calendarMonths.map(m => m.monthName))
 
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
