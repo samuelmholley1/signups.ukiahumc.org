@@ -174,8 +174,18 @@ export async function POST(request: NextRequest) {
           
           ccRecipients = isTrudySigningUp ? undefined : 'morganmiller@pacific.net'
           bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
+        } else if (isGreeters) {
+          // Greeters: Daphne is CC'd, Sam is BCC'd
+          // Exception 1: If Daphne is signing up, no CC (she's already TO), Sam still BCC'd
+          // Exception 2: If Sam is signing up, Daphne is CC'd, no BCC
+          const isDaphneSigningUp = body.email.toLowerCase() === 'daphnemacneil@yahoo.com'
+          const emailGoesToSam = body.email.toLowerCase().includes('@samuelholley.com') || 
+                                  body.email.toLowerCase() === 'sam@samuelholley.com'
+          
+          ccRecipients = isDaphneSigningUp ? undefined : emailGoesToSam ? 'daphnemacneil@yahoo.com' : 'daphnemacneil@yahoo.com'
+          bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
         } else {
-          // Liturgist & Greeter: Sam is CC'd (not BCC'd), no Trudy
+          // Liturgist: Sam is CC'd (not BCC'd)
           ccRecipients = isSamSigningUp ? undefined : 'sam@samuelholley.com'
           bccRecipients = undefined
         }
