@@ -820,7 +820,7 @@ export default function Home() {
           </button>
           
           {/* Calendar */}
-          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-64 lg:w-72 max-h-[calc(100vh-6rem)] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-64 lg:w-72 max-h-[calc(100vh-10rem)] overflow-y-auto">
             <div className="p-3 lg:p-4">
               <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 dark:bg-gray-800 z-10 pb-2">
                 <div className="flex items-center space-x-2">
