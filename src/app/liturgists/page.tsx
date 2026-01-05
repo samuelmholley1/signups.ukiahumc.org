@@ -50,32 +50,12 @@ interface Service {
   notes?: string
 }
 
-// Get current month and year with 25th-of-month advance logic
+// Get current month and year
 const getCurrentMonthYear = () => {
   const now = new Date()
   const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
-  const day = pacificTime.getDate()
-  let month = pacificTime.getMonth()
-  let year = pacificTime.getFullYear()
-  
-  console.log('[LITURGISTS] getCurrentMonthYear DEBUG:', {
-    rawDate: now.toISOString(),
-    pacificDate: pacificTime.toLocaleString(),
-    day,
-    monthBefore: month,
-    yearBefore: year
-  })
-  
-  // On/after 25th, advance to next month
-  if (day >= 25) {
-    month++
-    if (month > 11) {
-      month = 0
-      year++
-    }
-  }
-  
-  console.log('[LITURGISTS] After 25th logic:', { monthAfter: month, yearAfter: year })
+  const month = pacificTime.getMonth()
+  const year = pacificTime.getFullYear()
   
   return { month, year }
 }
@@ -250,31 +230,43 @@ export default function Home() {
     console.log('[LITURGISTS] fetchServices called with currentMonth:', currentMonth, 'currentYear:', currentYear)
     
     try {
-      const quarter = getQuarterString(currentMonth, currentYear)
-      console.log('[LITURGISTS] Fetching quarter:', quarter)
-      const response = await fetch(`/api/services?quarter=${quarter}`, {
-        cache: 'no-store', // Prevent caching
-        headers: {
-          'Cache-Control': 'no-cache'
+      // Fetch data for 2 months: current month and next month
+      const allServices: any[] = []
+      
+      for (let i = 0; i < 2; i++) {
+        let targetMonth = currentMonth + i
+        let targetYear = currentYear
+        
+        if (targetMonth > 11) {
+          targetMonth -= 12
+          targetYear++
         }
-      })
-      const data = await response.json()
-      console.log('[LITURGISTS] API returned', data.services?.length, 'services')
-      if (data.success) {
-        // Filter to current month only
-        const filteredServices = data.services.filter((service: any) => {
-          // Parse date string as YYYY-MM-DD to avoid timezone issues
-          const [year, month, day] = service.date.split('-').map(Number)
-          const matches = month - 1 === currentMonth && year === currentYear
-          if (!matches) {
-            console.log('[LITURGISTS] Filtered out:', service.displayDate, 'serviceMonth:', month - 1, 'targetMonth:', currentMonth)
+        
+        const quarter = getQuarterString(targetMonth, targetYear)
+        console.log('[LITURGISTS] Fetching quarter:', quarter)
+        const response = await fetch(`/api/services?quarter=${quarter}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
           }
-          return matches
         })
-        console.log('[LITURGISTS] After filtering:', filteredServices.length, 'services for month', currentMonth)
-        setServices(filteredServices)
-        setLastUpdated(new Date())
+        const data = await response.json()
+        
+        if (data.success && data.services) {
+          // Filter to target month only
+          const filteredServices = data.services.filter((service: any) => {
+            const [year, month, day] = service.date.split('-').map(Number)
+            return month - 1 === targetMonth && year === targetYear
+          })
+          allServices.push(...filteredServices)
+        }
       }
+      
+      // Sort by date
+      allServices.sort((a, b) => a.date.localeCompare(b.date))
+      console.log('[LITURGISTS] After fetching 2 months:', allServices.length, 'services')
+      setServices(allServices)
+      setLastUpdated(new Date())
     } catch (error) {
       console.error('Error fetching services:', error)
       // Don't report background refresh errors - they auto-retry every 5 seconds
@@ -363,8 +355,19 @@ export default function Home() {
   
   const mainServiceDate = getMainServiceDate()
   
-  // Generate calendar data for current month only
-  const calendarData = generateCalendarData(services, mainServiceDate, currentMonth, currentYear)
+  // Generate calendar data for 2 months
+  const calendarMonths = []
+  for (let i = 0; i < 2; i++) {
+    let targetMonth = currentMonth + i
+    let targetYear = currentYear
+    
+    if (targetMonth > 11) {
+      targetMonth -= 12
+      targetYear++
+    }
+    
+    calendarMonths.push(generateCalendarData(services, mainServiceDate, targetMonth, targetYear))
+  }
 
   const handleSignup = (serviceId: string, preferredRole?: 'liturgist' | 'liturgist2' /* | 'backup' | 'backup2' */) => {
     const service = services.find(s => s.id === serviceId)
@@ -817,7 +820,7 @@ export default function Home() {
           </button>
           
           {/* Calendar */}
-          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-64 lg:w-72">
+          <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 w-64 lg:w-72 max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div className="p-3 lg:p-4">
               <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 dark:bg-gray-800 z-10 pb-2">
                 <div className="flex items-center space-x-2">
@@ -858,44 +861,46 @@ export default function Home() {
                 </button>
               </div>
             
-            {/* Render single month */}
-            <div>
-              <h2 className="text-xs font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">{calendarData.monthName}</h2>
-              <div className="grid grid-cols-7 gap-1 text-xs">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                  <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400 py-1">
-                    {day}
-                  </div>
-                ))}
-                {calendarData.days.map((day, index) => (
-                  <div
-                    key={index}
-                    className={`text-center py-1 rounded text-xs transition-colors relative ${
-                      !day ? '' :
-                      day.isMainService ? 'bg-purple-600 text-white font-bold cursor-pointer hover:bg-purple-700' :
-                      day.isSunday && day.hasService ? (
-                        hoveredService === day.serviceData?.id ? 'bg-yellow-300 font-bold border border-yellow-500' : 'bg-green-100 font-medium cursor-pointer hover:bg-green-200'
-                      ) :
-                      day.isSunday ? 'bg-orange-100 font-medium' :
-                      'text-gray-600'
-                    }`}
-                    title={
-                      day?.isMainService ? `Next Service: ${day.serviceData?.displayDate}` :
-                      day?.serviceData?.notes ? `${day.serviceData?.notes}` :
-                      day?.isSunday && day?.hasService ? `Service on ${day.serviceData?.displayDate}` : ''
-                    }
-                    onClick={day?.hasService && isClient ? () => scrollToService(day.serviceData!.id) : undefined}
-                  >
-                    {day?.day || ''}
-                    {day?.isMainService && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[9px] text-purple-200 whitespace-nowrap font-semibold">
-                        NEXT
-                      </div>
-                    )}
-                  </div>
-                ))}
+            {/* Render 2 months */}
+            {calendarMonths.map((monthData, monthIndex) => (
+              <div key={monthIndex} className="mb-4">
+                <h2 className="text-xs font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">{monthData.monthName}</h2>
+                <div className="grid grid-cols-7 gap-1 text-xs">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                    <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400 py-1">
+                      {day}
+                    </div>
+                  ))}
+                  {monthData.days.map((day: any, index: number) => (
+                    <div
+                      key={index}
+                      className={`text-center py-1 rounded text-xs transition-colors relative ${
+                        !day ? '' :
+                        day.isMainService ? 'bg-purple-600 text-white font-bold cursor-pointer hover:bg-purple-700' :
+                        day.isSunday && day.hasService ? (
+                          hoveredService === day.serviceData?.id ? 'bg-yellow-300 font-bold border border-yellow-500' : 'bg-green-100 font-medium cursor-pointer hover:bg-green-200'
+                        ) :
+                        day.isSunday ? 'bg-orange-100 font-medium' :
+                        'text-gray-600'
+                      }`}
+                      title={
+                        day?.isMainService ? `Next Service: ${day.serviceData?.displayDate}` :
+                        day?.serviceData?.notes ? `${day.serviceData?.notes}` :
+                        day?.isSunday && day?.hasService ? `Service on ${day.serviceData?.displayDate}` : ''
+                      }
+                      onClick={day?.hasService && isClient ? () => scrollToService(day.serviceData!.id) : undefined}
+                    >
+                      {day?.day || ''}
+                      {day?.isMainService && (
+                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-[9px] text-purple-200 whitespace-nowrap font-semibold">
+                          NEXT
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
         </div>
@@ -1256,7 +1261,11 @@ export default function Home() {
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-6 lg:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
                 </svg>
-                Liturgist Services - {getMonthName(currentMonth, currentYear)}
+                Liturgist Services - {(() => {
+                  const month2 = (currentMonth + 1) % 12
+                  const year2 = currentMonth + 1 > 11 ? currentYear + 1 : currentYear
+                  return `${getMonthName(currentMonth, currentYear).split(' ')[0]} - ${getMonthName(month2, year2)}`
+                })()}
               </h2>
               {lastUpdated && (
                 <p className="text-[10px] sm:text-xs text-gray-500 ml-6 sm:ml-8 mt-0.5 sm:mt-1">

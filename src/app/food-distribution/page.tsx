@@ -102,22 +102,12 @@ const generateCalendarData = (signups: Signup[], month: number, year: number) =>
   }
 }
 
-// Get current month and year with 25th-of-month advance logic
+// Get current month and year
 const getCurrentMonthYear = () => {
   const now = new Date()
   const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
-  const day = pacificTime.getDate()
-  let month = pacificTime.getMonth()
-  let year = pacificTime.getFullYear()
-  
-  // On/after 25th, advance to next month
-  if (day >= 25) {
-    month++
-    if (month > 11) {
-      month = 0
-      year++
-    }
-  }
+  const month = pacificTime.getMonth()
+  const year = pacificTime.getFullYear()
   
   return { month, year }
 }
@@ -170,48 +160,51 @@ export default function FoodDistribution() {
   
   const fetchSignups = async () => {
     try {
-      const quarterString = getQuarterString(currentMonth, currentYear)
-      const response = await fetch(`/api/services?table=food&quarter=${quarterString}&t=${Date.now()}`, {
-        cache: 'no-store'
-      })
-      const data = await response.json()
+      // Fetch data for 2 months: current month and next month
+      const allSignups: any[] = []
       
-      if (data.success && data.services) {
-        // Filter to only show current month
-        const monthStart = new Date(currentYear, currentMonth, 1)
-        const monthEnd = new Date(currentYear, currentMonth + 1, 0)
-        const monthStartStr = monthStart.toISOString().split('T')[0]
-        const monthEndStr = monthEnd.toISOString().split('T')[0]
+      for (let i = 0; i < 2; i++) {
+        let targetMonth = currentMonth + i
+        let targetYear = currentYear
         
-        // Transform API data to our format and filter by month
-        const transformed = data.services
-          .filter((service: any) => service.date >= monthStartStr && service.date <= monthEndStr)
-          .map((service: any) => ({
-            date: service.date,
-            displayDate: service.displayDate,
-            volunteer1: service.volunteer1 || null,
-            volunteer2: service.volunteer2 || null,
-            volunteer3: service.volunteer3 || null,
-            volunteer4: service.volunteer4 || null
-          }))
+        if (targetMonth > 11) {
+          targetMonth -= 12
+          targetYear++
+        }
         
-        console.log('🔍 [FETCH] Raw API response:', JSON.stringify(data.services, null, 2))
-        console.log('🔍 [FETCH] Transformed data:', JSON.stringify(transformed, null, 2))
-        console.log('🔍 [FETCH] Current signups state BEFORE update:', JSON.stringify(signups, null, 2))
+        const quarterString = getQuarterString(targetMonth, targetYear)
+        const response = await fetch(`/api/services?table=food&quarter=${quarterString}&t=${Date.now()}`, {
+          cache: 'no-store'
+        })
+        const data = await response.json()
         
-        setSignups(transformed)
-        
-        // CRITICAL: Use setTimeout to ensure state updates are processed first
-        // This forces the key update to happen AFTER React processes the new signups
-        setTimeout(() => {
-          const newTimestamp = Date.now()
-          setLastUpdate(newTimestamp)
-          console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
-          console.log('📊 [FORCE UPDATE] New signups data:', transformed.length, 'records')
-          console.log('🔑 [FORCE UPDATE] New key timestamp:', newTimestamp)
-          console.log('🔍 [FORCE UPDATE] Transformed data that SHOULD be in state:', JSON.stringify(transformed, null, 2))
-        }, 0)
+        if (data.success && data.services) {
+          // Filter to target month only (Saturdays)
+          const filteredSignups = data.services.filter((service: any) => {
+            // Parse date string as YYYY-MM-DD to avoid timezone issues
+            const [year, month, day] = service.date.split('-').map(Number)
+            return month - 1 === targetMonth && year === targetYear
+          })
+          allSignups.push(...filteredSignups)
+        }
       }
+      
+      // Sort by date
+      allSignups.sort((a, b) => a.date.localeCompare(b.date))
+      
+      console.log('🔍 [FETCH] After fetching 2 months:', allSignups.length, 'food distribution events')
+      
+      setSignups(allSignups)
+      
+      // CRITICAL: Use setTimeout to ensure state updates are processed first
+      // This forces the key update to happen AFTER React processes the new signups
+      setTimeout(() => {
+        const newTimestamp = Date.now()
+        setLastUpdate(newTimestamp)
+        console.log('✅ [FORCE UPDATE] Triggered re-render at', new Date().toLocaleTimeString())
+        console.log('📊 [FORCE UPDATE] New signups data:', allSignups.length, 'records')
+        console.log('🔑 [FORCE UPDATE] New key timestamp:', newTimestamp)
+      }, 0)
     } catch (error) {
       console.error('Error fetching signups:', error)
       // Fall back to empty signups - API should provide the dates
@@ -470,8 +463,19 @@ export default function FoodDistribution() {
     }
   }
 
-  // Generate calendar data for current month
-  const calendarData = generateCalendarData(signups, currentMonth, currentYear)
+  // Generate calendar data for 2 months
+  const calendarMonths = []
+  for (let i = 0; i < 2; i++) {
+    let targetMonth = currentMonth + i
+    let targetYear = currentYear
+    
+    if (targetMonth > 11) {
+      targetMonth -= 12
+      targetYear++
+    }
+    
+    calendarMonths.push(generateCalendarData(signups, targetMonth, targetYear))
+  }
 
   return (
     <PasswordGate title="Food Distribution Signups" color="green">
@@ -493,7 +497,7 @@ export default function FoodDistribution() {
             </button>
             
             {/* Calendar */}
-            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 dark:border-gray-700 w-72 lg:w-80">
+            <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 dark:bg-gray-800 shadow-xl rounded-b-lg border-2 border-gray-200 dark:border-gray-700 dark:border-gray-700 dark:border-gray-700 w-72 lg:w-80 max-h-[calc(100vh-6rem)] overflow-y-auto">
               <div className="p-3 lg:p-4">
                 <div className="flex items-center justify-between mb-3 sticky top-0 bg-white dark:bg-gray-800 dark:bg-gray-800 dark:bg-gray-800 z-10 pb-2">
                   <div className="flex-1">
@@ -522,31 +526,37 @@ export default function FoodDistribution() {
                   </div>
                 </div>
               
-                <div className="grid grid-cols-7 gap-1 text-xs">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                    <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400 py-1">
-                      {day}
+                {/* Render 2 months */}
+                {calendarMonths.map((monthData, monthIndex) => (
+                  <div key={monthIndex} className="mb-4">
+                    <h2 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">{monthData.monthName}</h2>
+                    <div className="grid grid-cols-7 gap-1 text-xs">
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                        <div key={day} className="text-center font-medium text-gray-600 dark:text-gray-400 dark:text-gray-400 py-1">
+                          {day}
+                        </div>
+                      ))}
+                      {monthData.days.map((day: any, index: number) => (
+                        <div
+                          key={index}
+                          className={`text-center py-1 rounded text-xs transition-colors relative ${
+                            !day ? '' :
+                            day.isSaturday && day.hasSignup ? 'bg-green-100 font-medium' :
+                            day.isSaturday ? 'bg-orange-100 font-medium' :
+                            day.isToday ? 'bg-blue-100 font-bold' :
+                            'text-gray-600'
+                          }`}
+                          title={
+                            day?.isSaturday && day?.hasSignup ? `Food Distribution: ${day.signupData?.displayDate}` : 
+                            day?.isSaturday ? 'Food Distribution Day' : ''
+                          }
+                        >
+                          {day?.day || ''}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                  {calendarData.days.map((day, index) => (
-                    <div
-                      key={index}
-                      className={`text-center py-1 rounded text-xs transition-colors relative ${
-                        !day ? '' :
-                        day.isSaturday && day.hasSignup ? 'bg-green-100 font-medium' :
-                        day.isSaturday ? 'bg-orange-100 font-medium' :
-                        day.isToday ? 'bg-blue-100 font-bold' :
-                        'text-gray-600'
-                      }`}
-                      title={
-                        day?.isSaturday && day?.hasSignup ? `Food Distribution: ${day.signupData?.displayDate}` : 
-                        day?.isSaturday ? 'Food Distribution Day' : ''
-                      }
-                    >
-                      {day?.day || ''}
-                    </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -588,7 +598,11 @@ export default function FoodDistribution() {
               </button>
               
               <p className="text-sm md:text-lg text-gray-600 dark:text-gray-400 dark:text-gray-400 font-semibold min-w-[140px] md:min-w-[200px] text-center">
-                {getMonthName(currentMonth, currentYear).replace(' - Saturdays', '')}
+                {(() => {
+                  const month2 = (currentMonth + 1) % 12
+                  const year2 = currentMonth + 1 > 11 ? currentYear + 1 : currentYear
+                  return `${getMonthName(currentMonth, currentYear).split(' ')[0]} - ${getMonthName(month2, year2)}`
+                })()}
               </p>
               
               <button
