@@ -57,13 +57,16 @@ export function generateSignupEmail(data: {
 }) {
   const { name, email, phone, role, displayDate, notes, recordId, systemName = 'UUMC Liturgist Scheduling' } = data
   
-  // Check if this is food distribution or liturgist
+  // Check if this is food distribution, greeters, or liturgist
   const isFoodDistribution = systemName.includes('Food Distribution')
+  const isGreeters = systemName.includes('Greeter')
   
   // Determine role label based on service type
   let roleLabel = 'Liturgist'
   if (isFoodDistribution) {
     roleLabel = 'Food Distribution Volunteer'
+  } else if (isGreeters) {
+    roleLabel = 'Greeter'
   } else {
     const isBackup = role.toLowerCase() === 'backup'
     roleLabel = isBackup ? 'Backup Liturgist' : 'Liturgist'
@@ -223,7 +226,7 @@ export function generateSignupEmail(data: {
           <h1>${isBackup ? 'Backup ' : ''}Signup Confirmed</h1>
         </div>
         <div class="content">
-          <p class="message-text">${isFoodDistribution ? 'You signed up to volunteer at Saturday Food Distribution!' : (isBackup ? 'You signed up as backup liturgist!' : 'You signed up for liturgist service!')}</p>
+          <p class="message-text">${isFoodDistribution ? 'You signed up to volunteer at Saturday Food Distribution!' : isGreeters ? 'You signed up as a greeter!' : (isBackup ? 'You signed up as backup liturgist!' : 'You signed up for liturgist service!')}</p>
           
           <div class="info-box">
             <div class="info-row">
@@ -255,7 +258,7 @@ export function generateSignupEmail(data: {
           </div>
           
           <div class="button-container">
-            <a href="https://signups.ukiahumc.org${isFoodDistribution ? '/food-distribution' : '/liturgist'}" class="button">View or Change Your Signups</a>
+            <a href="https://signups.ukiahumc.org${isFoodDistribution ? '/food-distribution' : isGreeters ? '/greeters' : '/liturgists'}" class="button">View or Change Your Signups</a>
             <!-- <a href="https://signups.ukiahumc.org/api/signup?recordId=${recordId}&action=cancel" class="button cancel-button">Cancel This Signup</a> -->
           </div>
           
@@ -266,7 +269,7 @@ export function generateSignupEmail(data: {
         </div>
         <div class="footer-text">
           <strong>Ukiah United Methodist Church</strong><br/>
-          ${isFoodDistribution ? 'Food Distribution Volunteer System' : 'Liturgist Signup System'}
+          ${isFoodDistribution ? 'Food Distribution Volunteer System' : isGreeters ? 'Greeter Signup System' : 'Liturgist Signup System'}
         </div>
       </div>
     </body>
@@ -282,13 +285,16 @@ export function generateCancellationEmail(data: {
 }) {
   const { name, role, displayDate, systemName = 'UUMC Liturgist Scheduling' } = data
   
-  // Check if this is food distribution or liturgist
+  // Check if this is food distribution, greeters, or liturgist
   const isFoodDistribution = systemName.includes('Food Distribution')
+  const isGreeters = systemName.includes('Greeter')
   
   // Determine role label based on service type
   let roleLabel = 'Liturgist'
   if (isFoodDistribution) {
     roleLabel = 'Food Distribution Volunteer'
+  } else if (isGreeters) {
+    roleLabel = 'Greeter'
   } else {
     const isBackup = role.toLowerCase() === 'backup'
     const isSecondLiturgist = role.toLowerCase() === 'liturgist2'
@@ -441,7 +447,7 @@ export function generateCancellationEmail(data: {
           <h1>${isBackup ? 'Backup ' : ''}Signup Cancelled</h1>
         </div>
         <div class="content">
-          <p class="message-text">${isFoodDistribution ? 'You cancelled your Saturday Food Distribution volunteer signup.' : (isBackup ? 'You cancelled your backup liturgist signup.' : 'You cancelled your liturgist signup.')}</p>
+          <p class="message-text">${isFoodDistribution ? 'You cancelled your Saturday Food Distribution volunteer signup.' : isGreeters ? 'You cancelled your greeter signup.' : (isBackup ? 'You cancelled your backup liturgist signup.' : 'You cancelled your liturgist signup.')}</p>
           
           <div class="info-box">
             <div class="info-row">
@@ -469,7 +475,7 @@ export function generateCancellationEmail(data: {
         </div>
         <div class="footer-text">
           <strong>Ukiah United Methodist Church</strong><br/>
-          ${isFoodDistribution ? 'Food Distribution Volunteer System' : 'Liturgist Signup System'}
+          ${isFoodDistribution ? 'Food Distribution Volunteer System' : isGreeters ? 'Greeter Signup System' : 'Liturgist Signup System'}
         </div>
       </div>
     </body>

@@ -122,7 +122,8 @@ export async function POST(request: NextRequest) {
       // Send email notifications
       try {
         const isFoodDistribution = tableName === 'Food Distribution'
-        const systemName = isFoodDistribution ? 'UUMC Food Distribution' : 'UUMC Liturgist Scheduling'
+        const isGreeters = tableName === 'Greeters'
+        const systemName = isFoodDistribution ? 'UUMC Food Distribution' : isGreeters ? 'UUMC Greeter Scheduling' : 'UUMC Liturgist Scheduling'
         
         const emailHtml = generateSignupEmail({
           name: body.name,
@@ -354,6 +355,8 @@ export async function GET(request: NextRequest) {
           let roleLabel = ''
           if (isFoodDistribution) {
             roleLabel = 'Food Distribution Volunteer'
+          } else if (isGreeters) {
+            roleLabel = 'Greeter'
           } else {
             const isBackup = role === 'backup'
             const isSecondLiturgist = role === 'liturgist2'
@@ -377,8 +380,16 @@ export async function GET(request: NextRequest) {
             
             ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
             bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
+          } else if (isGreeters) {
+            // Greeters: Daphne is CC'd, Sam is BCC'd
+            const isDaphneCancelling = userEmail.toLowerCase() === 'daphnemacneil@yahoo.com'
+            const emailGoesToSam = userEmail.toLowerCase().includes('@samuelholley.com') || 
+                                    userEmail.toLowerCase() === 'sam@samuelholley.com'
+            
+            ccRecipients = isDaphneCancelling ? undefined : 'daphnemacneil@yahoo.com'
+            bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else {
-            // Liturgist: Sam is CC'd (not BCC'd), no Trudy
+            // Liturgist: Sam is CC'd (not BCC'd), no Trudy or Daphne
             ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
             bccRecipients = undefined
           }
@@ -727,6 +738,8 @@ export async function DELETE(request: NextRequest) {
           let roleLabel = ''
           if (isFoodDistribution) {
             roleLabel = 'Food Distribution Volunteer'
+          } else if (isGreeters) {
+            roleLabel = 'Greeter'
           } else {
             const role = userRole.toLowerCase().trim()
             const isBackup = role === 'backup'
@@ -750,8 +763,16 @@ export async function DELETE(request: NextRequest) {
             
             ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
             bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
+          } else if (isGreeters) {
+            // Greeters: Daphne is CC'd, Sam is BCC'd
+            const isDaphneCancelling = userEmail.toLowerCase() === 'daphnemacneil@yahoo.com'
+            const emailGoesToSam = userEmail.toLowerCase().includes('@samuelholley.com') || 
+                                    userEmail.toLowerCase() === 'sam@samuelholley.com'
+            
+            ccRecipients = isDaphneCancelling ? undefined : 'daphnemacneil@yahoo.com'
+            bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else {
-            // Liturgist & Greeter: Sam is CC'd (not BCC'd), no Trudy
+            // Liturgist: Sam is CC'd (not BCC'd), no Trudy or Daphne
             ccRecipients = isSamCancelling ? undefined : 'sam@samuelholley.com'
             bccRecipients = undefined
           }
