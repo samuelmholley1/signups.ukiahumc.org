@@ -144,7 +144,6 @@ export async function POST(request: NextRequest) {
         
         // Determine role label based on table type
         let roleLabel = ''
-        const isGreeters = tableName === 'Greeters'
         if (isFoodDistribution) {
           // Food distribution roles: volunteer1, volunteer2, volunteer3, volunteer4
           roleLabel = 'Food Distribution Volunteer'
