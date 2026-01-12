@@ -233,6 +233,7 @@ export default function FoodDistribution() {
       'Bonnie Reda': { email: 'bonireda@aol.com' },
       'Michele Robbins': { email: 'shalompastor3@gmail.com' },
       'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
+      'Bev Williams': { email: 'grandma3410@gmail.com' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
     
