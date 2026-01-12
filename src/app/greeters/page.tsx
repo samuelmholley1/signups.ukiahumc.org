@@ -774,11 +774,14 @@ export default function Greeters() {
                       className="w-full border rounded-lg px-3 py-2"
                     >
                       <option value="">-- Choose --</option>
+                      <option value="Annie Gould">Annie Gould</option>
+                      <option value="Chad Raugewitz">Chad Raugewitz</option>
+                      <option value="Daphne Macneil">Daphne Macneil</option>
+                      <option value="Diana Waddle">Diana Waddle</option>
+                      <option value="Julie Apostolu">Julie Apostolu</option>
                       <option value="Kay Lieberknecht">Kay Lieberknecht</option>
-                      <option value="Linda Nagel">Linda Nagel</option>
-                      <option value="Doug Pratt">Doug Pratt</option>
-                      <option value="Gwen Hardage-Vergeer">Gwen Hardage-Vergeer</option>
-                      <option value="Lori Bialkowsky">Lori Bialkowsky</option>
+                      <option value="Mike Webster">Mike Webster</option>
+                      <option value="Mikey Pitts">Mikey Pitts</option>
                       <option value="Samuel Holley">Samuel Holley</option>
                       <option value="Test User">Test User</option>
                       <option value="other">Other (not listed)</option>
