@@ -112,6 +112,26 @@ const getCurrentMonthYear = () => {
   return { month, year }
 }
 
+// Preset food distribution volunteer contact info - single source of truth
+const FOOD_DIST_PRESET_PEOPLE: { [key: string]: { email: string; phone?: string } } = {
+  'Marly Anderson': { email: 'mnanderson75@yahoo.com', phone: '707-272-8710' },
+  'Raul Chairez': { email: 'raulshealinghands3@gmail.com' },
+  'Don Damp': { email: 'donalddamp@gmail.com' },
+  'Edward Dick': { email: 'edwardpdick@gmail.com' },
+  'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
+  'Billy Jenne': { email: 'billyjenne2@gmail.com' },
+  'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
+  'Noreen McDonald': { email: 'norio@xmission.com', phone: '801-664-4626' },
+  'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
+  'Trudy Morgan': { email: 'morganmiller@pacific.net', phone: '707-367-0783' },
+  'Vicki Okey': { email: 'vokey123@gmail.com' },
+  'Bonnie Reda': { email: 'bonireda@aol.com' },
+  'Michele Robbins': { email: 'shalompastor3@gmail.com' },
+  'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
+  'Bev Williams': { email: 'grandma3410@gmail.com' },
+  'Test User': { email: 'sam+test@samuelholley.com' }
+}
+
 export default function FoodDistribution() {
   // Use dynamic month/year with 25th advance logic
   const initialMonthYear = getCurrentMonthYear()
@@ -217,31 +237,11 @@ export default function FoodDistribution() {
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
     
-    // Map of preset people with their contact info (alphabetized by last name)
-    const presetPeople: { [key: string]: { email: string; phone?: string } } = {
-      'Marly Anderson': { email: 'mnanderson75@yahoo.com', phone: '707-272-8710' },
-      'Raul Chairez': { email: 'raulshealinghands3@gmail.com' },
-      'Don Damp': { email: 'donalddamp@gmail.com' },
-      'Edward Dick': { email: 'edwardpdick@gmail.com' },
-      'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
-      'Billy Jenne': { email: 'billyjenne2@gmail.com' },
-      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
-      'Noreen McDonald': { email: 'norio@xmission.com', phone: '801-664-4626' },
-      'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
-      'Trudy Morgan': { email: 'morganmiller@pacific.net', phone: '707-367-0783' },
-      'Vicki Okey': { email: 'vokey123@gmail.com' },
-      'Bonnie Reda': { email: 'bonireda@aol.com' },
-      'Michele Robbins': { email: 'shalompastor3@gmail.com' },
-      'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
-      'Bev Williams': { email: 'grandma3410@gmail.com' },
-      'Test User': { email: 'sam+test@samuelholley.com' }
-    }
-    
-    if (presetPeople[personName]) {
+    if (FOOD_DIST_PRESET_PEOPLE[personName]) {
       setFormData(prev => ({
         ...prev,
-        email: presetPeople[personName].email,
-        phone: presetPeople[personName].phone || '',
+        email: FOOD_DIST_PRESET_PEOPLE[personName].email,
+        phone: FOOD_DIST_PRESET_PEOPLE[personName].phone || '',
         firstName: '',
         lastName: ''
       }))
@@ -947,21 +947,28 @@ export default function FoodDistribution() {
                       className="w-full border rounded-lg px-3 py-2"
                     >
                       <option value="">-- Choose --</option>
-                      <option value="Marly Anderson">Marly Anderson</option>
-                      <option value="Raul Chairez">Raul Chairez</option>
-                      <option value="Don Damp">Don Damp</option>
-                      <option value="Edward Dick">Edward Dick</option>
-                      <option value="Samuel Holley">Samuel Holley</option>
-                      <option value="Billy Jenne">Billy Jenne</option>
-                      <option value="Daphne Macneil">Daphne Macneil</option>
-                      <option value="Noreen McDonald">Noreen McDonald</option>
-                      <option value="Cathy McKeon">Cathy McKeon</option>
-                      <option value="Trudy Morgan">Trudy Morgan</option>
-                      <option value="Vicki Okey">Vicki Okey</option>
-                      <option value="Bonnie Reda">Bonnie Reda</option>
-                      <option value="Michele Robbins">Michele Robbins</option>
-                      <option value="Diana Waddle">Diana Waddle</option>
-                      <option value="Test User">Test User</option>
+                      {Object.keys(FOOD_DIST_PRESET_PEOPLE).sort().map(name => {
+                        const personEmail = FOOD_DIST_PRESET_PEOPLE[name].email.toLowerCase().trim()
+                        const currentSignup = signups.find(s => s.date === selectedDate)
+                        const busyEmails = [
+                          currentSignup?.volunteer1?.email,
+                          currentSignup?.volunteer2?.email,
+                          currentSignup?.volunteer3?.email,
+                          currentSignup?.volunteer4?.email
+                        ].filter(Boolean).map(e => e!.toLowerCase().trim())
+                        const isBusy = busyEmails.includes(personEmail)
+                        
+                        return (
+                          <option 
+                            key={name} 
+                            value={name}
+                            disabled={isBusy}
+                            style={isBusy ? { color: '#9ca3af', fontStyle: 'italic' } : {}}
+                          >
+                            {name}{isBusy ? ' (Already signed up for this shift)' : ''}
+                          </option>
+                        )
+                      })}
                       <option value="other">Other (not listed)</option>
                     </select>
                   </div>
