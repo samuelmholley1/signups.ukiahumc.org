@@ -271,7 +271,6 @@ export default function Greeters() {
       'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
       'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
       'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
-      'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
     
@@ -378,7 +377,6 @@ export default function Greeters() {
       'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
       'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
       'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
-      'Samuel Holley': { email: 'sam@samuelholley.com', phone: '714-496-7006' },
       'Test User': { email: 'sam+test@samuelholley.com' }
     }
     const ccEmail = formData.selectedPerson !== 'other' && presetPeople[formData.selectedPerson]?.ccEmail
@@ -782,7 +780,6 @@ export default function Greeters() {
                       <option value="Kay Lieberknecht">Kay Lieberknecht</option>
                       <option value="Mike Webster">Mike Webster</option>
                       <option value="Mikey Pitts">Mikey Pitts</option>
-                      <option value="Samuel Holley">Samuel Holley</option>
                       <option value="Test User">Test User</option>
                       <option value="other">Other (not listed)</option>
                     </select>
