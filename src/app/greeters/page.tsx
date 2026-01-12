@@ -133,6 +133,19 @@ const getCurrentMonthYear = () => {
   return { month, year }
 }
 
+// Preset greeter contact info - single source of truth
+const GREETER_PRESET_PEOPLE: { [key: string]: { email: string; phone?: string; ccEmail?: string } } = {
+  'Annie Gould': { email: 'annia@pacific.net', phone: '707-513-9634' },
+  'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
+  'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
+  'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
+  'Julie Apostolu': { email: 'forestlove@comcast.net', phone: '707-357-6035' },
+  'Kay Lieberknecht': { email: 'kay.hoofin.it@gmail.com', phone: '707-621-3662' },
+  'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
+  'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
+  'Test User': { email: 'sam+test@samuelholley.com' }
+}
+
 export default function Greeters() {
   // Use dynamic month/year - shows current month + next 2 months
   const initialMonthYear = getCurrentMonthYear()
@@ -261,24 +274,11 @@ export default function Greeters() {
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
     
-    // Map of preset people with their contact info
-    const presetPeople: { [key: string]: { email: string; phone?: string; ccEmail?: string } } = {
-      'Julie Apostolu': { email: 'forestlove@comcast.net', phone: '707-357-6035' },
-      'Kay Lieberknecht': { email: 'kay.hoofin.it@gmail.com', phone: '707-621-3662' },
-      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
-      'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
-      'Annie Gould': { email: 'annia@pacific.net', phone: '707-513-9634' },
-      'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
-      'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
-      'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
-      'Test User': { email: 'sam+test@samuelholley.com' }
-    }
-    
-    if (presetPeople[personName]) {
+    if (GREETER_PRESET_PEOPLE[personName]) {
       setFormData(prev => ({
         ...prev,
-        email: presetPeople[personName].email,
-        phone: presetPeople[personName].phone || '',
+        email: GREETER_PRESET_PEOPLE[personName].email,
+        phone: GREETER_PRESET_PEOPLE[personName].phone || '',
         firstName: '',
         lastName: ''
       }))
@@ -368,18 +368,7 @@ export default function Greeters() {
     setIsSubmitting(true)
     
     // Check if this person has a ccEmail (Chad Raugewitz)
-    const presetPeople: { [key: string]: { email: string; phone?: string; ccEmail?: string } } = {
-      'Julie Apostolu': { email: 'forestlove@comcast.net', phone: '707-357-6035' },
-      'Kay Lieberknecht': { email: 'kay.hoofin.it@gmail.com', phone: '707-621-3662' },
-      'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
-      'Diana Waddle': { email: 'waddlediana@yahoo.com', phone: '707-367-4732' },
-      'Annie Gould': { email: 'annia@pacific.net', phone: '707-513-9634' },
-      'Mikey Pitts': { email: 'mikeypitts@hotmail.com', phone: '206-707-3885' },
-      'Chad Raugewitz': { email: 'raugewitz@att.net', phone: '707-391-4920', ccEmail: 'craugewitz@uusd.net' },
-      'Mike Webster': { email: 'webster@pacific.net', phone: '707-513-8163' },
-      'Test User': { email: 'sam+test@samuelholley.com' }
-    }
-    const ccEmail = formData.selectedPerson !== 'other' && presetPeople[formData.selectedPerson]?.ccEmail
+    const ccEmail = formData.selectedPerson !== 'other' && GREETER_PRESET_PEOPLE[formData.selectedPerson]?.ccEmail
     
     try {
       const response = await fetch('/api/signup', {
@@ -772,15 +761,9 @@ export default function Greeters() {
                       className="w-full border rounded-lg px-3 py-2"
                     >
                       <option value="">-- Choose --</option>
-                      <option value="Annie Gould">Annie Gould</option>
-                      <option value="Chad Raugewitz">Chad Raugewitz</option>
-                      <option value="Daphne Macneil">Daphne Macneil</option>
-                      <option value="Diana Waddle">Diana Waddle</option>
-                      <option value="Julie Apostolu">Julie Apostolu</option>
-                      <option value="Kay Lieberknecht">Kay Lieberknecht</option>
-                      <option value="Mike Webster">Mike Webster</option>
-                      <option value="Mikey Pitts">Mikey Pitts</option>
-                      <option value="Test User">Test User</option>
+                      {Object.keys(GREETER_PRESET_PEOPLE).sort().map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
                       <option value="other">Other (not listed)</option>
                     </select>
                   </div>
