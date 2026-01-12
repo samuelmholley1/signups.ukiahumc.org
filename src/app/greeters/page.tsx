@@ -161,7 +161,6 @@ export default function Greeters() {
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
-  const [busyVolunteers, setBusyVolunteers] = useState<{ email: string; name: string; services: string[] }[]>([])
   const [formData, setFormData] = useState({
     selectedPerson: '',
     firstName: '',
@@ -271,27 +270,6 @@ export default function Greeters() {
     calendarMonths.push(generateCalendarData(signups, targetMonth, targetYear))
   }
   console.log('📅 Generated', calendarMonths.length, 'calendar months:', calendarMonths.map(m => m.monthName))
-
-  // Fetch busy volunteers when a date is selected
-  const fetchBusyVolunteers = async (date: string) => {
-    try {
-      const response = await fetch(`/api/busy-volunteers?date=${date}&t=${Date.now()}`, {
-        cache: 'no-store'
-      })
-      const data = await response.json()
-      
-      if (data.success && data.busyVolunteers) {
-        setBusyVolunteers(data.busyVolunteers)
-      } else {
-        // On error, don't block anyone
-        setBusyVolunteers([])
-      }
-    } catch (error) {
-      console.error('Error fetching busy volunteers:', error)
-      // On error, don't block anyone
-      setBusyVolunteers([])
-    }
-  }
 
   const handlePersonSelect = (personName: string) => {
     setFormData(prev => ({ ...prev, selectedPerson: personName }))
@@ -634,7 +612,6 @@ export default function Greeters() {
                                 onClick={() => {
                                   setSelectedDate(signup.date)
                                   setFormData({ ...formData, role: 'greeter1' })
-                                  fetchBusyVolunteers(signup.date)
                                 }}
                                 className="px-5 py-3 md:px-4 md:py-2 bg-purple-600 text-white hover:bg-purple-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                               >
@@ -668,7 +645,6 @@ export default function Greeters() {
                                 onClick={() => {
                                   setSelectedDate(signup.date)
                                   setFormData({ ...formData, role: 'greeter2' })
-                                  fetchBusyVolunteers(signup.date)
                                 }}
                                 className="px-5 py-3 md:px-4 md:py-2 bg-purple-600 text-white hover:bg-purple-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                               >
@@ -703,7 +679,6 @@ export default function Greeters() {
                                   onClick={() => {
                                     setSelectedDate(signup.date)
                                     setFormData({ ...formData, role: 'greeter3' })
-                                    fetchBusyVolunteers(signup.date)
                                   }}
                                   className="px-5 py-3 md:px-4 md:py-2 bg-purple-600 text-white hover:bg-purple-700 text-base md:text-sm min-h-[44px] rounded-full transition-colors font-medium"
                                 >
@@ -788,8 +763,13 @@ export default function Greeters() {
                       <option value="">-- Choose --</option>
                       {Object.keys(GREETER_PRESET_PEOPLE).sort().map(name => {
                         const personEmail = GREETER_PRESET_PEOPLE[name].email.toLowerCase().trim()
-                        const busyInfo = busyVolunteers.find(v => v.email === personEmail)
-                        const isBusy = !!busyInfo
+                        const currentSignup = signups.find(s => s.date === selectedDate)
+                        const busyEmails = [
+                          currentSignup?.greeter1?.email,
+                          currentSignup?.greeter2?.email,
+                          currentSignup?.greeter3?.email
+                        ].filter(Boolean).map(e => e!.toLowerCase().trim())
+                        const isBusy = busyEmails.includes(personEmail)
                         
                         return (
                           <option 
@@ -798,7 +778,7 @@ export default function Greeters() {
                             disabled={isBusy}
                             style={isBusy ? { color: '#9ca3af', fontStyle: 'italic' } : {}}
                           >
-                            {name}{isBusy ? ` (Already signed up: ${busyInfo.services.join(', ')})` : ''}
+                            {name}{isBusy ? ' (Already signed up for this shift)' : ''}
                           </option>
                         )
                       })}
