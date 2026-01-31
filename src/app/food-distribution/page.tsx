@@ -616,14 +616,16 @@ export default function FoodDistribution() {
                 <span className="text-lg md:text-xl">→</span>
               </button>
             </div>
-            <p className="text-xs md:text-sm text-gray-500 mb-2">Saturdays</p>
-            
-            {/* Show/Hide Past Dates Toggle */}
+            <p className="text-xs md:text-sm text-gray-500 mb-4">Saturdays</p>
+          </div>
+          
+          {/* Show/Hide Past Dates Toggle - Centered above table */}
+          <div className="flex justify-center mb-4">
             <button
               onClick={() => setShowPastDates(!showPastDates)}
-              className="text-xs md:text-sm text-green-600 hover:text-green-800 underline mb-2"
+              className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg border border-gray-300 transition-colors"
             >
-              {showPastDates ? 'Hide Previous Records' : 'Show Previous Records'}
+              {showPastDates ? '▲ Hide Previous Records' : '▼ Show Previous Records'}
             </button>
           </div>
 
