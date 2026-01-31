@@ -144,6 +144,7 @@ export default function FoodDistribution() {
   const [isCancelling, setIsCancelling] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(true) // Calendar widget state
+  const [showPastDates, setShowPastDates] = useState(false)
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -616,6 +617,14 @@ export default function FoodDistribution() {
               </button>
             </div>
             <p className="text-xs md:text-sm text-gray-500 mb-2">Saturdays</p>
+            
+            {/* Show/Hide Past Dates Toggle */}
+            <button
+              onClick={() => setShowPastDates(!showPastDates)}
+              className="text-xs md:text-sm text-green-600 hover:text-green-800 underline mb-2"
+            >
+              {showPastDates ? 'Hide Previous Records' : 'Show Previous Records'}
+            </button>
           </div>
 
           {loading ? (
@@ -634,44 +643,37 @@ export default function FoodDistribution() {
           ) : (
             <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl overflow-x-auto w-full md:w-auto md:mx-auto">
               <div>
+                {(() => {
+                  // Get today's date in Pacific Time
+                  const now = new Date()
+                  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+                  const todayString = pacificTime.toISOString().split('T')[0]
+                  
+                  // Filter signups based on showPastDates toggle
+                  const filteredSignups = showPastDates 
+                    ? signups 
+                    : signups.filter(s => s.date >= todayString)
+                  
+                  const shouldShowVol3 = filteredSignups.some(s => s.volunteer1 && s.volunteer2)
+                  const shouldShowVol4 = filteredSignups.some(s => s.volunteer3)
+                  
+                  return (
                 <table className="w-full md:w-auto" key={lastUpdate}>
                   <thead className="bg-green-600 text-white">
                     <tr>
                       <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold whitespace-nowrap text-sm md:text-base">Date</th>
                       <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base md:w-64">Volunteer #1</th>
                       <th className="px-2 md:px-4 py-3 md:py-4 text-center font-semibold text-sm md:text-base md:w-64">Volunteer #2</th>
-                      {(() => {
-                        const shouldShowVol3 = signups.some(s => s.volunteer1 && s.volunteer2)
-                        console.log('🔍 [VOL3 COLUMN CHECK]', {
-                          shouldShow: shouldShowVol3,
-                          signups: signups.map(s => ({
-                            date: s.displayDate,
-                            hasVol1: !!s.volunteer1,
-                            hasVol2: !!s.volunteer2,
-                            bothFilled: !!(s.volunteer1 && s.volunteer2)
-                          }))
-                        })
-                        return shouldShowVol3 ? (
+                      {shouldShowVol3 ? (
                           <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64 hidden lg:table-cell">Volunteer #3</th>
-                        ) : null
-                      })()}
-                      {(() => {
-                        const shouldShowVol4 = signups.some(s => s.volunteer3)
-                        console.log('🔍 [VOL4 COLUMN CHECK]', {
-                          shouldShow: shouldShowVol4,
-                          signups: signups.map(s => ({
-                            date: s.displayDate,
-                            hasVol3: !!s.volunteer3
-                          }))
-                        })
-                        return shouldShowVol4 ? (
+                        ) : null}
+                      {shouldShowVol4 ? (
                           <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64 hidden lg:table-cell">Volunteer #4</th>
-                        ) : null
-                      })()}
+                        ) : null}
                     </tr>
                   </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {signups.map((signup, index) => {
+                  {filteredSignups.map((signup, index) => {
                     const bothFilled = signup.volunteer1 && signup.volunteer2
                     const hasThirdVolunteer = signup.volunteer3
                     const hasFourthVolunteer = signup.volunteer4
@@ -913,6 +915,8 @@ export default function FoodDistribution() {
                   })}
                   </tbody>
                 </table>
+                  )
+                })()}
               </div>
             </div>
           )}

@@ -158,6 +158,7 @@ export default function Greeters() {
   const [isCancelling, setIsCancelling] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(true)
+  const [showPastDates, setShowPastDates] = useState(false)
   const [errorModal, setErrorModal] = useState<{ show: boolean; title: string; message: string }>({ show: false, title: '', message: '' })
   const [successModal, setSuccessModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' })
   const [cancelConfirmModal, setCancelConfirmModal] = useState<{ show: boolean; recordId: string; name: string; displayDate: string }>({ show: false, recordId: '', name: '', displayDate: '' })
@@ -555,6 +556,14 @@ export default function Greeters() {
               </button>
             </div>
             <p className="text-xs md:text-sm text-gray-500 mb-2">Sundays</p>
+            
+            {/* Show/Hide Past Dates Toggle */}
+            <button
+              onClick={() => setShowPastDates(!showPastDates)}
+              className="text-xs md:text-sm text-purple-600 hover:text-purple-800 underline mb-2"
+            >
+              {showPastDates ? 'Hide Previous Records' : 'Show Previous Records'}
+            </button>
           </div>
 
           {loading ? (
@@ -564,24 +573,35 @@ export default function Greeters() {
           ) : (
             <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden w-fit mx-auto">
               <div>
+                {(() => {
+                  // Get today's date in Pacific Time
+                  const now = new Date()
+                  const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+                  const todayString = pacificTime.toISOString().split('T')[0]
+                  
+                  // Filter signups based on showPastDates toggle
+                  const filteredSignups = showPastDates 
+                    ? signups 
+                    : signups.filter(s => s.date >= todayString)
+                  
+                  const hasGreeter3InFiltered = filteredSignups.some(s => s.greeter3)
+                  
+                  return (
                 <table className="w-auto" key={lastUpdate}>
                   <thead className="bg-purple-600 text-white">
                     <tr>
                       <th className="px-4 py-4 text-center font-semibold whitespace-nowrap text-base md:text-sm">Date</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Greeter #1</th>
                       <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Greeter #2</th>
-                      {(() => {
-                        const hasGreeter3 = signups.some(s => s.greeter3)
-                        return hasGreeter3 ? (
+                      {hasGreeter3InFiltered ? (
                           <th className="px-4 py-4 text-center font-semibold text-base md:text-sm w-64">Greeter #3</th>
-                        ) : null
-                      })()}
+                        ) : null}
                     </tr>
                   </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {signups.map((signup, index) => {
+                  {filteredSignups.map((signup, index) => {
                     const hasGreeter3 = signup.greeter3 !== undefined && signup.greeter3 !== null
-                    const showGreeter3Column = signups.some(s => s.greeter3)
+                    const showGreeter3Column = filteredSignups.some(s => s.greeter3)
                     return (
                       <tr key={signup.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                         <td className="px-4 py-4 font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 align-top whitespace-nowrap text-base">
@@ -693,6 +713,8 @@ export default function Greeters() {
                   })}
                 </tbody>
                 </table>
+                  )
+                })()}
               </div>
             </div>
           )}

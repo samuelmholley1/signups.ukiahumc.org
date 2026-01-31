@@ -131,6 +131,7 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(true)
+  const [showPastDates, setShowPastDates] = useState(false)
   
   // Use dynamic month/year with 25th advance logic
   const initialMonthYear = getCurrentMonthYear()
@@ -1295,6 +1296,14 @@ export default function Home() {
                 </svg>
               </button>
             </div>
+            
+            {/* Show/Hide Past Dates Toggle */}
+            <button
+              onClick={() => setShowPastDates(!showPastDates)}
+              className="text-xs md:text-sm text-purple-600 hover:text-purple-800 underline"
+            >
+              {showPastDates ? 'Hide Previous Records' : 'Show Previous Records'}
+            </button>
           </div>
           
           {/* Empty State */}
@@ -1309,7 +1318,18 @@ export default function Home() {
             </div>
           )}
           
-          <div className="space-y-2 sm:space-y-3">{services.map((service: Service) => {
+          <div className="space-y-2 sm:space-y-3">{(() => {
+              // Get today's date in Pacific Time
+              const now = new Date()
+              const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))
+              const todayString = pacificTime.toISOString().split('T')[0]
+              
+              // Filter services based on showPastDates toggle
+              const filteredServices = showPastDates 
+                ? services 
+                : services.filter(s => s.date >= todayString)
+              
+              return filteredServices.map((service: Service) => {
               const isMainService = service.date === mainServiceDate
               
               return (
@@ -1606,7 +1626,8 @@ export default function Home() {
                   )}
                 </div>
               )
-            })}
+            })
+            })()}
           </div>
         </div>
 
