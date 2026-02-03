@@ -123,7 +123,7 @@ const FOOD_DIST_PRESET_PEOPLE: { [key: string]: { email: string; phone?: string 
   'Daphne Macneil': { email: 'daphnemacneil@yahoo.com', phone: '707-972-8552' },
   'Noreen McDonald': { email: 'norio@xmission.com', phone: '801-664-4626' },
   'Cathy McKeon': { email: 'cmckeon999@comcast.net' },
-  'Trudy Morgan': { email: 'morganmiller@pacific.net', phone: '707-367-0783' },
+  'Trudy Morgan': { email: 'morganmiller95482@gmail.com', phone: '707-367-0783' },
   'Vicki Okey': { email: 'vokey123@gmail.com' },
   'Bonnie Reda': { email: 'bonireda@aol.com' },
   'Michele Robbins': { email: 'shalompastor3@gmail.com' },

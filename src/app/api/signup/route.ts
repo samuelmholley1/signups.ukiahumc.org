@@ -167,12 +167,12 @@ export async function POST(request: NextRequest) {
         if (isFoodDistribution) {
           // Food Distribution: Trudy is CC'd, Sam is BCC'd
           // Exception: If Trudy is signing up, no CC (she's already TO), Sam still BCC'd
-          const isTrudySigningUp = body.email.toLowerCase() === 'morganmiller@pacific.net'
+          const isTrudySigningUp = body.email.toLowerCase() === 'morganmiller95482@gmail.com'
           // Check if TO email goes to Sam (including aliases like sam+test@)
           const emailGoesToSam = body.email.toLowerCase().includes('@samuelholley.com') || 
                                   body.email.toLowerCase() === 'sam@samuelholley.com'
           
-          ccRecipients = isTrudySigningUp ? undefined : 'morganmiller@pacific.net'
+          ccRecipients = isTrudySigningUp ? undefined : 'morganmiller95482@gmail.com'
           bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
         } else if (isGreeters) {
           // Greeters: Daphne is CC'd, Sam is BCC'd
@@ -372,12 +372,12 @@ export async function GET(request: NextRequest) {
           if (isFoodDistribution) {
             // Food Distribution: Trudy is CC'd, Sam is BCC'd
             // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
-            const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller@pacific.net'
+            const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller95482@gmail.com'
             // Check if TO email goes to Sam (including aliases like sam+test@)
             const emailGoesToSam = userEmail.toLowerCase().includes('@samuelholley.com') || 
                                     userEmail.toLowerCase() === 'sam@samuelholley.com'
             
-            ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
+            ccRecipients = isTrudyCancelling ? undefined : 'morganmiller95482@gmail.com'
             bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else if (isGreeters) {
             // Greeters: Daphne is CC'd, Sam is BCC'd
@@ -755,12 +755,12 @@ export async function DELETE(request: NextRequest) {
           if (isFoodDistribution) {
             // Food Distribution: Trudy is CC'd, Sam is BCC'd
             // Exception: If Trudy is cancelling, no CC (she's already TO), Sam still BCC'd
-            const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller@pacific.net'
+            const isTrudyCancelling = userEmail.toLowerCase() === 'morganmiller95482@gmail.com'
             // Check if TO email goes to Sam (including aliases like sam+test@)
             const emailGoesToSam = userEmail.toLowerCase().includes('@samuelholley.com') || 
                                     userEmail.toLowerCase() === 'sam@samuelholley.com'
             
-            ccRecipients = isTrudyCancelling ? undefined : 'morganmiller@pacific.net'
+            ccRecipients = isTrudyCancelling ? undefined : 'morganmiller95482@gmail.com'
             bccRecipients = emailGoesToSam ? undefined : 'sam@samuelholley.com'
           } else if (isGreeters) {
             // Greeters: Daphne is CC'd, Sam is BCC'd
